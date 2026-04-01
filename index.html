@@ -663,14 +663,14 @@ body.light .sp-global-player,body.cream .sp-global-player,body.lavender .sp-glob
 
 /* Background Patterns - Improved visibility */
 .bg-pattern-none .content::before{display:none}
-.bg-pattern-dots .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:radial-gradient(circle,var(--accent) 1.5px,transparent 1.5px);background-size:28px 28px}
-.bg-pattern-cross .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.05;background-image:linear-gradient(0deg,var(--accent) 1px,transparent 1px),linear-gradient(90deg,var(--accent) 1px,transparent 1px);background-size:36px 36px}
-.bg-pattern-diagonal .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.05;background-image:repeating-linear-gradient(45deg,var(--accent) 0,var(--accent) 1px,transparent 1px,transparent 16px)}
-.bg-pattern-circles .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.04;background-image:radial-gradient(circle 3px,var(--accent) 50%,transparent 50%);background-size:48px 48px}
-.bg-pattern-zigzag .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.04;background:linear-gradient(135deg,var(--accent) 25%,transparent 25%) -28px 0,linear-gradient(225deg,var(--accent) 25%,transparent 25%) -28px 0,linear-gradient(315deg,var(--accent) 25%,transparent 25%),linear-gradient(45deg,var(--accent) 25%,transparent 25%);background-size:56px 56px}
-.bg-pattern-waves .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.04;background-image:radial-gradient(ellipse at center,var(--accent) 2px,transparent 2px);background-size:56px 56px;background-position:0 0,28px 28px}
-.bg-pattern-hex .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.04;background-color:var(--accent);background-image:linear-gradient(30deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%),linear-gradient(150deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%),linear-gradient(30deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%),linear-gradient(150deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%);background-size:48px 84px;background-position:0 0,0 0,24px 42px,24px 42px}
-.bg-pattern-stars .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.05;background-image:radial-gradient(2px 2px at 24px 36px,var(--accent),transparent),radial-gradient(2px 2px at 48px 84px,var(--accent),transparent),radial-gradient(1.5px 1.5px at 108px 48px,var(--accent),transparent),radial-gradient(1.5px 1.5px at 156px 96px,var(--accent),transparent),radial-gradient(2px 2px at 72px 12px,var(--accent),transparent);background-size:180px 120px;background-repeat:repeat}
+.bg-pattern-dots .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.08;background-image:radial-gradient(circle,var(--accent) 2px,transparent 2px);background-size:32px 32px}
+.bg-pattern-cross .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:linear-gradient(0deg,var(--accent) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--accent) 1.5px,transparent 1.5px);background-size:40px 40px}
+.bg-pattern-diagonal .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:repeating-linear-gradient(45deg,var(--accent) 0,var(--accent) 1.5px,transparent 1.5px,transparent 20px)}
+.bg-pattern-circles .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:radial-gradient(circle 4px,var(--accent) 50%,transparent 50%);background-size:56px 56px}
+.bg-pattern-zigzag .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background:linear-gradient(135deg,var(--accent) 25%,transparent 25%) -32px 0,linear-gradient(225deg,var(--accent) 25%,transparent 25%) -32px 0,linear-gradient(315deg,var(--accent) 25%,transparent 25%),linear-gradient(45deg,var(--accent) 25%,transparent 25%);background-size:64px 64px}
+.bg-pattern-waves .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:radial-gradient(ellipse at center,var(--accent) 3px,transparent 3px);background-size:64px 64px;background-position:0 0,32px 32px}
+.bg-pattern-hex .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-color:var(--accent);background-image:linear-gradient(30deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%),linear-gradient(150deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%),linear-gradient(30deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%),linear-gradient(150deg,transparent 40%,var(--accent) 40%,var(--accent) 60%,transparent 60%);background-size:56px 98px;background-position:0 0,0 0,28px 49px,28px 49px}
+.bg-pattern-stars .content::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.1;background-image:radial-gradient(2.5px 2.5px at 20px 30px,var(--accent),transparent),radial-gradient(2px 2px at 40px 70px,var(--accent),transparent),radial-gradient(3px 3px at 90px 40px,var(--accent),transparent),radial-gradient(2px 2px at 130px 80px,var(--accent),transparent),radial-gradient(2.5px 2.5px at 60px 10px,var(--accent),transparent),radial-gradient(1.5px 1.5px at 160px 50px,var(--accent),transparent),radial-gradient(2px 2px at 200px 20px,var(--accent),transparent);background-size:220px 100px;background-repeat:repeat}
 
 /* Create Modal - Modern Design */
 .create-modal{max-width:520px;width:95%;background:var(--surface);border:1px solid var(--border);border-radius:var(--card-radius);padding:24px;box-shadow:var(--shadow-lg);animation:modalPopIn .25s cubic-bezier(.34,1.4,.64,1)}
@@ -9725,6 +9725,13 @@ function AITab({toast,onTabSwitch,apiKeys,callAI,user,setProv,prov}) {
     if (callRecognitionRef.current) { try { callRecognitionRef.current.abort(); } catch(e) {} callRecognitionRef.current = null; }
   };
   
+  const interruptAI = () => {
+    window.speechSynthesis.cancel();
+    setCallSpeaking(false);
+    setCallListening(false);
+    startCallListening();
+  };
+  
   const speakCallText = (text) => {
     if (!text || !isCallMode) return;
     window.speechSynthesis.cancel();
@@ -10379,83 +10386,222 @@ $$[formula in LaTeX]$$
 
   // Call Mode UI
   if (isCallMode) {
+    // Filter to female voices
+    const femaleVoices = callVoices.filter(v => 
+      v.lang.startsWith('it') && /female|woman|samantha|alice|elena|silvia|giulia|chiara|valentina/i.test(v.name)
+    );
+    const allVoices = femaleVoices.length > 0 ? femaleVoices : callVoices.filter(v => v.lang.startsWith('it'));
+    
     return (
-      <div style={{position:'fixed',inset:0,zIndex:999999,background:'linear-gradient(180deg,#0a0a1a,#1a0a2e)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#fff'}}>
-        <div style={{position:'absolute',inset:0,overflow:'hidden',opacity:.15}}>
-          <div style={{position:'absolute',top:'20%',left:'30%',width:300,height:300,borderRadius:'50%',background:'radial-gradient(circle,#FF4D6D,transparent)',filter:'blur(80px)',animation:'pulse 3s infinite'}}/>
-          <div style={{position:'absolute',bottom:'20%',right:'30%',width:250,height:250,borderRadius:'50%',background:'radial-gradient(circle,#8B5CF6,transparent)',filter:'blur(80px)',animation:'pulse 4s infinite'}}/>
+      <div style={{position:'fixed',inset:0,zIndex:999999,background:'linear-gradient(180deg,#0a0a1a 0%,#1a0a2e 50%,#0a1a2e 100%)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#fff'}}>
+        <style>{`
+          @keyframes avatarPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.02)} }
+          @keyframes mouthSpeak { 0%,100%{ry:3;rx:6} 25%{ry:7;rx:8} 50%{ry:4;rx:5} 75%{ry:6;rx:7} }
+          @keyframes eyeBlink { 0%,90%,100%{ry:7} 95%{ry:1} }
+          @keyframes hairSway { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(2deg)} }
+          @keyframes glowPulse { 0%,100%{opacity:.3} 50%{opacity:.6} }
+          @keyframes bgFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+        `}</style>
+        
+        {/* Background particles */}
+        <div style={{position:'absolute',inset:0,overflow:'hidden'}}>
+          {[...Array(20)].map((_,i) => (
+            <div key={i} style={{
+              position:'absolute',
+              width: Math.random()*4+2,
+              height: Math.random()*4+2,
+              borderRadius:'50%',
+              background: `rgba(${Math.random()>0.5?'255,107,157':'139,92,246'},${Math.random()*0.3+0.1})`,
+              left: `${Math.random()*100}%`,
+              top: `${Math.random()*100}%`,
+              animation: `bgFloat ${Math.random()*4+3}s ease-in-out infinite`,
+              animationDelay: `${Math.random()*2}s`
+            }}/>
+          ))}
         </div>
         
-        {/* AI Avatar */}
-        <div style={{position:'relative',zIndex:10,marginBottom:20}}>
-          <div style={{width:160,height:160,borderRadius:'50%',background:'linear-gradient(135deg,#FF6B9D,#8B5CF6)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto',boxShadow:callSpeaking?'0 0 80px rgba(255,107,157,.6)':callListening?'0 0 80px rgba(6,214,160,.6)':'0 0 40px rgba(139,92,246,.3)',transition:'box-shadow .3s',overflow:'hidden',position:'relative'}}>
-            {/* AI Girl Avatar SVG */}
-            <svg viewBox="0 0 160 160" style={{width:140,height:140}}>
+        {/* AI Avatar - Realistic Girl */}
+        <div style={{position:'relative',zIndex:10,marginBottom:24,animation:'avatarPulse 3s ease-in-out infinite'}}>
+          <div style={{
+            width:200,height:200,borderRadius:'50%',
+            background:'linear-gradient(135deg,#FF6B9D 0%,#8B5CF6 50%,#06B6D4 100%)',
+            display:'flex',alignItems:'center',justifyContent:'center',
+            margin:'0 auto',
+            boxShadow:callSpeaking?'0 0 100px rgba(255,107,157,.5), 0 0 200px rgba(255,107,157,.2)':callListening?'0 0 100px rgba(6,214,160,.5), 0 0 200px rgba(6,214,160,.2)':'0 0 60px rgba(139,92,246,.3)',
+            transition:'box-shadow .5s',
+            overflow:'hidden',position:'relative'
+          }}>
+            {/* Realistic AI Girl SVG */}
+            <svg viewBox="0 0 200 200" style={{width:180,height:180}}>
               <defs>
-                <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#8B5CF6"/>
-                  <stop offset="100%" stopColor="#FF6B9D"/>
+                <linearGradient id="hairGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#2D1B69"/>
+                  <stop offset="40%" stopColor="#4A2C8A"/>
+                  <stop offset="100%" stopColor="#8B5CF6"/>
                 </linearGradient>
-                <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FFE0BD"/>
-                  <stop offset="100%" stopColor="#FFD1A8"/>
+                <linearGradient id="skinGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FFE8D6"/>
+                  <stop offset="50%" stopColor="#FFDAB9"/>
+                  <stop offset="100%" stopColor="#FFCBA4"/>
                 </linearGradient>
+                <linearGradient id="lipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FF6B8A"/>
+                  <stop offset="100%" stopColor="#FF4D6D"/>
+                </linearGradient>
+                <radialGradient id="eyeGrad" cx="50%" cy="40%">
+                  <stop offset="0%" stopColor="#4A90D9"/>
+                  <stop offset="60%" stopColor="#2D5F8A"/>
+                  <stop offset="100%" stopColor="#1A3A5C"/>
+                </radialGradient>
+                <filter id="softShadow">
+                  <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000" floodOpacity="0.3"/>
+                </filter>
               </defs>
-              {/* Hair */}
-              <ellipse cx="80" cy="65" rx="55" ry="50" fill="url(#hairGrad)"/>
+              
+              {/* Neck */}
+              <rect x="85" y="130" width="30" height="30" rx="10" fill="url(#skinGrad2)"/>
+              
+              {/* Shoulders/Body */}
+              <path d="M55 155 Q100 140 145 155 L160 200 L40 200 Z" fill="linear-gradient(#8B5CF6,#FF6B9D)" style={{fill:'url(#hairGrad2)'}}/>
+              <path d="M60 158 Q100 148 140 158 L150 200 L50 200 Z" fill="#FF6B9D" opacity="0.8"/>
+              
+              {/* Hair back */}
+              <ellipse cx="100" cy="75" rx="65" ry="60" fill="url(#hairGrad2)"/>
+              <path d="M35 80 Q30 130 45 160 Q50 140 55 100 Z" fill="url(#hairGrad2)"/>
+              <path d="M165 80 Q170 130 155 160 Q150 140 145 100 Z" fill="url(#hairGrad2)"/>
+              
               {/* Face */}
-              <ellipse cx="80" cy="72" rx="38" ry="42" fill="url(#skinGrad)"/>
+              <ellipse cx="100" cy="85" rx="45" ry="50" fill="url(#skinGrad2)" filter="url(#softShadow)"/>
+              
+              {/* Hair front/bangs */}
+              <path d="M55 65 Q70 35 100 40 Q130 35 145 65 Q135 50 100 48 Q65 50 55 65 Z" fill="url(#hairGrad2)"/>
+              <path d="M55 65 Q58 55 70 50 Q65 60 60 70 Z" fill="url(#hairGrad2)"/>
+              <path d="M145 65 Q142 55 130 50 Q135 60 140 70 Z" fill="url(#hairGrad2)"/>
+              
+              {/* Eyebrows */}
+              <path d="M72 62 Q80 58 88 62" stroke="#2D1B69" strokeWidth="2" fill="none" strokeLinecap="round"/>
+              <path d="M112 62 Q120 58 128 62" stroke="#2D1B69" strokeWidth="2" fill="none" strokeLinecap="round"/>
+              
               {/* Eyes */}
-              <ellipse cx="65" cy="68" rx="6" ry="7" fill="#2D1B69"/>
-              <ellipse cx="95" cy="68" rx="6" ry="7" fill="#2D1B69"/>
-              <circle cx="67" cy="66" r="2" fill="white"/>
-              <circle cx="97" cy="66" r="2" fill="white"/>
-              {/* Mouth - animated when speaking */}
-              <ellipse cx="80" cy={callSpeaking?88:85} rx={callSpeaking?8:6} ry={callSpeaking?6:3} fill="#FF6B9D" style={{transition:'all .2s'}}/>
+              <g style={{animation:'eyeBlink 4s ease-in-out infinite'}}>
+                <ellipse cx="80" cy="78" rx="10" ry="11" fill="white"/>
+                <ellipse cx="120" cy="78" rx="10" ry="11" fill="white"/>
+                <ellipse cx="82" cy="78" rx="7" ry="8" fill="url(#eyeGrad)"/>
+                <ellipse cx="122" cy="78" rx="7" ry="8" fill="url(#eyeGrad)"/>
+                <circle cx="84" cy="75" r="3" fill="white" opacity="0.8"/>
+                <circle cx="124" cy="75" r="3" fill="white" opacity="0.8"/>
+                <circle cx="80" cy="80" r="1.5" fill="white" opacity="0.5"/>
+                <circle cx="120" cy="80" r="1.5" fill="white" opacity="0.5"/>
+              </g>
+              
+              {/* Eyelashes */}
+              <path d="M70 72 Q72 68 75 70" stroke="#2D1B69" strokeWidth="1.5" fill="none"/>
+              <path d="M130 72 Q128 68 125 70" stroke="#2D1B69" strokeWidth="1.5" fill="none"/>
+              
+              {/* Nose */}
+              <path d="M98 88 Q100 95 102 88" stroke="#E8B89D" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+              
+              {/* Lips */}
+              <g>
+                <path d="M85 100 Q92 96 100 98 Q108 96 115 100 Q108 108 100 110 Q92 108 85 100 Z" fill="url(#lipGrad)"/>
+                <path d="M85 100 Q92 97 100 99 Q108 97 115 100" stroke="#FF4D6D" strokeWidth="0.5" fill="none"/>
+                {/* Mouth animation when speaking */}
+                {callSpeaking && (
+                  <ellipse cx="100" cy="104" rx="8" ry="5" fill="#CC3355" style={{animation:'mouthSpeak 0.3s ease-in-out infinite'}}/>
+                )}
+              </g>
+              
               {/* Blush */}
-              <circle cx="55" cy="80" r="8" fill="rgba(255,107,157,.3)"/>
-              <circle cx="105" cy="80" r="8" fill="rgba(255,107,157,.3)"/>
-              {/* Hair bangs */}
-              <path d="M30 55 Q50 30 80 35 Q110 30 130 55" fill="url(#hairGrad)" stroke="none"/>
-              {/* Body */}
-              <path d="M50 110 Q80 100 110 110 L120 160 L40 160 Z" fill="url(#hairGrad)"/>
+              <ellipse cx="68" cy="92" rx="10" ry="6" fill="rgba(255,150,150,0.3)"/>
+              <ellipse cx="132" cy="92" rx="10" ry="6" fill="rgba(255,150,150,0.3)"/>
+              
+              {/* Earrings */}
+              <circle cx="55" cy="90" r="3" fill="#FFD700" opacity="0.8"/>
+              <circle cx="145" cy="90" r="3" fill="#FFD700" opacity="0.8"/>
             </svg>
-            {/* Speaking animation rings */}
+            
+            {/* Speaking rings */}
             {callSpeaking && (
               <>
-                <div style={{position:'absolute',inset:-10,borderRadius:'50%',border:'2px solid rgba(255,107,157,.3)',animation:'pulse 1.5s infinite'}}/>
-                <div style={{position:'absolute',inset:-20,borderRadius:'50%',border:'2px solid rgba(255,107,157,.15)',animation:'pulse 2s infinite'}}/>
+                <div style={{position:'absolute',inset:-15,borderRadius:'50%',border:'2px solid rgba(255,107,157,.25)',animation:'pulse 1.5s infinite'}}/>
+                <div style={{position:'absolute',inset:-30,borderRadius:'50%',border:'2px solid rgba(255,107,157,.12)',animation:'pulse 2s infinite'}}/>
+                <div style={{position:'absolute',inset:-45,borderRadius:'50%',border:'1px solid rgba(255,107,157,.06)',animation:'pulse 2.5s infinite'}}/>
               </>
             )}
-            {/* Listening animation */}
+            {/* Listening rings */}
             {callListening && (
               <>
-                <div style={{position:'absolute',inset:-10,borderRadius:'50%',border:'2px solid rgba(6,214,160,.3)',animation:'pulse 1s infinite'}}/>
-                <div style={{position:'absolute',inset:-20,borderRadius:'50%',border:'2px solid rgba(6,214,160,.15)',animation:'pulse 1.5s infinite'}}/>
+                <div style={{position:'absolute',inset:-15,borderRadius:'50%',border:'2px solid rgba(6,214,160,.25)',animation:'pulse 1s infinite'}}/>
+                <div style={{position:'absolute',inset:-30,borderRadius:'50%',border:'2px solid rgba(6,214,160,.12)',animation:'pulse 1.5s infinite'}}/>
               </>
             )}
           </div>
         </div>
         
-        <div style={{position:'relative',zIndex:10,textAlign:'center',marginBottom:20}}>
-          <div style={{fontSize:'1.3rem',fontWeight:700,marginBottom:4}}>Marco AI</div>
-          <div style={{fontSize:'.85rem',color:'rgba(255,255,255,.6)'}}>{callSpeaking?'🔊 Parlando...':callListening?'🎤 Ascoltando...':'In chiamata'}</div>
-          <div style={{fontSize:'.75rem',color:'rgba(255,255,255,.4)',marginTop:8}}>{formatCallDuration(callDuration)}</div>
+        <div style={{position:'relative',zIndex:10,textAlign:'center',marginBottom:16}}>
+          <div style={{fontSize:'1.4rem',fontWeight:700,marginBottom:4,background:'linear-gradient(135deg,#FF6B9D,#8B5CF6)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>Marco AI</div>
+          <div style={{fontSize:'.85rem',color:'rgba(255,255,255,.6)'}}>
+            {callSpeaking ? (
+              <span style={{color:'#FF6B9D'}}>🔊 Parlando...</span>
+            ) : callListening ? (
+              <span style={{color:'#06D6A0'}}>🎤 Ascoltando...</span>
+            ) : (
+              <span>In chiamata</span>
+            )}
+          </div>
+          <div style={{fontSize:'.75rem',color:'rgba(255,255,255,.4)',marginTop:4,fontFamily:'monospace'}}>{formatCallDuration(callDuration)}</div>
         </div>
-        <div style={{position:'relative',zIndex:10,marginBottom:20}}>
+        
+        {/* Voice selector with female filter */}
+        <div style={{position:'relative',zIndex:10,marginBottom:16}}>
           <select value={selectedCallVoice} onChange={e=>setSelectedCallVoice(e.target.value)} style={{background:'rgba(255,255,255,.1)',border:'1px solid rgba(255,255,255,.2)',borderRadius:10,padding:'8px 16px',color:'#fff',fontSize:'.82rem',cursor:'pointer'}}>
-            {callVoices.map((v,i) => <option key={i} value={i} style={{background:'#1a1a2e'}}>{v.name} ({v.lang})</option>)}
+            {allVoices.length > 0 ? allVoices.map((v,i) => (
+              <option key={i} value={callVoices.indexOf(v)} style={{background:'#1a1a2e'}}>
+                {v.name} ({v.lang}) {femaleVoices.includes(v) ? '👩' : ''}
+              </option>
+            )) : callVoices.map((v,i) => (
+              <option key={i} value={i} style={{background:'#1a1a2e'}}>{v.name} ({v.lang})</option>
+            ))}
           </select>
         </div>
-        <div style={{position:'relative',zIndex:10,width:'90%',maxWidth:500,maxHeight:150,overflowY:'auto',padding:'0 16px',marginBottom:30}}>
+        
+        {/* Messages */}
+        <div style={{position:'relative',zIndex:10,width:'90%',maxWidth:500,maxHeight:150,overflowY:'auto',padding:'0 16px',marginBottom:24}}>
           {callMessages.slice(-5).map((m,i)=>(
-            <div key={i} style={{textAlign:m.role==='user'?'right':'left',marginBottom:8}}>
+            <div key={i} style={{textAlign:m.role==='user'?'right':'left',marginBottom:8,animation:'fadeSlideUp .3s ease'}}>
               <div style={{display:'inline-block',padding:'8px 14px',borderRadius:16,background:m.role==='user'?'rgba(255,77,109,.2)':'rgba(139,92,246,.2)',border:`1px solid ${m.role==='user'?'rgba(255,77,109,.3)':'rgba(139,92,246,.3)'}`,fontSize:'.85rem',maxWidth:'80%'}}>{m.text}</div>
             </div>
           ))}
         </div>
-        <button onClick={endCallMode} style={{position:'relative',zIndex:10,width:70,height:70,borderRadius:'50%',background:'#FF4D6D',border:'none',cursor:'pointer',fontSize:'1.5rem',color:'#fff',boxShadow:'0 4px 20px rgba(255,77,109,.4)',transition:'all .2s'}} onMouseEnter={e=>e.target.style.transform='scale(1.1)'} onMouseLeave={e=>e.target.style.transform='scale(1)'}>📵</button>
-        <div style={{position:'relative',zIndex:10,fontSize:'.75rem',color:'rgba(255,255,255,.4)',marginTop:8}}>Tocca per chiudere</div>
+        
+        {/* Control buttons */}
+        <div style={{position:'relative',zIndex:10,display:'flex',gap:16,alignItems:'center'}}>
+          {/* Interrupt button */}
+          <button onClick={interruptAI} disabled={!callSpeaking} style={{
+            width:56,height:56,borderRadius:'50%',
+            background:callSpeaking?'rgba(251,191,36,.3)':'rgba(255,255,255,.1)',
+            border:callSpeaking?'2px solid rgba(251,191,36,.5)':'2px solid rgba(255,255,255,.1)',
+            cursor:callSpeaking?'pointer':'not-allowed',
+            fontSize:'1.3rem',color:callSpeaking?'#FBBF24':'rgba(255,255,255,.3)',
+            transition:'all .2s',opacity:callSpeaking?1:0.5
+          }} title="Interrompi AI">
+            ✋
+          </button>
+          
+          {/* End call */}
+          <button onClick={endCallMode} style={{
+            width:70,height:70,borderRadius:'50%',
+            background:'#FF4D6D',border:'none',cursor:'pointer',
+            fontSize:'1.5rem',color:'#fff',
+            boxShadow:'0 4px 20px rgba(255,77,109,.4)',
+            transition:'all .2s'
+          }} onMouseEnter={e=>e.target.style.transform='scale(1.1)'} onMouseLeave={e=>e.target.style.transform='scale(1)'}>
+            📵
+          </button>
+        </div>
+        <div style={{position:'relative',zIndex:10,fontSize:'.7rem',color:'rgba(255,255,255,.3)',marginTop:12}}>
+          {callSpeaking ? '✋ Tocca per interrompere' : '📵 Tocca per chiudere'}
+        </div>
       </div>
     );
   }
@@ -13420,45 +13566,56 @@ function YouTubeTab({toast}) {
     setTwitchSearchLoading(true);
     setTwitchSearchResults([]);
     try {
-      // Use decapi.me for Twitch channel search
-      const r = await fetch(`https://decapi.me/twitch/search/${encodeURIComponent(query)}`);
-      const text = await r.text();
-      if (text && text !== 'No channels found') {
-        const lines = text.split('\n').slice(0, 12);
-        const channels = lines.map(line => {
-          const parts = line.split(' - ');
-          const name = parts[0]?.trim() || '';
-          return {
-            login: name.toLowerCase().replace(/\s+/g,''),
-            display_name: name,
-            description: parts.slice(1).join(' - ').trim() || 'Canale Twitch',
-            profile_image_url: '',
-            is_live: false,
-            viewers: 0
-          };
-        }).filter(ch => ch.login);
-        setTwitchSearchResults(channels);
-        if (channels.length === 0) toast('Nessun canale trovato', 'var(--yellow)');
-      } else {
-        // Fallback: try known popular Twitch channels
-        const popular = ['ninjasinh', 'pokimane', 'shroud', 'xqcow', 'summit1g', 'lirik', 'timthetatman', 'ninja', 'tfue', 'c9sneaky'];
-        const filtered = popular.filter(p => p.includes(query.toLowerCase()));
-        if (filtered.length > 0) {
-          setTwitchSearchResults(filtered.map(name => ({
-            login: name,
-            display_name: name.charAt(0).toUpperCase() + name.slice(1),
-            description: 'Canale Twitch popolare',
-            profile_image_url: '',
-            is_live: false,
-            viewers: 0
-          })));
-        } else {
-          toast('Nessun risultato trovato', 'var(--yellow)');
+      // Use Twitch Helix API via proxy (no key needed for basic search)
+      const r = await fetch(`https://twitch-search.vercel.app/search?query=${encodeURIComponent(query)}`);
+      const data = await r.json();
+      if (data && data.length > 0) {
+        const channels = data.slice(0, 12).map(ch => ({
+          login: ch.login || ch.name?.toLowerCase() || '',
+          display_name: ch.display_name || ch.name || ch.login || '',
+          description: ch.description || ch.title || 'Canale Twitch',
+          profile_image_url: ch.profile_image_url || ch.avatar || '',
+          is_live: ch.is_live || ch.live || false,
+          viewers: ch.viewers_count || ch.viewers || 0
+        })).filter(ch => ch.login);
+        if (channels.length > 0) {
+          setTwitchSearchResults(channels);
+          setTwitchSearchLoading(false);
+          return;
         }
       }
-    } catch(e) {
-      toast('Errore ricerca Twitch', 'var(--red)');
-    }
+    } catch(e) {}
+    try {
+      // Fallback: use YouTube API to find Twitch streamers
+      const ytR = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${encodeURIComponent(query+' twitch')}&type=channel&key=${YT_KEY}`);
+      const ytD = await ytR.json();
+      if (ytD.items && ytD.items.length > 0) {
+        const channels = ytD.items.slice(0, 10).map(ch => ({
+          login: ch.snippet.title.toLowerCase().replace(/\s+/g,'').replace(/twitch/g,''),
+          display_name: ch.snippet.title,
+          description: 'YouTube Channel',
+          profile_image_url: ch.snippet.thumbnails?.default?.url || '',
+          is_live: false,
+          viewers: 0
+        }));
+        setTwitchSearchResults(channels);
+        setTwitchSearchLoading(false);
+        return;
+      }
+    } catch(e) {}
+    // Final fallback: show popular channels
+    const popular = [
+      {login:'xqcow',display_name:'xQc',description:'Variety Streamer',is_live:false},
+      {login:'shroud',display_name:'shroud',description:'FPS Pro',is_live:false},
+      {login:'summit1g',display_name:'summit1g',description:'Variety Gamer',is_live:false},
+      {login:'lirik',display_name:'LIRIK',description:'Variety Streamer',is_live:false},
+      {login:'pokimane',display_name:'Pokimane',description:'Variety Streamer',is_live:false},
+      {login:'ninja',display_name:'Ninja',description:'Pro Gamer',is_live:false},
+      {login:'timthetatman',display_name:'TimTheTatman',description:'Variety Gamer',is_live:false},
+      {login:'c9sneaky',display_name:'Sneaky',description:'League of Legends',is_live:false},
+    ];
+    const filtered = query.length > 2 ? popular.filter(p => p.display_name.toLowerCase().includes(query.toLowerCase())) : popular;
+    setTwitchSearchResults(filtered);
     setTwitchSearchLoading(false);
   };
 
@@ -14265,10 +14422,11 @@ function SnakeGame({onBack, level, onWin, toast}) {
   const [dir, setDir] = useState({x:1,y:0});
   const [running, setRunning] = useState(false);
   const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(() => parseInt(localStorage.getItem('lmv_snake_hs') || '0'));
   const dirRef = useRef(dir);
   dirRef.current = dir;
   
-  const speed = Math.max(80, 200 - level * 20);
+  const speed = Math.max(60, 180 - level * 15);
   
   useEffect(() => {
     if (!running) return;
@@ -14278,11 +14436,13 @@ function SnakeGame({onBack, level, onWin, toast}) {
         const newHead = {x: head.x + dirRef.current.x, y: head.y + dirRef.current.y};
         if (newHead.x < 0 || newHead.x >= gridSize || newHead.y < 0 || newHead.y >= gridSize) {
           setRunning(false);
+          if (score > highScore) { setHighScore(score); localStorage.setItem('lmv_snake_hs', score.toString()); }
           toast('Game Over! Punteggio: ' + score, 'var(--red)');
           return prev;
         }
         if (prev.some(s => s.x === newHead.x && s.y === newHead.y)) {
           setRunning(false);
+          if (score > highScore) { setHighScore(score); localStorage.setItem('lmv_snake_hs', score.toString()); }
           toast('Game Over! Punteggio: ' + score, 'var(--red)');
           return prev;
         }
@@ -14297,15 +14457,15 @@ function SnakeGame({onBack, level, onWin, toast}) {
       });
     }, speed);
     return () => clearInterval(iv);
-  }, [running, food, score, speed, toast]);
+  }, [running, food, score, speed, toast, highScore]);
   
   useEffect(() => {
     const handler = (e) => {
       const d = dirRef.current;
-      if (e.key === 'ArrowUp' && d.y !== 1) setDir({x:0,y:-1});
-      else if (e.key === 'ArrowDown' && d.y !== -1) setDir({x:0,y:1});
-      else if (e.key === 'ArrowLeft' && d.x !== 1) setDir({x:-1,y:0});
-      else if (e.key === 'ArrowRight' && d.x !== -1) setDir({x:1,y:0});
+      if (e.key === 'ArrowUp' && d.y !== 1) { e.preventDefault(); setDir({x:0,y:-1}); }
+      else if (e.key === 'ArrowDown' && d.y !== -1) { e.preventDefault(); setDir({x:0,y:1}); }
+      else if (e.key === 'ArrowLeft' && d.x !== 1) { e.preventDefault(); setDir({x:-1,y:0}); }
+      else if (e.key === 'ArrowRight' && d.x !== -1) { e.preventDefault(); setDir({x:1,y:0}); }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -14313,36 +14473,47 @@ function SnakeGame({onBack, level, onWin, toast}) {
   
   const resetGame = () => { setSnake([{x:10,y:10}]); setFood({x:15,y:10}); setDir({x:1,y:0}); setScore(0); setRunning(true); };
   
+  const boardSize = Math.min(480, window.innerWidth - 60);
+  
   return (
     <div style={{padding:'0 16px 100px'}}>
       <div className="sh" style={{marginBottom:16}}>
         <button className="ib" onClick={onBack}>← Indietro</button>
         <div style={{fontWeight:600}}>🐍 Snake - Livello {level}</div>
       </div>
-      <div style={{textAlign:'center',marginBottom:12}}>
-        <span style={{fontSize:'.85rem',color:'var(--text2)'}}>Punteggio: <strong style={{color:'var(--accent)'}}>{score}</strong></span>
-        <span style={{fontSize:'.75rem',color:'var(--text2)',marginLeft:16}}>Velocità: {Math.round((200-speed)/200*100)}%</span>
+      <div style={{display:'flex',justifyContent:'center',gap:24,marginBottom:16,fontSize:'.85rem'}}>
+        <span>Punteggio: <strong style={{color:'var(--accent)'}}>{score}</strong></span>
+        <span>Record: <strong style={{color:'var(--yellow)'}}>{highScore}</strong></span>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:`repeat(${gridSize},1fr)`,gap:1,background:'rgba(255,255,255,.05)',borderRadius:12,padding:4,maxWidth:400,margin:'0 auto',aspectRatio:'1'}}>
+      <div style={{display:'grid',gridTemplateColumns:`repeat(${gridSize},1fr)`,gap:1,background:'rgba(0,0,0,.3)',borderRadius:16,padding:6,maxWidth:boardSize,margin:'0 auto',aspectRatio:'1',boxShadow:'0 8px 32px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05)',border:'2px solid rgba(255,255,255,.1)'}}>
         {Array(gridSize*gridSize).fill(null).map((_,i) => {
           const x = i % gridSize, y = Math.floor(i / gridSize);
           const isSnake = snake.some(s => s.x === x && s.y === y);
           const isHead = snake[0]?.x === x && snake[0]?.y === y;
           const isFood = food.x === x && food.y === y;
-          return <div key={i} style={{background:isHead?'var(--accent)':isSnake?'rgba(6,214,160,.6)':isFood?'var(--red)':'rgba(255,255,255,.02)',borderRadius:isFood?'50%':'3px',transition:'background .1s'}}/>;
+          const snakeIdx = snake.findIndex(s => s.x === x && s.y === y);
+          const snakeOpacity = isSnake ? 1 - (snakeIdx / snake.length) * 0.5 : 0;
+          return (
+            <div key={i} style={{
+              background: isHead ? '#06D6A0' : isSnake ? `rgba(6,214,160,${Math.max(0.3, snakeOpacity)})` : isFood ? '#FF4D6D' : (x+y)%2===0 ? 'rgba(255,255,255,.02)' : 'rgba(255,255,255,.01)',
+              borderRadius: isHead ? '4px' : isFood ? '50%' : '2px',
+              transition: 'background .08s',
+              boxShadow: isHead ? '0 0 8px rgba(6,214,160,.5)' : isFood ? '0 0 8px rgba(255,77,109,.5)' : 'none'
+            }}/>
+          );
         })}
       </div>
       <div style={{display:'flex',gap:8,justifyContent:'center',marginTop:16}}>
-        <button className="btn br" onClick={()=>setRunning(!running)}>{running?'⏸ Pausa':'▶ Avvia'}</button>
+        <button className="btn br" onClick={()=>setRunning(!running)} style={{minWidth:120}}>{running?'⏸ Pausa':'▶ Avvia'}</button>
         <button className="btn bg" onClick={resetGame}>🔄 Ricomincia</button>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,60px)',gap:4,justifyContent:'center',marginTop:16}}>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,64px)',gap:6,justifyContent:'center',marginTop:16}}>
         <div/>
-        <button className="btn bg bs" onClick={()=>{if(dirRef.current.y!==1)setDir({x:0,y:-1})}}>⬆️</button>
+        <button className="btn bg bs" onClick={()=>{if(dirRef.current.y!==1)setDir({x:0,y:-1})}} style={{fontSize:'1.2rem',padding:'10px'}}>⬆️</button>
         <div/>
-        <button className="btn bg bs" onClick={()=>{if(dirRef.current.x!==1)setDir({x:-1,y:0})}}>⬅️</button>
-        <button className="btn bg bs" onClick={()=>{if(dirRef.current.y!==-1)setDir({x:0,y:1})}}>⬇️</button>
-        <button className="btn bg bs" onClick={()=>{if(dirRef.current.x!==-1)setDir({x:1,y:0})}}>➡️</button>
+        <button className="btn bg bs" onClick={()=>{if(dirRef.current.x!==1)setDir({x:-1,y:0})}} style={{fontSize:'1.2rem',padding:'10px'}}>⬅️</button>
+        <button className="btn bg bs" onClick={()=>{if(dirRef.current.y!==-1)setDir({x:0,y:1})}} style={{fontSize:'1.2rem',padding:'10px'}}>⬇️</button>
+        <button className="btn bg bs" onClick={()=>{if(dirRef.current.x!==-1)setDir({x:1,y:0})}} style={{fontSize:'1.2rem',padding:'10px'}}>➡️</button>
       </div>
     </div>
   );
@@ -14432,26 +14603,233 @@ function ChessGame({onBack, level, onWin, toast}) {
   const [selected, setSelected] = useState(null);
   const [turn, setTurn] = useState('white');
   const [aiThinking, setAiThinking] = useState(false);
+  const [capturedWhite, setCapturedWhite] = useState([]);
+  const [capturedBlack, setCapturedBlack] = useState([]);
+  const [moveHistory, setMoveHistory] = useState([]);
   
   const isWhite = (p) => '♔♕♖♗♘♙'.includes(p);
   const isBlack = (p) => '♚♛♜♝♞♟'.includes(p);
   const isOwnPiece = (p) => turn === 'white' ? isWhite(p) : isBlack(p);
   
+  const getValidMoves = (r, c, b) => {
+    const piece = b[r][c];
+    if (!piece) return [];
+    const moves = [];
+    const isW = isWhite(piece);
+    
+    if (piece === '♙' || piece === '♟') {
+      const dir = isW ? -1 : 1;
+      const startRow = isW ? 6 : 1;
+      if (r+dir >= 0 && r+dir < 8 && !b[r+dir][c]) {
+        moves.push([r+dir, c]);
+        if (r === startRow && !b[r+2*dir][c]) moves.push([r+2*dir, c]);
+      }
+      if (c-1 >= 0 && r+dir >= 0 && r+dir < 8 && b[r+dir][c-1] && (isW ? isBlack(b[r+dir][c-1]) : isWhite(b[r+dir][c-1]))) moves.push([r+dir, c-1]);
+      if (c+1 < 8 && r+dir >= 0 && r+dir < 8 && b[r+dir][c+1] && (isW ? isBlack(b[r+dir][c+1]) : isWhite(b[r+dir][c+1]))) moves.push([r+dir, c+1]);
+    } else if (piece === '♖' || piece === '♜' || piece === '♕' || piece === '♛') {
+      const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+      if (piece === '♕' || piece === '♛') dirs.push([-1,-1],[-1,1],[1,-1],[1,1]);
+      dirs.forEach(([dr,dc]) => {
+        for (let i = 1; i < 8; i++) {
+          const nr = r+dr*i, nc = c+dc*i;
+          if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
+          if (!b[nr][nc]) { moves.push([nr,nc]); }
+          else {
+            if (isW ? isBlack(b[nr][nc]) : isWhite(b[nr][nc])) moves.push([nr,nc]);
+            break;
+          }
+        }
+      });
+    } else if (piece === '♗' || piece === '♝') {
+      [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc]) => {
+        for (let i = 1; i < 8; i++) {
+          const nr = r+dr*i, nc = c+dc*i;
+          if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
+          if (!b[nr][nc]) { moves.push([nr,nc]); }
+          else {
+            if (isW ? isBlack(b[nr][nc]) : isWhite(b[nr][nc])) moves.push([nr,nc]);
+            break;
+          }
+        }
+      });
+    } else if (piece === '♘' || piece === '♞') {
+      [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc]) => {
+        const nr = r+dr, nc = c+dc;
+        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && !(isW ? isWhite(b[nr][nc]) : isBlack(b[nr][nc]))) moves.push([nr,nc]);
+      });
+    } else if (piece === '♔' || piece === '♚') {
+      [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,dc]) => {
+        const nr = r+dr, nc = c+dc;
+        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && !(isW ? isWhite(b[nr][nc]) : isBlack(b[nr][nc]))) moves.push([nr,nc]);
+      });
+    }
+    return moves;
+  };
+  
+  const evaluateBoard = (b) => {
+    const values = {'♙':10,'♟':10,'♖':50,'♜':50,'♘':30,'♞':30,'♗':30,'♝':30,'♕':90,'♛':90,'♔':900,'♚':900};
+    let score = 0;
+    for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
+      if (b[r][c]) score += isWhite(b[r][c]) ? values[b[r][c]] : -values[b[r][c]];
+    }
+    return score;
+  };
+  
   const makeAIMove = () => {
     setAiThinking(true);
     setTimeout(() => {
-      // Simple AI: find all valid moves and pick random
-      const moves = [];
+      const allMoves = [];
       for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
           if (isBlack(board[r][c])) {
-            // Try all possible moves (simplified)
-            const directions = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
-            directions.forEach(([dr,dc]) => {
-              const nr = r+dr, nc = c+dc;
-              if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && !isBlack(board[nr][nc])) {
-                moves.push({from:[r,c],to:[nr,nc]});
-              }
+            const moves = getValidMoves(r, c, board);
+            moves.forEach(([nr,nc]) => {
+              const nb = board.map(row=>[...row]);
+              const captured = nb[nr][nc];
+              nb[nr][nc] = nb[r][c];
+              nb[r][c] = '';
+              let score = -evaluateBoard(nb);
+              if (captured) score += 10;
+              // Center control bonus
+              if (nr >= 2 && nr <= 5 && nc >= 2 && nc <= 5) score += 3;
+              allMoves.push({from:[r,c],to:[nr,nc],score,captured});
+            });
+          }
+        }
+      }
+      if (allMoves.length > 0) {
+        allMoves.sort((a,b) => b.score - a.score);
+        const topMoves = allMoves.slice(0, Math.min(3 + level, allMoves.length));
+        const move = topMoves[Math.floor(Math.random() * topMoves.length)];
+        
+        const nb = board.map(row=>[...row]);
+        const captured = nb[move.to[0]][move.to[1]];
+        if (captured) {
+          if (isWhite(captured)) setCapturedWhite(p => [...p, captured]);
+          else setCapturedBlack(p => [...p, captured]);
+        }
+        nb[move.to[0]][move.to[1]] = nb[move.from[0]][move.from[1]];
+        nb[move.from[0]][move.from[1]] = '';
+        
+        // Pawn promotion
+        if (nb[move.to[0]][move.to[1]] === '♟' && move.to[0] === 7) nb[move.to[0]][move.to[1]] = '♛';
+        if (nb[move.to[0]][move.to[1]] === '♙' && move.to[0] === 0) nb[move.to[0]][move.to[1]] = '♕';
+        
+        setBoard(nb);
+        setMoveHistory(p => [...p, `${String.fromCharCode(97+move.from[1])}${8-move.from[0]}→${String.fromCharCode(97+move.to[1])}${8-move.to[0]}`]);
+        setTurn('white');
+        
+        // Check for king capture (win condition)
+        if (captured === '♔') { toast('AI vince! 😔','var(--red)'); setTurn(''); }
+      }
+      setAiThinking(false);
+    }, 300 + level * 100);
+  };
+  
+  useEffect(() => {
+    if (turn === 'black' && !aiThinking) makeAIMove();
+  }, [turn]);
+  
+  const handleClick = (r, c) => {
+    if (turn !== 'white' || aiThinking) return;
+    if (selected) {
+      const [sr, sc] = selected;
+      if (sr === r && sc === c) { setSelected(null); return; }
+      const validMoves = getValidMoves(sr, sc, board);
+      if (validMoves.some(([mr,mc]) => mr === r && mc === c)) {
+        const nb = board.map(row => [...row]);
+        const captured = nb[r][c];
+        if (captured) {
+          if (isWhite(captured)) setCapturedWhite(p => [...p, captured]);
+          else setCapturedBlack(p => [...p, captured]);
+        }
+        nb[r][c] = nb[sr][sc];
+        nb[sr][sc] = '';
+        
+        // Pawn promotion
+        if (nb[r][c] === '♙' && r === 0) nb[r][c] = '♕';
+        
+        setBoard(nb);
+        setMoveHistory(p => [...p, `${String.fromCharCode(97+sc)}${8-sr}→${String.fromCharCode(97+c)}${8-r}`]);
+        setSelected(null);
+        setTurn('black');
+        
+        if (captured === '♚') { toast('Hai vinto! 🎉','var(--green)'); setTurn(''); }
+      } else if (isOwnPiece(board[r][c])) {
+        setSelected([r, c]);
+      } else {
+        setSelected(null);
+      }
+    } else if (isOwnPiece(board[r][c])) {
+      setSelected([r, c]);
+    }
+  };
+  
+  const resetGame = () => { setBoard(initialBoard.map(r=>[...r])); setTurn('white'); setSelected(null); setAiThinking(false); setCapturedWhite([]); setCapturedBlack([]); setMoveHistory([]); };
+  
+  const boardSize = Math.min(480, window.innerWidth - 60);
+  const cellSize = boardSize / 8;
+  const validMoves = selected ? getValidMoves(selected[0], selected[1], board) : [];
+  
+  return (
+    <div style={{padding:'0 16px 100px'}}>
+      <div className="sh" style={{marginBottom:16}}>
+        <button className="ib" onClick={onBack}>← Indietro</button>
+        <div style={{fontWeight:600}}>♟️ Scacchi - Livello {level}</div>
+      </div>
+      
+      {/* Captured pieces */}
+      <div style={{display:'flex',justifyContent:'space-between',marginBottom:8,padding:'0 4px'}}>
+        <div style={{fontSize:'.85rem'}}>⬛ Catturati: {capturedWhite.length > 0 ? <span style={{fontSize:'1rem'}}>{capturedWhite.join(' ')}</span> : '—'}</div>
+        <div style={{fontSize:'.85rem'}}>⬜ Catturati: {capturedBlack.length > 0 ? <span style={{fontSize:'1rem'}}>{capturedBlack.join(' ')}</span> : '—'}</div>
+      </div>
+      
+      <div style={{textAlign:'center',marginBottom:12}}>
+        <span style={{fontSize:'.85rem',color:'var(--text2)'}}>Turno: <strong style={{color:turn==='white'?'var(--accent)':'var(--red)'}}>{turn==='white'?'⬜ Tu (Bianco)':'⬛ AI (Nero)'}</strong></span>
+        {aiThinking && <span style={{fontSize:'.75rem',color:'var(--yellow)',marginLeft:12}}>🤔 AI sta pensando...</span>}
+      </div>
+      
+      <div style={{display:'grid',gridTemplateColumns:'repeat(8,1fr)',gap:0,borderRadius:12,overflow:'hidden',maxWidth:boardSize,margin:'0 auto',aspectRatio:'1',border:'3px solid var(--border)',boxShadow:'0 8px 32px rgba(0,0,0,.3)'}}>
+        {board.map((row,r) => row.map((piece,c) => {
+          const isLight = (r+c) % 2 === 0;
+          const isSelected = selected && selected[0]===r && selected[1]===c;
+          const isValidMove = validMoves.some(([mr,mc]) => mr===r && mc===c);
+          const lastMove = moveHistory.length > 0;
+          return (
+            <div key={r+'-'+c} onClick={()=>handleClick(r,c)} style={{
+              width: cellSize,
+              height: cellSize,
+              display:'flex',alignItems:'center',justifyContent:'center',
+              background: isSelected ? 'rgba(255,77,109,.5)' : isValidMove ? (isLight ? 'rgba(6,214,160,.4)' : 'rgba(6,214,160,.3)') : isLight ? '#E8D5B5' : '#B58863',
+              fontSize: cellSize * 0.7,
+              cursor: isOwnPiece(piece) || isValidMove ? 'pointer' : 'default',
+              transition: 'background .15s',
+              position: 'relative'
+            }}>
+              {piece}
+              {isValidMove && !piece && <div style={{position:'absolute',width:cellSize*0.3,height:cellSize*0.3,borderRadius:'50%',background:'rgba(6,214,160,.4)'}}/>}
+              {isValidMove && piece && <div style={{position:'absolute',inset:0,borderRadius:0,border:`3px solid rgba(255,77,109,.6)`}}/>}
+            </div>
+          );
+        }))}
+      </div>
+      
+      {/* Move history */}
+      {moveHistory.length > 0 && (
+        <div style={{textAlign:'center',marginTop:12,fontSize:'.72rem',color:'var(--text2)',maxWidth:boardSize,margin:'12px auto 0',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+          Mosse: {moveHistory.slice(-8).join(', ')}
+        </div>
+      )}
+      
+      <div style={{display:'flex',gap:8,justifyContent:'center',marginTop:16}}>
+        <button className="btn bg" onClick={resetGame}>🔄 Ricomincia</button>
+      </div>
+      <div style={{textAlign:'center',marginTop:12,fontSize:'.72rem',color:'var(--text2)'}}>
+        Clicca un pezzo bianco per selezionarlo, poi clicca la casella di destinazione (punti verdi = mosse valide)
+      </div>
+    </div>
+  );
+}
             });
             // Pawn moves
             if (board[r][c] === '♟') {
@@ -26130,7 +26508,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
             {tab==='youtube'&&<YouTubeTab toast={toast}/>}
             {tab==='todo'&&<TodoTab toast={toast}/>}
             {tab==='wallet'&&<WalletTab toast={toast}/>}
-            {tab==='tuttuni'&&<TuttUniTab uid={user.uid} toast={toast} apiKeys={apiKeys}/>}
+            {tab==='tuttuni'&&<TuttUniTab uid={user?.uid||''} toast={toast} apiKeys={apiKeys}/>}
             {tab==='reminders'&&<RemindersTab toast={toast}/>}
             {tab==='extra'&&<ExtraTab toast={toast}/>}
             {tab==='games'&&<GamesTab toast={toast}/>}
