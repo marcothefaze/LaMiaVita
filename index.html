@@ -5393,6 +5393,37 @@ body.lmv-v2::after {
   animation: v2AmbientGlow 30s ease-in-out infinite;
 }
 
+/* V2: Background patterns must work too */
+body.lmv-v2.bg-pattern-dots .content::before,
+body.lmv-v2.bg-pattern-cross .content::before,
+body.lmv-v2.bg-pattern-diagonal .content::before,
+body.lmv-v2.bg-pattern-circles .content::before,
+body.lmv-v2.bg-pattern-zigzag .content::before,
+body.lmv-v2.bg-pattern-waves .content::before,
+body.lmv-v2.bg-pattern-hex .content::before,
+body.lmv-v2.bg-pattern-stars .content::before,
+body.lmv-v2.bg-pattern-diamond .content::before,
+body.lmv-v2.bg-pattern-grid .content::before,
+body.lmv-v2.bg-pattern-aurora .content::before,
+body.lmv-v2.bg-pattern-topo .content::before,
+body.lmv-v2.bg-pattern-matrix .content::before,
+body.lmv-v2.bg-pattern-nebula .content::before,
+body.lmv-v2.bg-pattern-circuit .content::before {
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+/* V2: Ensure content background doesn't hide patterns */
+body.lmv-v2 .content {
+  position: relative !important;
+  background: transparent !important;
+}
+
+body.lmv-v2 .content > * {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
 @keyframes v2AmbientGlow {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }
   33% { transform: translate(2%, 1%) rotate(1deg); }
@@ -8383,6 +8414,13 @@ function DataProvider({uid, children}) {
               setWallet(parsedWallet);
               await window._idb.saveOffline('wallet', parsedWallet);
             }
+            if(d.todos) {
+              const parsedTodos = typeof d.todos === 'string' ? JSON.parse(d.todos) : d.todos;
+              if(Array.isArray(parsedTodos) && parsedTodos.length > 0) {
+                setTodos(parsedTodos);
+                await window._idb.saveOffline('todos', parsedTodos);
+              }
+            }
             setLoaded(true);
             return;
           }
@@ -8525,28 +8563,28 @@ function DataProvider({uid, children}) {
   // Todos CRUD - sincronizzato
   const addTodo = useCallback((todo) => {
     setTodos(prev => { 
-      const n=[{id:Date.now(),done:false,...todo,createdAt:new Date().toISOString()},...prev]; 
-      save('todos',n); 
-      // Fallback localStorage - save full array
-      try { 
-        localStorage.setItem('lmv_todos', JSON.stringify(n)); 
-      } catch(e) {}
+      const newTodo = {id:Date.now(),done:false,...todo,createdAt:new Date().toISOString()};
+      const n=[newTodo,...prev]; 
+      // Save to localStorage FIRST (most reliable)
+      try { localStorage.setItem('lmv_todos', JSON.stringify(n)); } catch(e) {}
+      // Then save to IndexedDB
+      save('todos',n);
       return n; 
     });
   },[save]);
   const delTodo = useCallback((id) => {
     setTodos(prev => { 
       const n=prev.filter(x=>x.id!==id); 
-      save('todos',n); 
       try { localStorage.setItem('lmv_todos', JSON.stringify(n)); } catch(e) {}
+      save('todos',n); 
       return n; 
     });
   },[save]);
   const updateTodo = useCallback((id, updates) => {
     setTodos(prev => { 
       const n=prev.map(x=>x.id===id?{...x,...updates}:x); 
-      save('todos',n); 
       try { localStorage.setItem('lmv_todos', JSON.stringify(n)); } catch(e) {}
+      save('todos',n); 
       return n; 
     });
   },[save]);
@@ -9253,7 +9291,7 @@ function CalTab({toast}) {
             const parts=e.date.split('-');
             return (
               <div key={e.id} style={{padding:14,borderRadius:14,background:e.color+'12',border:'1px solid '+e.color+'30',position:'relative',overflow:'hidden',transition:'all .2s'}}>
-                <div style={{position:'absolute',top:0,right:0,width:80,height:80,borderRadius:'0 0 0 100%',background:e.color+'15'}}/>
+                <div style={{position:'absolute',top:0,right:0,width:80,height:80,borderRadius:'0 0 0 100%',background:e.color+'15',pointerEvents:'none'}}/>
                 <div style={{display:'flex',alignItems:'flex-start',gap:10}}>
                   <div style={{width:44,height:44,borderRadius:10,background:e.color+'20',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                     <span style={{fontSize:'1.2rem'}}>📅</span>
@@ -9263,7 +9301,7 @@ function CalTab({toast}) {
                     <div style={{fontSize:'.78rem',color:'var(--text2)'}}>{parseInt(parts[2])} {MS[parseInt(parts[1])-1]}{e.time?' alle '+e.time:''}</div>
                     {daysUntil&&<div style={{fontSize:'.72rem',fontWeight:600,color:e.color,marginTop:4}}>{daysUntil}</div>}
                   </div>
-                  <div className="ib" style={{color:'var(--red)'}} onClick={()=>{delEvent(e.id);toast('Eliminato','var(--red)');}}>🗑️</div>
+                  <div className="ib" style={{color:'var(--red)',cursor:'pointer',zIndex:1,position:'relative',flexShrink:0}} onClick={(ev)=>{ev.stopPropagation();delEvent(e.id);toast('Eliminato','var(--red)');}}>🗑️</div>
                 </div>
               </div>
             );
@@ -10045,6 +10083,7 @@ function AITab({toast,onTabSwitch,apiKeys,callAI,user,setProv,prov}) {
     window.speechSynthesis?.addEventListener('voiceschanged', loadVoices);
     speakCallText('Ciao! Sono Marco AI. Come posso aiutarti?');
   };
+  window._startCallMode = startCallMode;
   
   
   const endCallMode = () => {
@@ -10081,21 +10120,43 @@ function AITab({toast,onTabSwitch,apiKeys,callAI,user,setProv,prov}) {
   const startCallListening = () => {
     if (!isCallMode) return;
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { setCallMessages(p => [...p, {role:'bot',text:'Riconoscimento vocale non supportato'}]); return; }
+    if (!SR) { 
+      setCallMessages(p => [...p, {role:'bot',text:'⚠️ Riconoscimento vocale non supportato. Usa Chrome o Safari.'}]); 
+      return; 
+    }
+    if (callRecognitionRef.current) { 
+      try { callRecognitionRef.current.abort(); } catch(e) {} 
+      callRecognitionRef.current = null; 
+    }
     const r = new SR();
-    r.lang = 'it-IT'; r.interimResults = false; r.continuous = false;
+    r.lang = 'it-IT'; 
+    r.interimResults = false; 
+    r.continuous = false;
+    r.maxAlternatives = 1;
     callRecognitionRef.current = r;
     setCallListening(true);
     r.onresult = (ev) => {
       if (!isCallMode) return;
       const t = ev.results[0][0].transcript;
+      if (!t.trim()) { setCallListening(false); return; }
       setCallMessages(p => [...p, {role:'user',text:t}]);
       setCallListening(false);
       callAIForCall(t);
     };
-    r.onerror = () => { setCallListening(false); if(isCallMode) startCallListening(); };
-    r.onend = () => { setCallListening(false); if(isCallMode) startCallListening(); };
-    r.start();
+    r.onerror = (e) => { 
+      setCallListening(false); 
+      if (e.error === 'not-allowed') {
+        setCallMessages(p => [...p, {role:'bot',text:'⚠️ Permesso microfono negato. Consenti l\'accesso al microfono nelle impostazioni del browser.'}]);
+      }
+    };
+    r.onend = () => { 
+      setCallListening(false); 
+    };
+    try {
+      r.start();
+    } catch(e) {
+      setCallListening(false);
+    }
   };
   
   const callAIForCall = async (userText) => {
@@ -10103,17 +10164,28 @@ function AITab({toast,onTabSwitch,apiKeys,callAI,user,setProv,prov}) {
       const key = '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';
       const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:200,messages:[
-          {role:'system',content:'Sei Marco AI, un assistente vocale amichevole. Rispondi in italiano in modo breve (max 2-3 frasi). Sii naturale come in una conversazione telefonica.'},
+        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:150,temperature:0.7,messages:[
+          {role:'system',content:'Sei Marco AI, un assistente vocale amichevole. Rispondi SEMPRE in italiano in modo breve (max 2-3 frasi). Sii naturale come in una conversazione telefonica. Non usare formattazione markdown.'},
           {role:'user',content:userText}
         ]})
       });
+      if (!r.ok) {
+        const errText = await r.text();
+        throw new Error('API error: ' + r.status + ' ' + errText.substring(0, 100));
+      }
       const d = await r.json();
-      const reply = d.choices?.[0]?.message?.content || 'Non ho capito, puoi ripetere?';
+      let reply = d.choices?.[0]?.message?.content;
+      if (!reply || reply.trim().length === 0) {
+        reply = 'Non ho capito bene, puoi ripetere?';
+      }
+      // Clean markdown and special chars for speech
+      reply = reply.replace(/\*\*|__|\*|_|`|#/g, '').trim();
       setCallMessages(p => [...p, {role:'bot',text:reply}]);
       speakCallText(reply);
     } catch(e) {
-      setCallMessages(p => [...p, {role:'bot',text:'Errore: '+e.message}]);
+      console.error('Call AI error:', e);
+      const errMsg = 'Errore: ' + e.message;
+      setCallMessages(p => [...p, {role:'bot',text:errMsg}]);
       speakCallText('C\'è stato un errore, riprova.');
     }
   };
@@ -11074,7 +11146,7 @@ $$[formula in LaTeX]$$
                 <textarea className="cinp" rows={2} placeholder="Spiegami... Fammi domande... Riassumi..." value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendStudyMsg();}}}/>
                 <button className="csnd" onClick={startVoiceInput} disabled={isListening} style={{background:isListening?'var(--red)':'rgba(76,201,240,.2)',color:isListening?'#fff':'var(--blue)',padding:'8px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:'1rem',marginRight:4}}>{isListening?'🔴':'🎤'}</button>
                 <button className="csnd" onClick={()=>{const lastBot=msgs.filter(m=>m.role==='bot').pop();if(lastBot)speakText(lastBot.text.slice(0,2000));}} style={{background:'rgba(139,92,246,.2)',color:'var(--purple)',padding:'8px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:'1rem',marginRight:4}} title="Ascolta risposta">🔊</button>
-                <button className="csnd" onClick={startCallMode} style={{background:'rgba(6,214,160,.2)',color:'var(--green)',padding:'8px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:'1rem',marginRight:4}} title="Modalità Chiamata">📞</button>
+            <button className="csnd" onClick={()=>window._startCallMode&&window._startCallMode()} style={{background:'rgba(6,214,160,.2)',color:'var(--green)',padding:'8px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:'1rem',marginRight:4}} title="Modalità Chiamata">📞</button>
                 <button className="csnd" onClick={sendStudyMsg} style={{background:'linear-gradient(135deg,#8B5CF6,#6366F1)'}}>ok</button>
               </div>
             </div>
@@ -13544,7 +13616,20 @@ function VideoEditorTab({toast}) {
           ) : (
             <div>
               <div style={{background:'var(--surface)',borderRadius:12,overflow:'hidden',marginBottom:16,position:'relative'}}>
-                <video ref={videoRef} src={videoPreview} onLoadedMetadata={onVideoLoaded} onTimeUpdate={onTimeUpdate} controls style={{width:'100%',maxHeight:400,background:'#000',filter:appliedFilters?`brightness(${appliedFilters.brightness}%) contrast(${appliedFilters.contrast}%) saturate(${appliedFilters.saturate}%) hue-rotate(${appliedFilters.hue}deg) blur(${appliedFilters.blur}px) grayscale(${appliedFilters.grayscale}%) sepia(${appliedFilters.sepia}%) invert(${appliedFilters.invert}%)`:'none'}} />
+                <video ref={videoRef} src={videoPreview} onLoadedMetadata={onVideoLoaded} onTimeUpdate={onTimeUpdate} controls 
+                  style={{width:'100%',maxHeight:400,background:'#000',filter:appliedFilters?`brightness(${appliedFilters.brightness}%) contrast(${appliedFilters.contrast}%) saturate(${appliedFilters.saturate}%) hue-rotate(${appliedFilters.hue}deg) blur(${appliedFilters.blur}px) grayscale(${appliedFilters.grayscale}%) sepia(${appliedFilters.sepia}%) invert(${appliedFilters.invert}%)`:'none'}}
+                  onPlay={function(){
+                    if(appliedTrim) { this.currentTime = appliedTrim.start; }
+                    if(appliedSpeed) { this.playbackRate = appliedSpeed; }
+                  }}
+                  onSeeking={function(){
+                    if(appliedTrim && this.currentTime < appliedTrim.start) { this.currentTime = appliedTrim.start; }
+                    if(appliedTrim && this.currentTime > appliedTrim.end) { this.pause(); this.currentTime = appliedTrim.start; }
+                  }}
+                  onEnded={function(){
+                    if(appliedTrim) { this.currentTime = appliedTrim.start; this.pause(); }
+                  }}
+                />
                 {(appliedText ? appliedText : textOverlays).map((t,i) => t.text && (
                   <div key={i} style={{position:'absolute',top:t.y+'%',left:t.x+'%',transform:'translate(-50%,-50%)',fontSize:t.size+'px',color:t.color,fontFamily:t.font,fontWeight:t.bold?700:400,textShadow:t.shadow?'2px 2px 6px rgba(0,0,0,.8)':'none',pointerEvents:'none',whiteSpace:'nowrap'}}>{t.text}</div>
                 ))}
@@ -15050,17 +15135,25 @@ function WordleGame({onBack, toast}) {
   };
   
   const WORDS = ALL_WORDS[wordLength] || ALL_WORDS[5];
-  const [target, setTarget] = useState(() => {
-    if (!wordLength) return '';
-    const unused = WORDS.filter(w => !usedWords.includes(w));
-    const pool = unused.length > 0 ? unused : WORDS;
-    return pool[Math.floor(Math.random() * pool.length)];
-  });
+  const [target, setTarget] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [currentGuess, setCurrentGuess] = useState('');
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
   const maxGuesses = wordLength <= 4 ? 5 : wordLength <= 5 ? 6 : wordLength <= 6 ? 7 : 8;
+  
+  // Generate new target when wordLength changes
+  useEffect(() => {
+    if (!wordLength) return;
+    const w = ALL_WORDS[wordLength] || ALL_WORDS[5];
+    const unused = w.filter(ww => !usedWords.includes(ww));
+    const pool = unused.length > 0 ? unused : w;
+    setTarget(pool[Math.floor(Math.random() * pool.length)]);
+    setGuesses([]);
+    setCurrentGuess('');
+    setGameOver(false);
+    setWon(false);
+  }, [wordLength]);
   
   const getTileColors = (guess) => {
     const colors = Array(wordLength).fill('rgba(255,255,255,.1)');
@@ -15207,6 +15300,36 @@ function ChessGame({onBack, level, onWin, toast}) {
   const [gameMode, setGameMode] = useState(null);
   const [aiDifficulty, setAiDifficulty] = useState(5);
   const [showModeSelect, setShowModeSelect] = useState(true);
+  const [showDiffSelect, setShowDiffSelect] = useState(false);
+  
+  // Allow changing difficulty from within ChessAI
+  useEffect(() => {
+    window._changeChessDiff = () => setShowDiffSelect(true);
+    return () => { delete window._changeChessDiff; };
+  }, []);
+  
+  if (showDiffSelect) {
+    return (
+      <div style={{padding:'0 16px 100px'}}>
+        <div className="sh" style={{marginBottom:16}}>
+          <button className="ib" onClick={()=>setShowDiffSelect(false)}>← Indietro</button>
+          <div style={{fontWeight:600}}>♟️ Difficoltà AI</div>
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:10,maxWidth:400,margin:'0 auto'}}>
+          {CHESS_DIFFICULTIES.map(d=>(
+            <button key={d.id} onClick={()=>{setAiDifficulty(d.id);setShowDiffSelect(false);setGameMode('ai');setShowModeSelect(false);}} style={{display:'flex',alignItems:'center',gap:14,padding:'14px 18px',borderRadius:14,border:'2px solid '+(aiDifficulty===d.id?'rgba(139,92,246,.4)':'rgba(255,255,255,.06)'),background:aiDifficulty===d.id?'rgba(139,92,246,.15)':'rgba(255,255,255,.03)',cursor:'pointer',transition:'all .2s'}}>
+              <div style={{fontSize:'1.6rem'}}>{d.icon}</div>
+              <div style={{textAlign:'left',flex:1}}>
+                <div style={{fontWeight:700,fontSize:'.95rem',color:'#fff'}}>{d.id}. {d.name}</div>
+                <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{d.desc}</div>
+              </div>
+              {aiDifficulty===d.id && <div style={{color:'#818cf8',fontSize:'.8rem',fontWeight:700}}>✓</div>}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
   
   if (showModeSelect) {
     return (
@@ -15220,11 +15343,11 @@ function ChessGame({onBack, level, onWin, toast}) {
           <div style={{fontWeight:700,fontSize:'1.3rem',marginBottom:8}}>Scegli modalità</div>
           <div style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:32}}>Come vuoi giocare?</div>
           <div style={{display:'flex',flexDirection:'column',gap:14,maxWidth:360,margin:'0 auto'}}>
-            <button onClick={()=>{setGameMode('ai');setShowModeSelect(false);}} style={{display:'flex',alignItems:'center',gap:16,padding:'18px 22px',borderRadius:18,border:'2px solid rgba(139,92,246,.3)',background:'linear-gradient(135deg,rgba(139,92,246,.15),rgba(139,92,246,.05))',cursor:'pointer',transition:'all .2s'}}>
+            <button onClick={()=>setShowDiffSelect(true)} style={{display:'flex',alignItems:'center',gap:16,padding:'18px 22px',borderRadius:18,border:'2px solid rgba(139,92,246,.3)',background:'linear-gradient(135deg,rgba(139,92,246,.15),rgba(139,92,246,.05))',cursor:'pointer',transition:'all .2s'}}>
               <div style={{fontSize:'2.2rem'}}>🤖</div>
               <div style={{textAlign:'left',flex:1}}>
                 <div style={{fontWeight:700,fontSize:'1.05rem',color:'#fff'}}>Contro AI</div>
-                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Sfida l'intelligenza artificiale</div>
+                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Scegli la difficoltà dell'AI</div>
               </div>
               <div style={{fontSize:'1.2rem',color:'var(--text3)'}}>→</div>
             </button>
@@ -15462,6 +15585,7 @@ function ChessAI({onBack, difficulty, toast}) {
       <div className="sh" style={{marginBottom:16}}>
         <button className="ib" onClick={onBack}>← Indietro</button>
         <div style={{fontWeight:600}}>♟️ Scacchi - {diff.icon} {diff.name}</div>
+        <button className="btn bt bs" style={{fontSize:'.72rem',padding:'4px 10px'}} onClick={()=>window._changeChessDiff&&window._changeChessDiff()}>⚙️</button>
       </div>
       
       {gameOver && (
@@ -17534,21 +17658,32 @@ function AIPlusTab({user, toast, events, notes, todos}) {
   const aiPlusVoiceRespond = async (userText) => {
     try {
       const sys = 'Sei Marco AI, un assistente vocale amichevole. Risposte brevi e concise (max 3 frasi). Parla in italiano.';
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', {
+      const key = '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';
+      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
         body: JSON.stringify({
           model: 'llama-3.1-8b-instant',
           max_tokens: 200,
+          temperature: 0.7,
           messages: [{ role: 'system', content: sys }, { role: 'user', content: userText }]
         })
       });
+      if (!r.ok) {
+        const errText = await r.text();
+        throw new Error('API error: ' + r.status + ' ' + errText.substring(0, 100));
+      }
       const d = await r.json();
-      const response = d.choices?.[0]?.message?.content || 'Non ho capito, ripeti.';
+      let response = d.choices?.[0]?.message?.content;
+      if (!response || response.trim().length === 0) {
+        response = 'Non ho capito bene, puoi ripetere?';
+      }
+      // Clean markdown for speech
+      response = response.replace(/\*\*|__|\*|_|`|#/g, '').trim();
       setAiPlusVoiceMode(p => ({...p, messages: [...p.messages, {role: 'bot', text: response}]}));
-      // Speak the response
       aiPlusSpeak(response);
     } catch (e) {
+      console.error('AI voice error:', e);
       toast('Errore AI: ' + e.message, 'var(--red)');
     }
   };
@@ -18544,7 +18679,7 @@ function AIPlusTab({user, toast, events, notes, todos}) {
 
 // - WALLET TAB -
 function WalletTab({toast}) {
-  const {wallet, addTransaction, delTransaction, updateWallet} = useContext(DataCtx);
+  const {wallet, addTransaction, delTransaction, updateWallet, addEvent} = useContext(DataCtx);
   const [recurring, setRecurring] = useState(() => {
     try { return JSON.parse(localStorage.getItem('lmv_recurring') || '[]'); } 
     catch (e) { return []; }
@@ -24503,7 +24638,7 @@ function ProjectView({project, onUpdate, onBack, uid, apiKeys}) {
   const MAX_STORAGE = 180 * 1024 * 1024;
   const fmtStorage = (bytes) => (bytes/(1024*1024)).toFixed(1)+'MB';
   const dataCtx = useContext(DataCtx) || {};
-  const {notes=[],addNote=()=>{}} = dataCtx;
+  const {notes=[],addNote=()=>{},addEvent=()=>{}} = dataCtx;
   const chatRef = useRef(null);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
