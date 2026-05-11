@@ -8672,6 +8672,24 @@ function playSound(type) {
     else if(type==='click'){note(1200,0,.08,.4);}
     else if(type==='save'){note(440,0,.15,.6);note(660,.12,.2,.5);}
     else if(type==='delete'){note(440,0,.12,.5);note(330,.1,.2,.4);}
+    else if(type==='alarm'){
+      const now=ctx.currentTime;
+      for(let i=0;i<10;i++){
+        const t=i*0.85;
+        const o=ctx.createOscillator();const g=ctx.createGain();
+        o.type='square';o.connect(g);g.connect(master);
+        o.frequency.setValueAtTime(i%2===0?880:1100,now+t);
+        g.gain.setValueAtTime(0.5,now+t);
+        g.gain.exponentialRampToValueAtTime(0.001,now+t+0.35);
+        o.start(now+t);o.stop(now+t+0.35);
+        const o2=ctx.createOscillator();const g2=ctx.createGain();
+        o2.type='square';o2.connect(g2);g2.connect(master);
+        o2.frequency.setValueAtTime(i%2===0?1100:880,now+t+0.4);
+        g2.gain.setValueAtTime(0.5,now+t+0.4);
+        g2.gain.exponentialRampToValueAtTime(0.001,now+t+0.7);
+        o2.start(now+t+0.4);o2.stop(now+t+0.7);
+      }
+    }
     // Suoni sidebar per sezione
     else if(type==='tab-pw'){note(523,0,.15,.5);note(659,.12,.15,.4);note(784,.24,.2,.4);} // Password - tonalità calda
     else if(type==='tab-cal'){note(262,0,.2,.4);note(330,.15,.2,.4);note(392,.3,.25,.4);} // Calendario - tonalità fresca
@@ -25349,8 +25367,7 @@ function UniDashboard({onClose, addNote, toast}) {
             clearInterval(intervalId);
             setTimeout(()=>{
               setPomRunning(false);
-              playSound('success');
-              playSound('notification');
+              playSound('alarm');
               if(localStorage.getItem('lmv_notifsound')!=='off'){
                 try{
                   if(Notification.permission==='granted'){
@@ -29380,7 +29397,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
           if(s<=1){
             clearInterval(miniPomRef.current);
             setMiniPomRunning(false);
-            playSound('success');
+            playSound('alarm');
             try{if(Notification.permission==='granted')new Notification(miniPomMode==='work'?'Pausa!':'Torna a studiare!');}catch(e){}
             const cycles = parseInt(localStorage.getItem('pom_cycles')||'0')+(miniPomMode==='work'?1:0);
             localStorage.setItem('pom_cycles',String(cycles));
@@ -29425,7 +29442,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
             clearInterval(focusTimerRef.current);
             setFocusRunning(false);
             if(focusMode === 'work'){
-              playSound('success');
+              playSound('alarm');
               try{if(Notification.permission==='granted')new Notification('Focus Mode','Sessione completata! Fai una pausa.');}catch(e){}
               setFocusSessions(p => {
                 const newVal = p + 1;
@@ -29435,7 +29452,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
               setFocusMode('short');
               setFocusSecs(5*60);
             } else {
-              playSound('notification');
+              playSound('alarm');
               setFocusMode('work');
               setFocusSecs(focusDuration*60);
             }
