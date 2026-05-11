@@ -5642,6 +5642,8 @@ body:not(.lmv-v2) ::selection {
 body:not(.lmv-v2) .content {
   animation: fadeInContent .3s ease;
   background: transparent !important;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
   position: relative;
 }
   body:not(.lmv-v2)::after {
@@ -5735,6 +5737,8 @@ body:not(.lmv-v2) .card {
   border-radius: 24px !important;
   box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05) !important;
   transition: all .35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  contain: layout style paint;
+  will-change: transform, opacity;
   position: relative;
   overflow: hidden;
 }
@@ -28497,7 +28501,19 @@ function App(){
        document.removeEventListener('touchend', handleTouchEnd);
        document.removeEventListener('touchmove', handleTouchMove);
      };
-   }, []);
+    }, []);
+
+  // Keyboard shortcut: Ctrl/Cmd+K to open global search
+  useEffect(()=>{
+    const handler = (e) => {
+      if((e.ctrlKey||e.metaKey) && e.key==='k'){
+        e.preventDefault();
+        setGlobalSearchOpen(o=>!o);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return ()=>window.removeEventListener('keydown', handler);
+  },[]);
 
   const [isCallMode, setIsCallMode] = useState(false);
   const [callMessages, setCallMessages] = useState([]);
@@ -30846,8 +30862,9 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
               <span className="v2-badge">✨ 2.0</span>
             </div>
             <div className="tr">
-              <div className="tbb" onClick={()=>setGlobalSearchOpen(o=>!o)} title="Ricerca globale" style={{background:globalSearchOpen?'rgba(139,92,246,.2)':'rgba(255,255,255,.05)'}}>
-                🔍
+<div className="tbb" onClick={()=>setGlobalSearchOpen(o=>!o)} title="Ricerca globale (Ctrl+K / ⌘K)" style={{background:globalSearchOpen?'rgba(139,92,246,.2)':'rgba(255,255,255,.05)',position:'relative'}}>
+              🔍
+              <span style={{position:'absolute',bottom:-2,right:-2,fontSize:'.55rem',padding:'1px 3px',background:'rgba(139,92,246,.3)',borderRadius:3,color:'rgba(255,255,255,.6)',lineHeight:1}}>⌘K</span>
               </div>
               <div className="tbb" onClick={()=>setFocusModeOpen(true)} title="Focus Mode" style={{background:focusRunning?'rgba(244,63,94,.3)':'rgba(255,255,255,.05)'}}>
                 🎯
@@ -30877,8 +30894,8 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
           
           {/* Global Search Modal */}
           {globalSearchOpen && (
-            <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.7)',zIndex:9999,display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:80}} onClick={()=>setGlobalSearchOpen(false)}>
-              <div style={{background:'var(--surface)',borderRadius:16,padding:20,maxWidth:600,width:'90%',maxHeight:'70vh',overflow:'auto',boxShadow:'0 20px 60px rgba(0,0,0,.5)'}} onClick={e=>e.stopPropagation()}>
+            <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.65)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',zIndex:9999,display:'flex',alignItems:'flex-start',justifyContent:'center',paddingTop:80,animation:'fadeIn .2s ease'}} onClick={()=>setGlobalSearchOpen(false)}>
+              <div style={{background:'var(--surface)',borderRadius:16,padding:20,maxWidth:600,width:'90%',maxHeight:'70vh',overflow:'auto',boxShadow:'0 20px 60px rgba(0,0,0,.5)',animation:'v2-enter .3s cubic-bezier(0.4,0,0.2,1) forwards'}} onClick={e=>e.stopPropagation()}>
                 <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:16}}>
                   <span style={{fontSize:'1.2rem'}}>🔍</span>
                   <input 
@@ -31300,19 +31317,23 @@ setTimeout(function(){
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 <script>
-firebase.initializeApp({
-  apiKey:"AIzaSyDKK8_Qac2xrggOgZ9GWvNjAt_4nOTHkfk",
-  authDomain:"mylife-dashboard.firebaseapp.com",
-  projectId:"mylife-dashboard",
-  storageBucket:"mylife-dashboard.appspot.com",
-  messagingSenderId:"14910139571",
-  appId:"1:14910139571:web:e2866dcea73588186454c6"
-});
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-const gp = new firebase.auth.GoogleAuthProvider();
+let auth, db, storage, gp;
+try {
+  firebase.initializeApp({
+    apiKey:"AIzaSyDKK8_Qac2xrggOgZ9GWvNjAt_4nOTHkfk",
+    authDomain:"mylife-dashboard.firebaseapp.com",
+    projectId:"mylife-dashboard",
+    storageBucket:"mylife-dashboard.appspot.com",
+    messagingSenderId:"14910139571",
+    appId:"1:14910139571:web:e2866dcea73588186454c6"
+  });
+  auth = firebase.auth();
+  db = firebase.firestore();
+  storage = firebase.storage();
+  gp = new firebase.auth.GoogleAuthProvider();
+} catch(e) {
+  console.warn('Firebase init failed:', e);
+}
 
 // CORS Proxy helper for AI API calls - GLOBAL SCOPE
 window.proxyFetch = async (url, options) => {
@@ -31966,12 +31987,13 @@ const decryptData = async (encrypted, uid) => {
 };
 
 window._fb = {
-  signInGoogle: () => auth.signInWithPopup(gp),
-  signInEmail: (e,p) => auth.signInWithEmailAndPassword(e,p),
-  registerEmail: (e,p) => auth.createUserWithEmailAndPassword(e,p),
-  signOut: () => auth.signOut(),
-  onAuth: (cb) => auth.onAuthStateChanged(cb),
+  signInGoogle: () => auth ? auth.signInWithPopup(gp) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
+  signInEmail: (e,p) => auth ? auth.signInWithEmailAndPassword(e,p) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
+  registerEmail: (e,p) => auth ? auth.createUserWithEmailAndPassword(e,p) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
+  signOut: () => auth ? auth.signOut() : Promise.resolve(),
+  onAuth: (cb) => auth ? auth.onAuthStateChanged(cb) : (cb(null), () => {}),
   save: async (uid, key, val) => {
+    if(!db) return;
     if(key === 'passwords' && uid) {
       const encrypted = await encryptData(val, uid);
       if(encrypted) await db.collection('users').doc(uid).set({'passwords_encrypted': encrypted}, {merge:true});
@@ -31981,6 +32003,7 @@ window._fb = {
     }
   },
   loadPasswords: async (uid) => {
+    if(!db) return null;
     try {
       const snap = await db.collection('users').doc(uid).get();
       if(snap.exists && snap.data().passwords_encrypted) {
@@ -31991,23 +32014,26 @@ window._fb = {
     return null;
   },
   load: async (uid) => {
+    if(!db) return {};
     const snap = await db.collection('users').doc(uid).get();
     return snap.exists ? snap.data() : {};
   },
   uploadFile: async (uid, file) => {
+    if(!storage) return null;
     const path = `users/${uid}/files/${Date.now()}_${file.name}`;
     const storageRef = ref(storage, path);
     await uploadBytes(storageRef, file);
     return await getDownloadURL(storageRef);
   },
   deleteFile: async (url) => {
-    if(!url || !url.includes('firebasestorage')) return;
+    if(!storage || !url || !url.includes('firebasestorage')) return;
     try {
       const storageRef = ref(storage, url);
       await deleteObject(storageRef);
     } catch(e) {}
   },
   getStorageUsed: async (uid) => {
+    if(!db) return 0;
     try {
       const snap = await getDoc(doc(db,'users',uid));
       if(snap.exists() && snap.data().storageUsed) {
@@ -32017,6 +32043,7 @@ window._fb = {
     return 0;
   },
   addStorageUsed: async (uid, bytes) => {
+    if(!db) return 0;
     try {
       const snap = await getDoc(doc(db,'users',uid));
       const current = snap.exists() && snap.data().storageUsed ? parseInt(snap.data().storageUsed) : 0;
@@ -32025,6 +32052,7 @@ window._fb = {
     } catch(e) { return 0; }
   },
   removeStorageUsed: async (uid, bytes) => {
+    if(!db) return 0;
     try {
       const snap = await getDoc(doc(db,'users',uid));
       const current = snap.exists() && snap.data().storageUsed ? parseInt(snap.data().storageUsed) : 0;
