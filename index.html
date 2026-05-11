@@ -23926,6 +23926,128 @@ function ExtraTab({toast}) {
   );
 }
 
+// - STUDY SESSIONS MODAL -
+function StudySessionsModal({onClose}) {
+  const [log] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('pom_log') || '[]'); }
+    catch(e) { return []; }
+  });
+  const workLog = log.filter(e => e.type === 'work');
+  const breakLog = log.filter(e => e.type === 'break');
+  const totalSessions = workLog.length;
+  const totalMinutes = workLog.reduce((s, e) => s + (e.duration || 25), 0);
+  const totalBreaks = breakLog.length;
+
+  const byDate = {};
+  workLog.forEach(e => {
+    if(!byDate[e.date]) byDate[e.date] = {date: e.date, sessions: 0, minutes: 0};
+    byDate[e.date].sessions++;
+    byDate[e.date].minutes += e.duration || 25;
+  });
+  const breaksByDate = {};
+  breakLog.forEach(e => {
+    if(!breaksByDate[e.date]) breaksByDate[e.date] = 0;
+    breaksByDate[e.date]++;
+  });
+
+  const sortedDates = Object.keys(byDate).sort().reverse();
+  const last7 = [];
+  for(let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const ds = d.toISOString().split('T')[0];
+    const dn = d.toLocaleDateString('it-IT', {weekday:'short'}).slice(0,2);
+    const dd = byDate[ds] || {sessions: 0, minutes: 0};
+    last7.push({day: dn, sessions: dd.sessions, minutes: dd.minutes});
+  }
+  const maxMin = Math.max(...last7.map(d => d.minutes), 1);
+  const avgPerDay = sortedDates.length > 0 ? (totalMinutes / sortedDates.length) : 0;
+  const bestDay = sortedDates.length > 0
+    ? sortedDates.reduce((a, b) => byDate[a].minutes > byDate[b].minutes ? a : b)
+    : null;
+
+  return (
+    <div className="modal-overlay" onClick={onClose} style={{position:'fixed',inset:0,zIndex:99999,background:'rgba(0,0,0,.6)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{maxWidth:560,width:'100%',maxHeight:'90vh',overflowY:'auto'}}>
+        <div className="mh"><div className="mt">📊 Dettaglio studio</div><div className="mx" onClick={onClose}>✕</div></div>
+
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,margin:16}}>
+          <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
+            <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--red)'}}>{totalSessions}</div>
+            <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Sessioni</div>
+          </div>
+          <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
+            <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--accent)'}}>{Math.floor(totalMinutes/60)}h {totalMinutes%60}m</div>
+            <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Tempo studio</div>
+          </div>
+          <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
+            <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--green)'}}>{totalBreaks}</div>
+            <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Pause</div>
+          </div>
+        </div>
+
+        <div className="card" style={{margin:'0 16px 16px',padding:'18px 16px'}}>
+          <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📈 Minuti studio (7 giorni)</div>
+          <div style={{display:'flex',alignItems:'flex-end',gap:6,height:100}}>
+            {last7.map((d, i) => (
+              <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+                <div style={{width:'100%',background:'linear-gradient(180deg,var(--accent),var(--accent2))',borderRadius:'6px 6px 0 0',height:(d.minutes/maxMin*100)+'%',minHeight:d.minutes>0?4:0,transition:'height .4s',position:'relative'}}>
+                  {d.minutes > 0 && <div style={{position:'absolute',top:-18,left:'50%',transform:'translateX(-50%)',fontSize:'.6rem',color:'var(--text2)',whiteSpace:'nowrap'}}>{d.minutes}m</div>}
+                </div>
+                <div style={{fontSize:'.65rem',color:'var(--text2)'}}>{d.day}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="card" style={{margin:'0 16px 16px',padding:'18px 16px'}}>
+          <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📅 Sessioni per giorno</div>
+          {sortedDates.length === 0 && (
+            <div style={{color:'var(--text2)',fontSize:'.85rem',textAlign:'center',padding:20}}>
+              Nessuna sessione ancora. Usa il Pomodoro per studiare! 🍅
+            </div>
+          )}
+          {sortedDates.map(date => {
+            const d = byDate[date];
+            const b = breaksByDate[date] || 0;
+            const dayName = new Date(date + 'T12:00').toLocaleDateString('it-IT', {weekday:'long',day:'numeric',month:'short'});
+            return (
+              <div key={date} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.06)'}}>
+                <div>
+                  <div style={{fontWeight:600,fontSize:'.85rem'}}>{dayName}</div>
+                  <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{d.sessions} sessioni · {b} pause</div>
+                </div>
+                <div style={{fontWeight:700,color:'var(--accent)',fontSize:'1.1rem'}}>{Math.floor(d.minutes/60)}h {d.minutes%60}m</div>
+              </div>
+            );
+          })}
+        </div>
+
+        {sortedDates.length > 0 && (
+          <div className="card" style={{margin:'0 16px 16px',padding:'18px 16px'}}>
+            <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📊 Statistiche avanzate</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+              {[
+                {label:'Media al giorno',val:avgPerDay.toFixed(1)+' min'},
+                {label:'Miglior giorno',val:(bestDay ? byDate[bestDay].minutes : 0)+' min'},
+                {label:'Media per sessione',val:(totalSessions > 0 ? (totalMinutes/totalSessions).toFixed(1) : 0)+' min'},
+                {label:'Giorni attivi',val:sortedDates.length},
+                {label:'Sessioni al giorno',val:(sortedDates.length > 0 ? (totalSessions/sortedDates.length).toFixed(1) : 0)},
+                {label:'Pause totali',val:totalBreaks},
+              ].map((s, i) => (
+                <div key={i} style={{padding:'10px 12px',background:'rgba(255,255,255,.04)',borderRadius:10}}>
+                  <div style={{fontSize:'.72rem',color:'var(--text2)',marginBottom:2}}>{s.label}</div>
+                  <div style={{fontWeight:700,fontSize:'1rem',color:'var(--accent)'}}>{s.val}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // - STATS TAB -
 function StatsTab({toast}) {
   const data = useContext(DataCtx);
@@ -23935,6 +24057,7 @@ function StatsTab({toast}) {
   const [todoItems, setTodoItems] = useState(()=>{try{return JSON.parse(localStorage.getItem('todo_items')||'[]');}catch(e){return [];}});
   const todos = data?.todos || todoItems;
   const [docs, setDocs] = useState([]);
+  const [sessionsOpen, setSessionsOpen] = useState(false);
   useEffect(()=>{window._idb.getAll('docs').then(d=>setDocs(d)).catch(()=>setDocs([]));},[]);
   
   const getActivityData = () => {
@@ -23982,11 +24105,12 @@ function StatsTab({toast}) {
       
       <div className="cg" style={{marginBottom:20}}>
         {stats.map((s,i)=>(
-          <div key={i} className="card" style={{textAlign:'center',padding:'20px 14px',position:'relative',overflow:'hidden'}}>
+          <div key={i} className="card" style={{textAlign:'center',padding:'20px 14px',position:'relative',overflow:'hidden',cursor:(s.icon==='🍅'||s.icon==='⏱️')?'pointer':'default',transition:'transform .15s,box-shadow .15s'}} onClick={(s.icon==='🍅'||s.icon==='⏱️')?()=>setSessionsOpen(true):undefined}>
             <div style={{position:'absolute',top:-20,right:-20,width:80,height:80,borderRadius:'50%',background:'rgba(255,255,255,.06)'}}/>
             <div style={{fontSize:'2rem',marginBottom:8}}>{s.icon}</div>
             <div style={{fontSize:'1.8rem',fontWeight:800,color:s.color}}>{s.val}</div>
             <div style={{fontSize:'.78rem',color:'var(--text2)',marginTop:4}}>{s.label}</div>
+            {(s.icon==='🍅'||s.icon==='⏱️')&&<div style={{position:'absolute',bottom:8,right:10,fontSize:'.6rem',color:'var(--text2)',opacity:.5}}>▶ clicca</div>}
           </div>
         ))}
       </div>
@@ -24017,6 +24141,7 @@ function StatsTab({toast}) {
         {pomCycles<10&&todos.length>0&&<div style={{color:'var(--text2)',fontSize:'.85rem'}}>Hai completato {pomCycles} pomodori. Prova a usare il Pomodoro per studiare più efficacemente!</div>}
         {pomCycles>=10&&<div style={{color:'var(--green)',fontSize:'.85rem'}}>🎉 Ottimo! {pomCycles} sessioni di studio completate. Continua così!</div>}
       </div>
+      {sessionsOpen && <StudySessionsModal onClose={() => setSessionsOpen(false)}/>}
     </div>
   );
 }
@@ -25245,8 +25370,10 @@ function UniDashboard({onClose, addNote, toast}) {
               setPomCycles(c=>{
                 const newCount = pomMode==='work'?c+1:c;
                 localStorage.setItem('pom_cycles', newCount.toString());
+                if(pomMode==='work') logStudySession('work',pomDurationsRef.current.work);
                 return newCount;
               });
+              if(pomMode!=='work') logStudySession('break',pomDurationsRef.current.short||5);
               setPomMode(nextMode);
               setPomSecs(nextDur);
             },100);
@@ -28362,6 +28489,22 @@ function useNotifications(events, birthdays) {
   return {notifList, notifOpen, setNotifOpen, unread, markAllRead, addNotif};
 }
 
+function logStudySession(type, duration) {
+  try {
+    const log = JSON.parse(localStorage.getItem('pom_log') || '[]');
+    const now = new Date();
+    log.push({
+      id: Date.now() + Math.random(),
+      date: now.toISOString().split('T')[0],
+      type,
+      duration,
+      completedAt: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0')
+    });
+    if(log.length > 10000) log.splice(0, log.length - 10000);
+    localStorage.setItem('pom_log', JSON.stringify(log));
+  } catch(e) {}
+}
+
 function App(){
   const [fbOk,setFbOk]=useState(!!window._fbReady);
   const [user,setUser]=useState(null);
@@ -29241,6 +29384,8 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
             try{if(Notification.permission==='granted')new Notification(miniPomMode==='work'?'Pausa!':'Torna a studiare!');}catch(e){}
             const cycles = parseInt(localStorage.getItem('pom_cycles')||'0')+(miniPomMode==='work'?1:0);
             localStorage.setItem('pom_cycles',String(cycles));
+            if(miniPomMode==='work') logStudySession('work',miniPomDurations.work);
+            else logStudySession('break',miniPomDurations.short||5);
             const next = miniPomMode==='work'?(cycles)%4===0?'long':'short':'work';
             setMiniPomMode(next);
             return miniPomDurations[next]*60;
