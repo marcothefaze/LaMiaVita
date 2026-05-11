@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lamiavita-v4';
+const CACHE_NAME = 'lamiavita-v5';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,8 @@ const STATIC_ASSETS = [
   'https://sdk.scdn.co/spotify-player.js',
   'https://accounts.google.com/gsi/client'
 ];
+// Cache API responses for 5 minutes
+const API_CACHE_DURATION = 5 * 60 * 1000;
 
 // Install event - cache static assets
 self.addEventListener('install', (event) => {

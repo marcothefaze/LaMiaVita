@@ -26,8 +26,13 @@
 <meta name="og:description" content="La tua vita in un posto solo">
 <meta name="og:image" content="https://i.ibb.co/6JYFJ2hQ/un-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg">
 <title>LaMiaVita 2.0</title>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" media="print" onload="this.media='all';this.onload=null">
+<noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"></noscript>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false});"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -43,12 +48,12 @@ window.onSpotifyWebPlaybackSDKReady = function() {
   if(window._spotifyInitCallback) window._spotifyInitCallback();
 };
 </script>
-<script src="https://sdk.scdn.co/spotify-player.js" onerror="window._spotifySDKErr=true"></script>
+<script src="https://sdk.scdn.co/spotify-player.js" async onerror="window._spotifySDKErr=true"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 /* PWA Icon optimization - remove thick borders when dragging to desktop/doc */
 img[src*="ibb.co"],img[src*="imgur.com"]{border:none;outline:none;background:transparent;image-rendering:-webkit-optimize-contrast}
-:root{--bg:#0A0E1A;--surface:#111827;--surface2:#1A2332;--surface3:#1F2937;--border:rgba(255,255,255,.08);--text:#F3F4F6;--text2:#9CA3AF;--text3:#6B7280;--red:#F43F5E;--yellow:#FBBF24;--green:#10B981;--blue:#06B6D4;--purple:#8B5CF6;--pink:#EC4899;--accent:#F43F5E;--accent2:#F97316;--g1:linear-gradient(135deg,var(--accent),var(--accent2));--g2:linear-gradient(135deg,#06B6D4,#10B981);--g3:linear-gradient(135deg,#8B5CF6,#06B6D4);--g4:linear-gradient(135deg,#FBBF24,#F97316);--g5:linear-gradient(135deg,#EC4899,#8B5CF6);--r:12px;--r2:16px;--font-main:Inter,sans-serif;--radius:12px;--radius2:16px;--shadow:0 4px 24px rgba(0,0,0,.4);--shadow-lg:0 8px 48px rgba(0,0,0,.5);--shadow-glow:0 0 30px rgba(244,63,94,.15);--btn-radius:10px;--card-radius:16px}
+:root{--bg:#0A0E1A;--surface:#111827;--surface2:#1A2332;--surface3:#1F2937;--border:rgba(255,255,255,.08);--text:#F3F4F6;--text2:#9CA3AF;--text3:#6B7280;--red:#F43F5E;--yellow:#FBBF24;--green:#10B981;--blue:#06B6D4;--purple:#8B5CF6;--pink:#EC4899;--accent:#F43F5E;--accent2:#F97316;--g1:linear-gradient(135deg,var(--accent),var(--accent2));--g2:linear-gradient(135deg,#06B6D4,#10B981);--g3:linear-gradient(135deg,#8B5CF6,#06B6D4);--g4:linear-gradient(135deg,#FBBF24,#F97316);--g5:linear-gradient(135deg,#EC4899,#8B5CF6);--g6:linear-gradient(135deg,#8B5CF6,#EC4899);--r:12px;--r2:16px;--font-main:Inter,sans-serif;--radius:12px;--radius2:16px;--shadow:0 4px 24px rgba(0,0,0,.4);--shadow-lg:0 8px 48px rgba(0,0,0,.5);--shadow-glow:0 0 30px rgba(244,63,94,.15);--btn-radius:10px;--card-radius:16px;--card-radius-v2:24px;--shadow-card:0 8px 32px rgba(0,0,0,.4);--shadow-card-hover:0 12px 48px rgba(0,0,0,.5),0 0 30px rgba(139,92,246,.15);--orange:#F97316;--content-pad:20px}
 :root.light{--bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F1F5F9;--surface3:#E2E8F0;--border:rgba(0,0,0,.06);--text:#0F172A;--text2:#64748B;--text3:#94A3B8;--red:#E11D48;--yellow:#D97706;--green:#059669;--blue:#0891B2;--purple:#7C3AED;--pink:#DB2777;--accent:#E11D48;--accent2:#EA580C}
 html,body,#root{height:100%;overflow:hidden;min-height:100vh}
 body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
@@ -74,7 +79,7 @@ button span{font-family:'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',
 .lock-btn{padding:10px 20px;border-radius:12px;border:none;cursor:pointer;font-weight:600;transition:all .2s}
 .lock-btn-clear{background:rgba(255,255,255,.05);color:var(--text2)}
 .lock-btn-clear:hover{background:rgba(255,255,255,.1)}
-.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:-1;animation:v2-float 8s ease-in-out infinite}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:-1;animation:v2-float 8s ease-in-out infinite;will-change:transform}
 
 /* V2 Enhanced Orbs - More vibrant */
 /* Fix: Disable orbs when pattern is active (V1: orb1-5, V2: orb-a,b,c) */
@@ -118,8 +123,8 @@ body[class*="bg-pattern-"] .orb-c{display:none}
 .ltab.active{background:var(--surface2);color:var(--text)}
 .lerr{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);border-radius:10px;padding:10px 14px;font-size:.82rem;color:var(--red);margin-bottom:12px}
 
-.app{display:flex;height:100vh;position:relative;z-index:1}
-.sb{width:72px;background:linear-gradient(180deg,#0E1220 0%,#0a0e1a 100%);border-right:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:2px;flex-shrink:0;transition:width .3s cubic-bezier(.4,0,.2,1);overflow:hidden;position:relative;z-index:10;box-shadow:4px 0 20px rgba(0,0,0,.3)}
+.app{display:flex;height:100vh;width:100%;max-width:100%;position:relative;z-index:1;overflow:hidden;contain:layout style}
+.sb{width:72px;background:linear-gradient(180deg,#0E1220 0%,#0a0e1a 100%);border-right:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:2px;flex-shrink:0;transition:width .3s cubic-bezier(.4,0,.2,1);overflow:hidden;position:relative;z-index:10;box-shadow:4px 0 20px rgba(0,0,0,.3);contain:layout style}
 .sb.exp{width:230px}
 .sb-top{display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:16px;padding:0 14px;min-height:56px;gap:10px}
 .logo-i{width:48px;height:48px;border-radius:14px;background:var(--g1);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;box-shadow:0 4px 14px rgba(255,77,109,.4)}
@@ -156,7 +161,7 @@ body[class*="bg-pattern-"] .orb-c{display:none}
 .tgb{width:44px;height:34px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;color:rgba(255,255,255,.4);transition:all .2s;font-size:.8rem}
 .tgb:hover{background:rgba(255,255,255,.1);color:var(--text)}
 .sb.exp .tgb{width:100%}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;width:100%;max-width:100%;contain:layout style}
 
 /* Sidebar scrollable nav - v1 (non-v2) */
 .sidebar-nav-scroll {
@@ -180,21 +185,21 @@ body[class*="bg-pattern-"] .orb-c{display:none}
 .tr{display:flex;align-items:center;gap:8px}
 .tbb{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:all .2s;color:var(--text)}
 .tbb:hover{background:rgba(255,255,255,.09);transform:scale(1.05)}
-.content{flex:1;overflow-y:auto;padding:20px;animation:fadeIn .25s ease-out}
+.content{flex:1;overflow-y:auto;padding:var(--content-pad,20px);animation:fadeIn .25s ease-out;width:100%;max-width:100%;contain:layout style}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
 @keyframes scaleIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
 
-.card{background:linear-gradient(145deg,rgba(26,35,50,.9) 0%,rgba(17,24,39,.95) 100%);border:1px solid rgba(139,92,246,.15);border-radius:var(--card-radius-v2);padding:18px;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-card),inset 0 1px 0 rgba(255,255,255,.03)}
+.card{background:linear-gradient(145deg,rgba(26,35,50,.85) 0%,rgba(17,24,39,.9) 100%);border:1px solid rgba(139,92,246,.15);border-radius:var(--card-radius-v2);padding:18px;transition:all .25s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow-card),inset 0 1px 0 rgba(255,255,255,.03);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .card:hover{border-color:rgba(139,92,246,.4);box-shadow:var(--shadow-card-hover);transform:translateY(-3px)}
 .cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(139,92,246,.1)}
 .sht{font-family:var(--font-main);font-weight:600;font-size:1.2rem;letter-spacing:-.01em}
 .sht em{font-style:normal;background:var(--g6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .btn{padding:8px 16px;border-radius:var(--btn-radius);border:none;cursor:pointer;font-family:var(--font-main);font-weight:600;font-size:.84rem;transition:all .2s cubic-bezier(.4,0,.2,1);display:inline-flex;align-items:center;gap:6px;letter-spacing:.01em}
-.btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.btn:hover{opacity:.95;transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.4)}
 .btn:active{transform:translateY(0);opacity:1}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
 .br{background:var(--g1);color:#fff;box-shadow:0 4px 15px rgba(244,63,94,.3)}.bt{background:var(--g2);color:#0A0E1A}.bpu{background:var(--g3);color:#fff}.by{background:var(--g4);color:#0A0E1A}.bg{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border);backdrop-filter:blur(10px)}.bg:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.15)}.bs{padding:6px 12px;font-size:.8rem;border-radius:var(--btn-radius)}
@@ -719,6 +724,13 @@ body.light .sp-global-player,body.cream .sp-global-player,body.lavender .sp-glob
 .bg-pattern-grid::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.7!important;background-image:linear-gradient(0deg,var(--accent) 1px,transparent 1px),linear-gradient(90deg,var(--accent) 1px,transparent 1px);background-size:24px 24px;animation:patternDrift 40s linear infinite}
 .bg-pattern-aurora::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.8!important;background:radial-gradient(ellipse at 20% 50%,var(--accent) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(139,92,246,.8) 0%,transparent 50%);animation:auroraShift 15s ease-in-out infinite}
 .bg-pattern-circuit::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.7!important;background-image:linear-gradient(0deg,var(--accent) 1px,transparent 1px),linear-gradient(90deg,var(--accent) 1px,transparent 1px);background-size:32px 32px;animation:circuitPulse 3s ease-in-out infinite}
+.bg-pattern-nebula::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.9!important;background:radial-gradient(circle at 30% 30%,var(--accent) 0%,transparent 40%),radial-gradient(circle at 70% 60%,var(--purple) 0%,transparent 40%),radial-gradient(circle at 50% 80%,rgba(76,201,240,.5) 0%,transparent 30%);background-size:100% 100%;animation:nebulaRotate 30s linear infinite}
+.bg-pattern-matrix::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.5!important;background-image:linear-gradient(0deg,var(--accent) 1px,transparent 1px);background-size:14px 20px;animation:matrixScroll 10s linear infinite;background-color:transparent}
+.bg-pattern-topo::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.6!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M0 0h50v50H0zM50 50h50v50H50z' fill='none' stroke='%23FF4D6D' stroke-width='1' opacity='0.3'/%3E%3C/svg%3E");background-size:30px 30px;animation:topoPulse 8s ease-in-out infinite}
+.bg-pattern-zigzag::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.7!important;background-image:repeating-linear-gradient(45deg,var(--accent) 0,var(--accent) 2px,transparent 2px,transparent 16px),repeating-linear-gradient(-45deg,var(--accent) 0,var(--accent) 2px,transparent 2px,transparent 16px);background-size:40px 40px;animation:patternDrift 25s linear infinite}
+.bg-pattern-waves::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.6!important;background-image:repeating-linear-gradient(0deg,var(--accent) 0,var(--accent) 2px,transparent 2px,transparent 30px);background-size:100px 30px;animation:patternWave 4s ease-in-out infinite}
+.bg-pattern-hex::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.6!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49'%3E%3Cpath fill='none' stroke='%23FF4D6D' stroke-width='1' d='M14 0l14 7v14l-14 7-14-7V7zM14 28l14-7v14l-14 7-14-7V21zM0 21l14 7v14l-14 7-14-7V14z'/%3E%3C/svg%3E");background-size:28px 49px;animation:patternPulse 6s ease-in-out infinite}
+.bg-pattern-diamond::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1!important;opacity:.7!important;background-image:linear-gradient(45deg,var(--accent) 25%,transparent 25%),linear-gradient(-45deg,var(--accent) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--accent) 75%),linear-gradient(-45deg,transparent 75%,var(--accent) 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0px;animation:patternPulse 5s ease-in-out infinite}
 
 @keyframes matrixScroll{0%{background-position:0 0}100%{background-position:0 100vh}}
 @keyframes patternDrift{0%{background-position:0 0}100%{background-position:100px 100px}}
@@ -4812,6 +4824,7 @@ body.lmv-v2 .card {
   border-radius: 24px !important;
   box-shadow: 0 12px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05) !important;
   transition: all .4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  will-change: transform !important;
 }
 
 body.lmv-v2 .card:hover {
@@ -5084,12 +5097,18 @@ body.lmv-v2 .nl {
 
 /* V2: Topbar - enhanced with glow */
 body.lmv-v2 .topbar {
-  background: linear-gradient(180deg, rgba(12, 12, 20, 0.95), rgba(8, 8, 14, 0.9)) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.12) !important;
-  height: 64px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 40px rgba(139, 92, 246, 0.05) !important;
-  position: relative;
+  background: rgba(8,8,14,.98) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(99,102,241,.12) !important;
+  height: 60px !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 100 !important;
 }
 body.lmv-v2 .topbar::after {
   content: '';
@@ -5180,6 +5199,7 @@ body.lmv-v2 .orb-b,
 body.lmv-v2 .orb-c {
   filter: blur(80px) !important;
   opacity: .12 !important;
+  will-change: transform !important;
 }
 
 body.lmv-v2 .orb-b {
@@ -5402,30 +5422,6 @@ body.lmv-v2 .cal-day:hover {
   background: rgba(99,102,241,.15) !important;
 }
 
-/* V2: Todo */
-body.lmv-v2 .todo-item {
-  background: rgba(255,255,255,.04) !important;
-  border: 1px solid rgba(255,255,255,.06) !important;
-  border-radius: 14px !important;
-  transition: all .2s !important;
-}
-
-body.lmv-v2 .todo-item:hover {
-  border-color: rgba(99,102,241,.2) !important;
-}
-
-/* V2: Password items */
-body.lmv-v2 .pwi {
-  background: rgba(255,255,255,.04) !important;
-  border: 1px solid rgba(255,255,255,.06) !important;
-  border-radius: 14px !important;
-  transition: all .2s !important;
-}
-
-body.lmv-v2 .pwi:hover {
-  border-color: rgba(99,102,241,.2) !important;
-}
-
 /* V2: Spotify */
 body.lmv-v2 .sp-cover {
   border-radius: 20px !important;
@@ -5495,16 +5491,21 @@ body.lmv-v2 .mobile-menu {
 }
 
 /* V2: Content area - rich gradient background */
-  body.lmv-v2 .content {
-    padding: 24px !important;
-    max-width: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch !important;
-    height: calc(100vh - 64px) !important;
-    background: linear-gradient(180deg, #0a0a12 0%, #0d0d1a 20%, #080810 50%, #0a0a15 80%, #050508 100%) !important;
-    position: relative;
-  }
+body.lmv-v2 .content {
+  max-width: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  scroll-behavior: smooth !important;
+  overscroll-behavior: contain !important;
+  position: relative;
+}
+body.lmv-v2:not([class*="bg-pattern-"]) .content {
+  background: linear-gradient(180deg, #0a0a12 0%, #0d0d1a 20%, #080810 50%, #0a0a15 80%, #050508 100%) !important;
+}
+body.lmv-v2[class*="bg-pattern-"] .content {
+  background: transparent !important;
+}
   body.lmv-v2::before {
     content: '';
     position: fixed;
@@ -5710,14 +5711,9 @@ body.lmv-v2::after {
 .bg-pattern-matrix::before,
 .bg-pattern-nebula::before,
 .bg-pattern-circuit::before {
-  z-index: 1 !important;
+  z-index: -1 !important;
   pointer-events: none !important;
-}
-
-/* V2: Ensure content background doesn't hide patterns */
-body.lmv-v2 .content {
-  position: relative !important;
-  background: transparent !important;
+  opacity: 0.8 !important;
 }
 
 body.lmv-v2 .content > * {
@@ -6882,25 +6878,29 @@ body.lmv-v2 .nb::before {
   transition: height 0.3s ease !important;
 }
 
-body.lmv-v2 .nb:hover {
-  background: rgba(99, 102, 241, 0.08) !important;
-}
-
 body.lmv-v2 .nb:hover::before {
   height: 24px !important;
 }
 
 body.lmv-v2 .nb.active {
-  background: rgba(99, 102, 241, 0.15) !important;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.15)) !important;
+  border-color: rgba(139, 92, 246, 0.3) !important;
+  box-shadow: 0 0 24px rgba(139, 92, 246, 0.15), inset 0 0 20px rgba(139, 92, 246, 0.05) !important;
 }
 
 body.lmv-v2 .nb.active::before {
   height: 32px !important;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.6) !important;
 }
 
 body.lmv-v2 .nb.active .nl {
   color: var(--v2-text) !important;
   font-weight: 700 !important;
+}
+
+body.lmv-v2 .nb:hover {
+  background: rgba(99, 102, 241, 0.12) !important;
+  border-color: rgba(139, 92, 246, 0.2) !important;
 }
 
 body.lmv-v2 .nl {
@@ -7363,15 +7363,421 @@ body.lmv-v2 .fab:hover {
   transform: scale(1.1) rotate(90deg) !important;
 }
 
-/* V2 Bottom Nav */
-body.lmv-v2 .bottom-nav {
+/* V2 Notifications */
+body.lmv-v2 .notif-item2 {
+  background: var(--v2-surface-2) !important;
+  border-radius: 14px !important;
+  margin-bottom: 8px !important;
+  border-left: 3px solid var(--v2-primary) !important;
+  transition: all 0.3s ease !important;
+}
+
+body.lmv-v2 .notif-item2:hover {
+  background: var(--v2-surface-3) !important;
+  transform: translateX(-4px) !important;
+}
+
+body.lmv-v2 .notif-item2.unread {
+  background: rgba(99, 102, 241, 0.1) !important;
+  border-left-color: var(--v2-secondary) !important;
+}
+
+/* V2 Toast */
+body.lmv-v2 .toast {
   background: var(--v2-surface) !important;
-  border-top: 1px solid var(--v2-border) !important;
+  border: 1px solid var(--v2-border) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
   backdrop-filter: blur(20px) !important;
 }
 
-body.lmv-v2 .bottom-nav-item.active {
-  color: var(--v2-primary) !important;
+/* V2 Orbs */
+body.lmv-v2 .orb-a,
+body.lmv-v2 .orb-b,
+body.lmv-v2 .orb-c {
+  filter: blur(100px) !important;
+  opacity: 0.4 !important;
+  animation: v2-orb-float 12s ease-in-out infinite !important;
+  will-change: transform !important;
+}
+
+body.lmv-v2 .orb-b {
+  animation-delay: -4s !important;
+}
+
+body.lmv-v2 .orb-c {
+  animation-delay: -8s !important;
+}
+
+@keyframes v2-orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -30px) scale(1.1); }
+  50% { transform: translate(-20px, 20px) scale(0.9); }
+  75% { transform: translate(20px, 30px) scale(1.05); }
+}
+
+/* V2 Grid & Noise */
+body.lmv-v2 .grid-overlay {
+  opacity: 0.02 !important;
+}
+
+body.lmv-v2 .noise-overlay {
+  opacity: 0.015 !important;
+  filter: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E") !important;
+}
+
+/* V2 Animations */
+body.lmv-v2 .card {
+  animation: v2-enter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  contain: layout style paint;
+  will-change: transform, opacity;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+body.lmv-v2 .card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+@keyframes v2-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* V2 Empty State */
+body.lmv-v2 .empty-state {
+  background: var(--v2-surface) !important;
+  border: 2px dashed var(--v2-border) !important;
+  border-radius: 24px !important;
+  padding: 40px !important;
+}
+
+/* V2 Scrollbar - Global */
+body.lmv-v2 ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+body.lmv-v2 ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body.lmv-v2 ::-webkit-scrollbar-thumb {
+  background: var(--v2-primary);
+  border-radius: 6px;
+}
+
+body.lmv-v2 ::-webkit-scrollbar-thumb:hover {
+  background: var(--v2-secondary);
+}
+
+body.lmv-v2 .sht {
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: var(--v2-text) !important;
+  letter-spacing: -0.01em !important;
+}
+
+body.lmv-v2 .sht em {
+  font-style: normal !important;
+  background: linear-gradient(135deg, var(--v2-primary), var(--v2-secondary)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* V2 Buttons */
+body.lmv-v2 .btn {
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  padding: 12px 20px !important;
+  font-size: 0.9rem !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: none !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+body.lmv-v2 .btn::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent) !important;
+  transition: left 0.5s ease !important;
+}
+
+body.lmv-v2 .btn:hover::after {
+  left: 100% !important;
+}
+
+body.lmv-v2 .btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.lmv-v2 .btn:active {
+  transform: translateY(0) !important;
+}
+
+body.lmv-v2 .btn.bt {
+  background: linear-gradient(135deg, var(--v2-primary), var(--v2-primary-dark)) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px var(--v2-glow) !important;
+}
+
+body.lmv-v2 .btn.bt:hover {
+  box-shadow: 0 8px 32px var(--v2-glow) !important;
+}
+
+body.lmv-v2 .btn.bs {
+  background: var(--v2-surface-2) !important;
+  color: var(--v2-text) !important;
+  border: 1px solid var(--v2-border) !important;
+}
+
+body.lmv-v2 .btn.bg {
+  background: var(--v2-surface-3) !important;
+  color: var(--v2-text-2) !important;
+  border: 1px solid var(--v2-border) !important;
+}
+
+/* V2 Modal */
+body.lmv-v2 .mbg {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(10px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+}
+
+body.lmv-v2 .modal {
+  background: var(--v2-surface) !important;
+  border: 1px solid var(--v2-border) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 60px var(--v2-glow) !important;
+  max-width: 500px !important;
+  width: 100% !important;
+  max-height: 85vh !important;
+  overflow: hidden !important;
+}
+
+body.lmv-v2 .mh {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.08)) !important;
+  border-bottom: 1px solid var(--v2-border) !important;
+  padding: 20px 24px !important;
+}
+
+body.lmv-v2 .mt {
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  color: var(--v2-text) !important;
+}
+
+body.lmv-v2 .mx {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  background: var(--v2-surface-2) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  color: var(--v2-text-2) !important;
+}
+
+body.lmv-v2 .mx:hover {
+  background: var(--v2-danger) !important;
+  color: #fff !important;
+}
+
+/* V2 Inputs */
+body.lmv-v2 .field {
+  background: var(--v2-surface-2) !important;
+  border: 1px solid var(--v2-border) !important;
+  border-radius: 12px !important;
+  padding: 14px 18px !important;
+  font-size: 0.9rem !important;
+  color: var(--v2-text) !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+}
+
+body.lmv-v2 .field:focus {
+  outline: none !important;
+  background: var(--v2-surface-3) !important;
+  border-color: var(--v2-primary) !important;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15), 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.lmv-v2 .field::placeholder {
+  color: var(--v2-text-3) !important;
+}
+
+body.lmv-v2 .fl {
+  margin-bottom: 16px !important;
+}
+
+body.lmv-v2 .fl label {
+  display: block !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  color: var(--v2-text-2) !important;
+  margin-bottom: 6px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* V2 Sub Tabs */
+body.lmv-v2 .stab {
+  background: var(--v2-surface-2) !important;
+  border: 1px solid var(--v2-border) !important;
+  border-radius: 10px !important;
+  padding: 8px 16px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: var(--v2-text-2) !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+}
+
+body.lmv-v2 .stab:hover {
+  background: var(--v2-surface-3) !important;
+  transform: translateY(-2px) !important;
+}
+
+body.lmv-v2 .stab.active {
+  background: linear-gradient(135deg, var(--v2-primary), var(--v2-primary-dark)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 16px var(--v2-glow) !important;
+}
+
+/* V2 Toggle */
+body.lmv-v2 .toggle {
+  width: 52px !important;
+  height: 28px !important;
+  border-radius: 14px !important;
+  background: var(--v2-surface-3) !important;
+  position: relative !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+}
+
+body.lmv-v2 .toggle::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 3px !important;
+  left: 3px !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  background: var(--v2-text-2) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.lmv-v2 .toggle.on {
+  background: linear-gradient(135deg, var(--v2-primary), var(--v2-secondary)) !important;
+}
+
+body.lmv-v2 .toggle.on::after {
+  left: 27px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 12px var(--v2-glow) !important;
+}
+
+/* V2 Settings */
+body.lmv-v2 .set-section {
+  background: var(--v2-surface) !important;
+  border: 1px solid var(--v2-border) !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  margin-bottom: 16px !important;
+}
+
+body.lmv-v2 .set-title {
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  color: var(--v2-text) !important;
+  margin-bottom: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+body.lmv-v2 .set-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 0 !important;
+  border-bottom: 1px solid var(--v2-border) !important;
+}
+
+body.lmv-v2 .set-row:last-child {
+  border-bottom: none !important;
+}
+
+body.lmv-v2 .set-label {
+  font-weight: 600 !important;
+  color: var(--v2-text) !important;
+  font-size: 0.9rem !important;
+}
+
+body.lmv-v2 .set-sub {
+  font-size: 0.75rem !important;
+  color: var(--v2-text-3) !important;
+  margin-top: 2px !important;
+}
+
+/* V2 Quick Note */
+body.lmv-v2 .quick-note-popup {
+  background: var(--v2-surface) !important;
+  border: 1px solid var(--v2-border) !important;
+  border-radius: 20px !important;
+  padding: 20px !important;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5), 0 0 40px var(--v2-glow) !important;
+}
+
+body.lmv-v2 .quick-note-input {
+  background: var(--v2-surface-2) !important;
+  border: 1px solid var(--v2-border) !important;
+  border-radius: 12px !important;
+  padding: 14px !important;
+  color: var(--v2-text) !important;
+  resize: none !important;
+  width: 100% !important;
+  min-height: 100px !important;
+  font-family: inherit !important;
+  font-size: 0.9rem !important;
+}
+
+/* V2 FAB */
+body.lmv-v2 .fab {
+  background: linear-gradient(135deg, var(--v2-primary), var(--v2-secondary)) !important;
+  box-shadow: 0 8px 32px var(--v2-glow), 0 0 60px var(--v2-glow) !important;
+  animation: v2-fab-glow 2s ease-in-out infinite !important;
+}
+
+@keyframes v2-fab-glow {
+  0%, 100% { box-shadow: 0 8px 32px var(--v2-glow), 0 0 60px var(--v2-glow); }
+  50% { box-shadow: 0 8px 48px var(--v2-glow), 0 0 80px var(--v2-glow); }
+}
+
+body.lmv-v2 .fab:hover {
+  transform: scale(1.1) rotate(90deg) !important;
 }
 
 /* V2 Notifications */
@@ -7409,6 +7815,7 @@ body.lmv-v2 .orb-c {
   filter: blur(100px) !important;
   opacity: 0.4 !important;
   animation: v2-orb-float 12s ease-in-out infinite !important;
+  will-change: transform !important;
 }
 
 body.lmv-v2 .orb-b {
@@ -7437,13 +7844,16 @@ body.lmv-v2 .noise-overlay {
 }
 
 /* V2 Animations */
-body.lmv-v2 .card,
-body.lmv-v2 .nb,
-body.lmv-v2 .btn,
-body.lmv-v2 .modal,
-body.lmv-v2 .set-section,
-body.lmv-v2 .sh {
+body.lmv-v2 .card {
   animation: v2-enter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  contain: layout style paint;
+  will-change: transform, opacity;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+body.lmv-v2 .card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
 }
 
 @keyframes v2-enter {
@@ -7542,35 +7952,28 @@ body.lmv-v2 ::-webkit-scrollbar-thumb:hover {
   body.lmv-v2 .todo-text { font-size: 1.05rem !important; }
   body.lmv-v2 .note-card { padding: 16px !important; }
   body.lmv-v2 .cal-day { width: 40px !important; height: 40px !important; }
-  body.lmv-v2 .topbar { height: 54px !important; }
-  body.lmv-v2 .content { padding: 12px !important; padding-bottom: 80px !important; }
+  body.lmv-v2 .topbar { height: 54px !important; padding: 0 12px !important; position: sticky !important; top: 0 !important; }
+  body.lmv-v2 .content { padding: 12px !important; padding-bottom: 90px !important; }
   body.lmv-v2 .quick-create-fab { bottom: 80px !important; width: 56px !important; height: 56px !important; }
-  body.lmv-v2 .bottom-nav { height: 60px !important; padding-bottom: env(safe-area-inset-bottom) !important; }
+  body.lmv-v2 .bottom-nav { height: 64px !important; padding-bottom: env(safe-area-inset-bottom, 10px) !important; display: flex !important; justify-content: space-around !important; }
+  body.lmv-v2 .bottom-nav-item { padding: 8px 12px !important; min-width: 50px !important; display: flex !important; flex-direction: column !important; align-items: center !important; gap: 4px !important; font-size: .7rem !important; }
+  body.lmv-v2 .bottom-nav-item svg { width: 24px !important; height: 24px !important; }
   body.lmv-v2 .cg { grid-template-columns: 1fr !important; }
   body.lmv-v2 .notes-grid { grid-template-columns: 1fr !important; }
   body.lmv-v2 .pw-grid { grid-template-columns: 1fr !important; }
   body.lmv-v2 .cinp { font-size: 16px !important; min-height: 80px !important; }
-}
-  
+  body.lmv-v2 .nb { width: 44px !important; height: 44px !important; }
+  body.lmv-v2 .tab { padding: 12px 14px !important; font-size: .85rem !important; }
+  body.lmv-v2 .stab { padding: 10px 12px !important; font-size: .8rem !important; }
   body.lmv-v2 .topbar {
     right: 0 !important;
     height: 52px !important;
     padding: 0 12px !important;
   }
-  
   body.lmv-v2 .pt {
     font-size: .95rem !important;
   }
-  
-  body.lmv-v2 .content {
-    padding: 12px !important;
-    padding-bottom: 140px !important;
-    max-width: 100% !important;
-    width: 100% !important;
-    overflow-y: auto !important;
-    height: auto !important;
-  }
-  }
+}
   
   /* Music Studio V2 fix - ensure sequencer is scrollable */
   body.lmv-v2 [style*="overflow-x"],
@@ -7603,12 +8006,6 @@ body.lmv-v2 ::-webkit-scrollbar-thumb:hover {
   body.lmv-v2 .sp-global-player img {
     width: 46px !important;
     height: 46px !important;
-  }
-  
-  body.lmv-v2 .bottom-nav {
-    height: 60px !important;
-    z-index: 400 !important;
-    padding-bottom: env(safe-area-inset-bottom) !important;
   }
   
   body.lmv-v2 .quick-create-fab {
@@ -7873,754 +8270,7 @@ body.lmv-v2 .v2-logo {
 </div>
 <div id="root"></div>
 
-<!-- Firebase SDK -->
-<!-- 
-  IMPORTANT: Se l'app è su un nuovo dominio (es. GitHub Pages):
-  1. Vai su Firebase Console → Authentication → Settings → Authorized domains
-  2. Aggiungi il nuovo dominio (es. marcothefaze.github.io)
-  3. Vai su Storage → Rules e assicurati che允许 authenticated users
--->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-<script>
-firebase.initializeApp({
-  apiKey:"AIzaSyDKK8_Qac2xrggOgZ9GWvNjAt_4nOTHkfk",
-  authDomain:"mylife-dashboard.firebaseapp.com",
-  projectId:"mylife-dashboard",
-  storageBucket:"mylife-dashboard.appspot.com",
-  messagingSenderId:"14910139571",
-  appId:"1:14910139571:web:e2866dcea73588186454c6"
-});
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-const gp = new firebase.auth.GoogleAuthProvider();
-
-// CORS Proxy helper for AI API calls - GLOBAL SCOPE
-window.proxyFetch = async (url, options) => {
-  // AI APIs now support CORS directly - no proxy needed
-  const aiApis = ['api.deepseek.com', 'api.x.ai', 'api.groq.com', 'generativelanguage.googleapis.com'];
-  const needsProxy = aiApis.some(api => url.includes(api));
-  
-  if (!needsProxy) return fetch(url, options);
-  
-  // Direct fetch for AI APIs (they support CORS)
-  console.log('🔍 Direct fetch to AI API:', url);
-  return fetch(url, options);
-};
-
-// IndexedDB for large data storage (files, projects, docs)
-const DB_NAME = 'LaMiaVitaDB';
-const DB_VERSION = 2;
-let _db = null;
-
-const openDB = () => {
-  if(_db) return Promise.resolve(_db);
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onerror = () => reject(req.error);
-    req.onsuccess = () => { _db = req.result; resolve(_db); };
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if(!db.objectStoreNames.contains('projects')) {
-        db.createObjectStore('projects', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('files')) {
-        const fs = db.createObjectStore('files', {keyPath: 'id'});
-        fs.createIndex('projectId', 'projectId', {unique: false});
-      }
-      if(!db.objectStoreNames.contains('docs')) {
-        db.createObjectStore('docs', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('esami')) {
-        db.createObjectStore('esami', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('flash_decks')) {
-        db.createObjectStore('flash_decks', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('scadenze')) {
-        db.createObjectStore('scadenze', {keyPath: 'id'});
-      }
-      // Offline data stores
-      if(!db.objectStoreNames.contains('notes')) {
-        db.createObjectStore('notes', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('passwords')) {
-        db.createObjectStore('passwords', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('events')) {
-        db.createObjectStore('events', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('todos')) {
-        db.createObjectStore('todos', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('reminders')) {
-        db.createObjectStore('reminders', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('birthdays')) {
-        db.createObjectStore('birthdays', {keyPath: 'id'});
-      }
-      if(!db.objectStoreNames.contains('syncQueue')) {
-        db.createObjectStore('syncQueue', {keyPath: 'id', autoIncrement: true});
-      }
-    };
-  });
-};
-
-const IDB = {
-  saveProject: async (project) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('projects', 'readwrite');
-      tx.objectStore('projects').put(project);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  getProject: async (id) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('projects', 'readonly');
-      const req = tx.objectStore('projects').get(id);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  },
-  getAllProjects: async () => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('projects', 'readonly');
-      const req = tx.objectStore('projects').getAll();
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => reject(req.error);
-    });
-  },
-  deleteProject: async (id) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(['projects', 'files'], 'readwrite');
-      tx.objectStore('projects').delete(id);
-      const fsTx = tx.objectStore('files');
-      const idx = fsTx.index('projectId');
-      const getReq = idx.getAllKeys(id);
-      getReq.onsuccess = () => {
-        getReq.result.forEach(k => fsTx.delete(k));
-      };
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  saveFile: async (file) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('files', 'readwrite');
-      tx.objectStore('files').put(file);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  getProjectFiles: async (projectId) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('files', 'readonly');
-      const idx = tx.objectStore('files').index('projectId');
-      const req = idx.getAll(projectId);
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => reject(req.error);
-    });
-  },
-  deleteFile: async (fileId) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('files', 'readwrite');
-      tx.objectStore('files').delete(fileId);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  getStorageSize: async () => {
-    const db = await openDB();
-    return new Promise((resolve) => {
-      let total = 0;
-      const tx = db.transaction('files', 'readonly');
-      const req = tx.objectStore('files').openCursor();
-      req.onsuccess = (e) => {
-        const cursor = e.target.result;
-        if(cursor) {
-          total += JSON.stringify(cursor.value).length;
-          cursor.continue();
-        } else {
-          resolve(total);
-        }
-      };
-      req.onerror = () => resolve(0);
-    });
-  },
-  // Generic methods for all data types
-  save: async (store, data) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(store, 'readwrite');
-      tx.objectStore(store).put(data);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  get: async (store, id) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(store, 'readonly');
-      const req = tx.objectStore(store).get(id);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
-  },
-  getAll: async (store) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(store, 'readonly');
-      const req = tx.objectStore(store).getAll();
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => reject(req.error);
-    });
-  },
-  delete: async (store, id) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(store, 'readwrite');
-      tx.objectStore(store).delete(id);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  clear: async (store) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(store, 'readwrite');
-      tx.objectStore(store).clear();
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  saveOffline: async (store, data) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(store, 'readwrite');
-      const obj = tx.objectStore(store);
-      if (Array.isArray(data)) {
-        data.forEach(item => obj.put(item));
-      } else {
-        obj.put(data);
-      }
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  addToSyncQueue: async (action) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('syncQueue', 'readwrite');
-      tx.objectStore('syncQueue').add({
-        ...action,
-        timestamp: Date.now(),
-        synced: false
-      });
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  getSyncQueue: async () => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('syncQueue', 'readonly');
-      const req = tx.objectStore('syncQueue').getAll();
-      req.onsuccess = () => resolve(req.result || []);
-      req.onerror = () => reject(req.error);
-    });
-  },
-  clearSyncQueue: async () => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('syncQueue', 'readwrite');
-      tx.objectStore('syncQueue').clear();
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  },
-  removeSyncItem: async (id) => {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('syncQueue', 'readwrite');
-      tx.objectStore('syncQueue').delete(id);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-};
-window._idb = IDB;
-
-// ═══════════════════════════════════════════════════════════════
-// SHARED PDF UTILITY - Usata da tutte le AI
-// ═══════════════════════════════════════════════════════════════
-
-// OCR Cache - store results for 7 days
-window._ocrCache = {
-  get: (hash) => {
-    try {
-      const cached = localStorage.getItem('lmv_ocr_cache');
-      if (!cached) return null;
-      const data = JSON.parse(cached);
-      // Check if expired (7 days)
-      if (Date.now() - data.time > 7 * 24 * 60 * 60 * 1000) {
-        localStorage.removeItem('lmv_ocr_cache');
-        return null;
-      }
-      return data.cache[hash] || null;
-    } catch { return null; }
-  },
-  set: (hash, value) => {
-    try {
-      let data = { time: Date.now(), cache: {} };
-      const cached = localStorage.getItem('lmv_ocr_cache');
-      if (cached) {
-        const existing = JSON.parse(cached);
-        if (Date.now() - existing.time < 7 * 24 * 60 * 60 * 1000) {
-          data = existing;
-        }
-      }
-      data.cache[hash] = value;
-      // Limit cache size (keep last 50 items)
-      const keys = Object.keys(data.cache);
-      if (keys.length > 50) {
-        const oldest = keys.slice(0, keys.length - 50);
-        oldest.forEach(k => delete data.cache[k]);
-      }
-      localStorage.setItem('lmv_ocr_cache', JSON.stringify(data));
-    } catch {}
-  },
-  hash: (str) => {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return hash.toString(16);
-  }
-};
-
-window.extractPDFFile = async (file, onProgress) => {
-  const pdfSize = (file.size / 1024).toFixed(1);
-  
-  // Check OCR cache
-  const fileHash = window._ocrCache.hash(file.name + file.size + file.lastModified);
-  const cached = window._ocrCache.get(fileHash);
-  if (cached) {
-    console.log('PDF from cache:', file.name);
-    return cached;
-  }
-  
-  // Load PDF.js
-  if (!window.pdfjs) {
-    console.log('Loading PDF.js...');
-    await new Promise((res, rej) => {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-      script.onload = () => setTimeout(res, 100);
-      script.onerror = rej;
-      document.head.appendChild(script);
-    });
-    console.log('PDF.js loaded');
-  }
-  
-  const pdfjsLib = window.pdfjs;
-  if (pdfjsLib.GlobalWorkerOptions) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  }
-  
-  const arrayBuffer = await file.arrayBuffer();
-  console.log('Parsing PDF...');
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-  console.log('PDF pages:', pdf.numPages);
-  
-  let text = '';
-  let tables = '';
-  const maxPages = Math.min(pdf.numPages, 100);
-  
-  // Method 1: Direct text extraction
-  for (let i = 1; i <= maxPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    text += content.items.map(item => item.str).join(' ') + '\n\n';
-    
-    // Try to detect tables (simple heuristic)
-    const pageText = content.items.map(item => item.str).join(' ');
-    const tableMatch = pageText.match(/[\d.,]+\s{2,}[\d.,]+/g);
-    if (tableMatch && tableMatch.length > 2) {
-      tables += `\n--- Tabella Pagina ${i} ---\n${tableMatch.join('\n')}\n`;
-    }
-    
-    if (onProgress) onProgress(i, maxPages);
-  }
-  
-  console.log('Extracted text length:', text.length);
-  
-  // Check if text quality is good
-  const wordCount = text.trim().split(/\s+/).filter(w => w.length > 1).length;
-  const lines = text.split('\n').filter(l => l.trim().length > 0);
-  const avgWordsPerLine = lines.length > 0 ? wordCount / lines.length : 0;
-  const needsOCR = text.trim().length < 100 || wordCount < 20 || avgWordsPerLine < 2;
-  
-  if (!needsOCR) {
-    let result = `[PDF: ${file.name}]\nPagine: ${pdf.numPages}\nDimensione: ${pdfSize}KB\n\n${text}`;
-    if (tables) result += `\n\n📊 TABELLE RILEVATE:\n${tables}`;
-    if (pdf.numPages > 100) result += `\n[Documento troncato: ${pdf.numPages - 100} pagine]`;
-    window._ocrCache.set(fileHash, result);
-    return result;
-  }
-  
-  // Method 2: OCR on ALL pages
-  console.log('Text quality low, trying OCR...');
-  try {
-    let ocrText = '';
-    
-    for (let i = 1; i <= pdf.numPages; i++) {
-      console.log(`OCR page ${i}/${pdf.numPages}...`);
-      if (onProgress) onProgress(i, pdf.numPages);
-      
-      const page = await pdf.getPage(i);
-      const scale = 2;
-      const viewport = page.getViewport({ scale });
-      const canvas = document.createElement('canvas');
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      const ctx = canvas.getContext('2d');
-      await page.render({ canvasContext: ctx, viewport }).promise;
-      
-      // Compress for OCR
-      const maxDim = 1200;
-      let w = canvas.width, h = canvas.height;
-      if (w > maxDim || h > maxDim) {
-        const ratio = Math.min(maxDim / w, maxDim / h);
-        w = Math.round(w * ratio); h = Math.round(h * ratio);
-        const tmpCanvas = document.createElement('canvas');
-        tmpCanvas.width = w; tmpCanvas.height = h;
-        tmpCanvas.getContext('2d').drawImage(canvas, 0, 0, w, h);
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(tmpCanvas, 0, 0);
-      }
-      
-      const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-      
-      const ocrResponse = await fetch('https://api.ocr.space/parse/image', {
-        method: 'POST',
-        headers: { 'apikey': 'helloworld' },
-        body: new URLSearchParams({
-          base64Image: 'data:image/jpeg;base64,' + base64,
-          language: 'ita',
-          isOverlayRequired: 'false',
-          scale: 'true',
-          OCREngine: '2'
-        })
-      });
-      
-      const ocrData = await ocrResponse.json();
-      if (ocrData.ParsedResults && ocrData.ParsedResults[0] && ocrData.ParsedResults[0].ParsedText) {
-        ocrText += `--- Pagina ${i} ---\n${ocrData.ParsedResults[0].ParsedText}\n\n`;
-      }
-    }
-    
-    if (ocrText.trim().length > 50) {
-      let result = `[PDF: ${file.name}]\nPagine: ${pdf.numPages}\nDimensione: ${pdfSize}KB\n\n📸 Testo estratto con OCR:\n\n${ocrText}`;
-      if (tables) result += `\n\n📊 TABELLE RILEVATE:\n${tables}`;
-      window._ocrCache.set(fileHash, result);
-      return result;
-    }
-  } catch (ocrErr) {
-    console.log('OCR failed:', ocrErr);
-  }
-  
-  return `[PDF: ${file.name}]\nPagine: ${pdf.numPages}\n⚠️ PDF potrebbe essere scansione.\n\n${text || 'Testo non disponibile'}`;
-};
-
-window.extractImageText = async (file) => {
-  // Check cache first
-  const fileHash = window._ocrCache.hash(file.name + file.size + (file.lastModified || 0));
-  const cached = window._ocrCache.get(fileHash);
-  if (cached) {
-    console.log('Image from cache:', file.name);
-    return cached;
-  }
-  
-  return new Promise((res, rej) => {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const img = new Image();
-        img.onload = async () => {
-          const maxDim = 1200;
-          let w = img.width, h = img.height;
-          if (w > maxDim || h > maxDim) {
-            const ratio = Math.min(maxDim / w, maxDim / h);
-            w = Math.round(w * ratio); h = Math.round(h * ratio);
-          }
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-          
-          const response = await fetch('https://api.ocr.space/parse/image', {
-            method: 'POST',
-            headers: { 'apikey': 'helloworld' },
-            body: new URLSearchParams({
-              base64Image: 'data:image/jpeg;base64,' + base64,
-              language: 'ita',
-              isOverlayRequired: 'false',
-              scale: 'true',
-              OCREngine: '2'
-            })
-          });
-          
-          const data = await response.json();
-          let result;
-          if (data.ParsedResults && data.ParsedResults[0] && data.ParsedResults[0].ParsedText) {
-            const text = data.ParsedResults[0].ParsedText.trim();
-            if (text.length > 10) {
-              result = `[IMMAGINE: ${file.name}]\n\n📝 TESTO ESTRATTO:\n${text}\n\n[Fine testo]`;
-            } else {
-              result = `[IMMAGINE: ${file.name}]\n\n⚠️ Nessun testo rilevato.`;
-            }
-          } else {
-            result = `[IMMAGINE: ${file.name}]\n\n⚠️ OCR fallito.`;
-          }
-          window._ocrCache.set(fileHash, result);
-          res(result);
-        };
-        img.onerror = () => {
-          const result = `[IMMAGINE: ${file.name}]\n\n⚠️ Errore caricamento.`;
-          window._ocrCache.set(fileHash, result);
-          res(result);
-        };
-        img.src = e.target.result;
-      } catch (err) {
-        const result = `[IMMAGINE: ${file.name}]\n\n⚠️ OCR non disponibile.`;
-        window._ocrCache.set(fileHash, result);
-        res(result);
-      }
-    };
-    reader.onerror = () => rej(new Error('Errore lettura immagine'));
-    reader.readAsDataURL(file);
-  });
-};
-
-window.readFileContent = async (file) => {
-  const textTypes = ['text/plain', 'text/html', 'text/css', 'text/javascript', 'application/json', 'application/xml', 'text/markdown'];
-  const ext = file.name.split('.').pop().toLowerCase();
-  
-  // Text files
-  if (textTypes.includes(file.type) || ['txt', 'md', 'html', 'css', 'js', 'json', 'xml', 'csv', 'log', 'py', 'java', 'c', 'cpp', 'h', 'ts', 'jsx', 'tsx'].includes(ext)) {
-    return new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = e => res(e.target.result);
-      r.onerror = () => rej(new Error('Errore lettura file'));
-      r.readAsText(file);
-    });
-  }
-  
-  // Images
-  if (file.type.startsWith('image/')) {
-    return window.extractImageText(file);
-  }
-  
-  // PDF files
-  if (file.type === 'application/pdf' || ext === 'pdf') {
-    return window.extractPDFFile(file);
-  }
-  
-  // Office files
-  if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(ext)) {
-    return `[FILE: ${file.name}]\nTipo: ${ext.toUpperCase()}\nDimensione: ${(file.size / 1024).toFixed(1)}KB\n\nConverti in PDF o incolla il contenuto.`;
-  }
-  
-  // Fallback
-  return `[FILE: ${file.name}]\nTipo: ${file.type || ext}\nDimensione: ${(file.size / 1024).toFixed(1)}KB`;
-};
-
-window.searchWeb = async (query) => {
-  const results = [];
-  
-  try {
-    // Wikipedia IT
-    const wikiItRes = await fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query.split(' ').slice(0, 4).join(' '))}`);
-    if (wikiItRes.ok) {
-      const wikiIt = await wikiItRes.json();
-      if (wikiIt.extract) {
-        results.push(`📚 **Wikipedia IT:**\n${wikiIt.extract.substring(0, 600)}`);
-      }
-    }
-  } catch (e) {}
-  
-  try {
-    // Wikipedia EN
-    const wikiEnRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query.split(' ').slice(0, 4).join(' '))}`);
-    if (wikiEnRes.ok) {
-      const wikiEn = await wikiEnRes.json();
-      if (wikiEn.extract) {
-        results.push(`🌍 **Wikipedia EN:**\n${wikiEn.extract.substring(0, 600)}`);
-      }
-    }
-  } catch (e) {}
-  
-  try {
-    // DuckDuckGo
-    const res = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_html=1&skip_disambig=1');
-    const data = await res.json();
-    if (data.AbstractText) {
-      results.push(`🔍 **DuckDuckGo:**\n${data.AbstractText.substring(0, 500)}`);
-    }
-    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-      const topics = data.RelatedTopics.slice(0, 3).map(t => t.Text).join('\n');
-      if (topics) results.push(`📌 **Argomenti correlati:**\n${topics.substring(0, 300)}`);
-    }
-  } catch (e) {}
-  
-  return results.length > 0 ? '\n\n' + results.join('\n\n') : null;
-};
-
-window.saveFileToIDB = async (fileObj) => {
-  if (window._idb) {
-    try {
-      await window._idb.saveFile(fileObj);
-      return true;
-    } catch (e) {
-      console.log('IDB save error:', e);
-      return false;
-    }
-  }
-  return false;
-};
-
-window.deleteFileFromIDB = async (fileId) => {
-  if (window._idb) {
-    try {
-      await window._idb.deleteFile(fileId);
-      return true;
-    } catch (e) {
-      console.log('IDB delete error:', e);
-      return false;
-    }
-  }
-  return false;
-};
-
-// ═══════════════════════════════════════════════════════════════
-// END SHARED UTILITIES
-// ═══════════════════════════════════════════════════════════════
-
-const deriveKey = async (uid) => {
-  const encoder = new TextEncoder();
-  const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(uid + 'lamiavita_salt_2024'), 'PBKDF2', false, ['deriveKey']);
-  return await crypto.subtle.deriveKey({name:'PBKDF2',salt:encoder.encode('lmv_salt_v1'),iterations:100000,hash:'SHA-256'}, keyMaterial, {name:'AES-GCM',length:256}, false, ['encrypt','decrypt']);
-};
-
-const encryptData = async (data, uid) => {
-  try {
-    const key = await deriveKey(uid);
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encoded = new TextEncoder().encode(JSON.stringify(data));
-    const encrypted = await crypto.subtle.encrypt({name:'AES-GCM',iv}, key, encoded);
-    const combined = new Uint8Array(iv.length + encrypted.byteLength);
-    combined.set(iv);
-    combined.set(new Uint8Array(encrypted), iv.length);
-    return btoa(String.fromCharCode(...combined));
-  } catch(e) { return null; }
-};
-
-const decryptData = async (encrypted, uid) => {
-  try {
-    const key = await deriveKey(uid);
-    const combined = new Uint8Array(atob(encrypted).split('').map(c=>c.charCodeAt(0)));
-    const iv = combined.slice(0, 12);
-    const data = combined.slice(12);
-    const decrypted = await crypto.subtle.decrypt({name:'AES-GCM',iv}, key, data);
-    return JSON.parse(new TextDecoder().decode(decrypted));
-  } catch(e) { return null; }
-};
-
-window._fb = {
-  signInGoogle: () => auth.signInWithPopup(gp),
-  signInEmail: (e,p) => auth.signInWithEmailAndPassword(e,p),
-  registerEmail: (e,p) => auth.createUserWithEmailAndPassword(e,p),
-  signOut: () => auth.signOut(),
-  onAuth: (cb) => auth.onAuthStateChanged(cb),
-  save: async (uid, key, val) => {
-    if(key === 'passwords' && uid) {
-      const encrypted = await encryptData(val, uid);
-      if(encrypted) await db.collection('users').doc(uid).set({'passwords_encrypted': encrypted}, {merge:true});
-      await db.collection('users').doc(uid).set({[key]: JSON.stringify(val)}, {merge:true});
-    } else {
-      await db.collection('users').doc(uid).set({[key]: JSON.stringify(val)}, {merge:true});
-    }
-  },
-  loadPasswords: async (uid) => {
-    try {
-      const snap = await db.collection('users').doc(uid).get();
-      if(snap.exists && snap.data().passwords_encrypted) {
-        const decrypted = await decryptData(snap.data().passwords_encrypted, uid);
-        if(decrypted) return decrypted;
-      }
-    } catch(e) {}
-    return null;
-  },
-  load: async (uid) => {
-    const snap = await db.collection('users').doc(uid).get();
-    return snap.exists ? snap.data() : {};
-  },
-  uploadFile: async (uid, file) => {
-    const path = `users/${uid}/files/${Date.now()}_${file.name}`;
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
-  },
-  deleteFile: async (url) => {
-    if(!url || !url.includes('firebasestorage')) return;
-    try {
-      const storageRef = ref(storage, url);
-      await deleteObject(storageRef);
-    } catch(e) {}
-  },
-  getStorageUsed: async (uid) => {
-    try {
-      const snap = await getDoc(doc(db,'users',uid));
-      if(snap.exists() && snap.data().storageUsed) {
-        return parseInt(snap.data().storageUsed) || 0;
-      }
-    } catch(e) {}
-    return 0;
-  },
-  addStorageUsed: async (uid, bytes) => {
-    try {
-      const snap = await getDoc(doc(db,'users',uid));
-      const current = snap.exists() && snap.data().storageUsed ? parseInt(snap.data().storageUsed) : 0;
-      await setDoc(doc(db,'users',uid), {storageUsed: current + bytes}, {merge:true});
-      return current + bytes;
-    } catch(e) { return 0; }
-  },
-  removeStorageUsed: async (uid, bytes) => {
-    try {
-      const snap = await getDoc(doc(db,'users',uid));
-      const current = snap.exists() && snap.data().storageUsed ? parseInt(snap.data().storageUsed) : 0;
-      const newTotal = Math.max(0, current - bytes);
-      await setDoc(doc(db,'users',uid), {storageUsed: newTotal}, {merge:true});
-      return newTotal;
-    } catch(e) { return 0; }
-  }
-};
-window._fbReady = true;
-window.dispatchEvent(new Event('_fbReady'));
 
 // ========== OFFLINE MODE & PUSH NOTIFICATIONS ==========
 
@@ -29688,7 +29338,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
     {id:'settings',label:'Impostazioni',cls:'tset'},
   ];
 
-  const TabIcon = ({id, active, size=32}) => {
+  const TabIcon = React.memo(({id, active, size=32}) => {
     const c = active ? 'currentColor' : 'rgba(255,255,255,.55)';
     const s = {width:size,height:size,overflow:'visible'};
     const vs = document.documentElement.getAttribute('data-visual-style') || 'modern';
@@ -31107,7 +30757,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
     }
     
     return null;
-  };
+  });
   const TITLES={pw:'Password & Note',cal:'Calendario',email:'Email',ai:'Marco IA',music:'Spotify',studio:'Music Studio',video:'Video Editor',youtube:'YouTube',todo:'To-Do List',wallet:'Wallet',tuttuni:"TUTT'UNI",reminders:'Promemoria & Notifiche',aiplus:'AI & Integrazioni',extra:'Extra',settings:'Impostazioni',profile:'Il mio Profilo',stats:'Statistiche'};
 
   // Section-specific background config
@@ -31637,5 +31287,754 @@ setTimeout(function(){
   }
 })();
 </script>
+
+<!-- Firebase SDK -->
+<!-- 
+  IMPORTANT: Se l'app è su un nuovo dominio (es. GitHub Pages):
+  1. Vai su Firebase Console → Authentication → Settings → Authorized domains
+  2. Aggiungi il nuovo dominio (es. marcothefaze.github.io)
+  3. Vai su Storage → Rules e assicurati che允许 authenticated users
+-->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDKK8_Qac2xrggOgZ9GWvNjAt_4nOTHkfk",
+  authDomain:"mylife-dashboard.firebaseapp.com",
+  projectId:"mylife-dashboard",
+  storageBucket:"mylife-dashboard.appspot.com",
+  messagingSenderId:"14910139571",
+  appId:"1:14910139571:web:e2866dcea73588186454c6"
+});
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+const gp = new firebase.auth.GoogleAuthProvider();
+
+// CORS Proxy helper for AI API calls - GLOBAL SCOPE
+window.proxyFetch = async (url, options) => {
+  // AI APIs now support CORS directly - no proxy needed
+  const aiApis = ['api.deepseek.com', 'api.x.ai', 'api.groq.com', 'generativelanguage.googleapis.com'];
+  const needsProxy = aiApis.some(api => url.includes(api));
+  
+  if (!needsProxy) return fetch(url, options);
+  
+  // Direct fetch for AI APIs (they support CORS)
+  console.log('🔍 Direct fetch to AI API:', url);
+  return fetch(url, options);
+};
+
+// IndexedDB for large data storage (files, projects, docs)
+const DB_NAME = 'LaMiaVitaDB';
+const DB_VERSION = 2;
+let _db = null;
+
+const openDB = () => {
+  if(_db) return Promise.resolve(_db);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onerror = () => reject(req.error);
+    req.onsuccess = () => { _db = req.result; resolve(_db); };
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if(!db.objectStoreNames.contains('projects')) {
+        db.createObjectStore('projects', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('files')) {
+        const fs = db.createObjectStore('files', {keyPath: 'id'});
+        fs.createIndex('projectId', 'projectId', {unique: false});
+      }
+      if(!db.objectStoreNames.contains('docs')) {
+        db.createObjectStore('docs', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('esami')) {
+        db.createObjectStore('esami', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('flash_decks')) {
+        db.createObjectStore('flash_decks', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('scadenze')) {
+        db.createObjectStore('scadenze', {keyPath: 'id'});
+      }
+      // Offline data stores
+      if(!db.objectStoreNames.contains('notes')) {
+        db.createObjectStore('notes', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('passwords')) {
+        db.createObjectStore('passwords', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('events')) {
+        db.createObjectStore('events', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('todos')) {
+        db.createObjectStore('todos', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('reminders')) {
+        db.createObjectStore('reminders', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('birthdays')) {
+        db.createObjectStore('birthdays', {keyPath: 'id'});
+      }
+      if(!db.objectStoreNames.contains('syncQueue')) {
+        db.createObjectStore('syncQueue', {keyPath: 'id', autoIncrement: true});
+      }
+    };
+  });
+};
+
+const IDB = {
+  saveProject: async (project) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('projects', 'readwrite');
+      tx.objectStore('projects').put(project);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  getProject: async (id) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('projects', 'readonly');
+      const req = tx.objectStore('projects').get(id);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  },
+  getAllProjects: async () => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('projects', 'readonly');
+      const req = tx.objectStore('projects').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  },
+  deleteProject: async (id) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(['projects', 'files'], 'readwrite');
+      tx.objectStore('projects').delete(id);
+      const fsTx = tx.objectStore('files');
+      const idx = fsTx.index('projectId');
+      const getReq = idx.getAllKeys(id);
+      getReq.onsuccess = () => {
+        getReq.result.forEach(k => fsTx.delete(k));
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  saveFile: async (file) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('files', 'readwrite');
+      tx.objectStore('files').put(file);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  getProjectFiles: async (projectId) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('files', 'readonly');
+      const idx = tx.objectStore('files').index('projectId');
+      const req = idx.getAll(projectId);
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  },
+  deleteFile: async (fileId) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('files', 'readwrite');
+      tx.objectStore('files').delete(fileId);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  getStorageSize: async () => {
+    const db = await openDB();
+    return new Promise((resolve) => {
+      let total = 0;
+      const tx = db.transaction('files', 'readonly');
+      const req = tx.objectStore('files').openCursor();
+      req.onsuccess = (e) => {
+        const cursor = e.target.result;
+        if(cursor) {
+          total += JSON.stringify(cursor.value).length;
+          cursor.continue();
+        } else {
+          resolve(total);
+        }
+      };
+      req.onerror = () => resolve(0);
+    });
+  },
+  // Generic methods for all data types
+  save: async (store, data) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).put(data);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  get: async (store, id) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readonly');
+      const req = tx.objectStore(store).get(id);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  },
+  getAll: async (store) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readonly');
+      const req = tx.objectStore(store).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  },
+  delete: async (store, id) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  clear: async (store) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  saveOffline: async (store, data) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(store, 'readwrite');
+      const obj = tx.objectStore(store);
+      if (Array.isArray(data)) {
+        data.forEach(item => obj.put(item));
+      } else {
+        obj.put(data);
+      }
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  addToSyncQueue: async (action) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('syncQueue', 'readwrite');
+      tx.objectStore('syncQueue').add({
+        ...action,
+        timestamp: Date.now(),
+        synced: false
+      });
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  getSyncQueue: async () => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('syncQueue', 'readonly');
+      const req = tx.objectStore('syncQueue').getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  },
+  clearSyncQueue: async () => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('syncQueue', 'readwrite');
+      tx.objectStore('syncQueue').clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  },
+  removeSyncItem: async (id) => {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('syncQueue', 'readwrite');
+      tx.objectStore('syncQueue').delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+};
+window._idb = IDB;
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED PDF UTILITY - Usata da tutte le AI
+// ═══════════════════════════════════════════════════════════════
+
+// OCR Cache - store results for 7 days
+window._ocrCache = {
+  get: (hash) => {
+    try {
+      const cached = localStorage.getItem('lmv_ocr_cache');
+      if (!cached) return null;
+      const data = JSON.parse(cached);
+      // Check if expired (7 days)
+      if (Date.now() - data.time > 7 * 24 * 60 * 60 * 1000) {
+        localStorage.removeItem('lmv_ocr_cache');
+        return null;
+      }
+      return data.cache[hash] || null;
+    } catch { return null; }
+  },
+  set: (hash, value) => {
+    try {
+      let data = { time: Date.now(), cache: {} };
+      const cached = localStorage.getItem('lmv_ocr_cache');
+      if (cached) {
+        const existing = JSON.parse(cached);
+        if (Date.now() - existing.time < 7 * 24 * 60 * 60 * 1000) {
+          data = existing;
+        }
+      }
+      data.cache[hash] = value;
+      // Limit cache size (keep last 50 items)
+      const keys = Object.keys(data.cache);
+      if (keys.length > 50) {
+        const oldest = keys.slice(0, keys.length - 50);
+        oldest.forEach(k => delete data.cache[k]);
+      }
+      localStorage.setItem('lmv_ocr_cache', JSON.stringify(data));
+    } catch {}
+  },
+  hash: (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash.toString(16);
+  }
+};
+
+window.extractPDFFile = async (file, onProgress) => {
+  const pdfSize = (file.size / 1024).toFixed(1);
+  
+  // Check OCR cache
+  const fileHash = window._ocrCache.hash(file.name + file.size + file.lastModified);
+  const cached = window._ocrCache.get(fileHash);
+  if (cached) {
+    console.log('PDF from cache:', file.name);
+    return cached;
+  }
+  
+  // Load PDF.js
+  if (!window.pdfjs) {
+    console.log('Loading PDF.js...');
+    await new Promise((res, rej) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = () => setTimeout(res, 100);
+      script.onerror = rej;
+      document.head.appendChild(script);
+    });
+    console.log('PDF.js loaded');
+  }
+  
+  const pdfjsLib = window.pdfjs;
+  if (pdfjsLib.GlobalWorkerOptions) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+  
+  const arrayBuffer = await file.arrayBuffer();
+  console.log('Parsing PDF...');
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  console.log('PDF pages:', pdf.numPages);
+  
+  let text = '';
+  let tables = '';
+  const maxPages = Math.min(pdf.numPages, 100);
+  
+  // Method 1: Direct text extraction
+  for (let i = 1; i <= maxPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(item => item.str).join(' ') + '\n\n';
+    
+    // Try to detect tables (simple heuristic)
+    const pageText = content.items.map(item => item.str).join(' ');
+    const tableMatch = pageText.match(/[\d.,]+\s{2,}[\d.,]+/g);
+    if (tableMatch && tableMatch.length > 2) {
+      tables += `\n--- Tabella Pagina ${i} ---\n${tableMatch.join('\n')}\n`;
+    }
+    
+    if (onProgress) onProgress(i, maxPages);
+  }
+  
+  console.log('Extracted text length:', text.length);
+  
+  // Check if text quality is good
+  const wordCount = text.trim().split(/\s+/).filter(w => w.length > 1).length;
+  const lines = text.split('\n').filter(l => l.trim().length > 0);
+  const avgWordsPerLine = lines.length > 0 ? wordCount / lines.length : 0;
+  const needsOCR = text.trim().length < 100 || wordCount < 20 || avgWordsPerLine < 2;
+  
+  if (!needsOCR) {
+    let result = `[PDF: ${file.name}]\nPagine: ${pdf.numPages}\nDimensione: ${pdfSize}KB\n\n${text}`;
+    if (tables) result += `\n\n📊 TABELLE RILEVATE:\n${tables}`;
+    if (pdf.numPages > 100) result += `\n[Documento troncato: ${pdf.numPages - 100} pagine]`;
+    window._ocrCache.set(fileHash, result);
+    return result;
+  }
+  
+  // Method 2: OCR on ALL pages
+  console.log('Text quality low, trying OCR...');
+  try {
+    let ocrText = '';
+    
+    for (let i = 1; i <= pdf.numPages; i++) {
+      console.log(`OCR page ${i}/${pdf.numPages}...`);
+      if (onProgress) onProgress(i, pdf.numPages);
+      
+      const page = await pdf.getPage(i);
+      const scale = 2;
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement('canvas');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      const ctx = canvas.getContext('2d');
+      await page.render({ canvasContext: ctx, viewport }).promise;
+      
+      // Compress for OCR
+      const maxDim = 1200;
+      let w = canvas.width, h = canvas.height;
+      if (w > maxDim || h > maxDim) {
+        const ratio = Math.min(maxDim / w, maxDim / h);
+        w = Math.round(w * ratio); h = Math.round(h * ratio);
+        const tmpCanvas = document.createElement('canvas');
+        tmpCanvas.width = w; tmpCanvas.height = h;
+        tmpCanvas.getContext('2d').drawImage(canvas, 0, 0, w, h);
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(tmpCanvas, 0, 0);
+      }
+      
+      const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+      
+      const ocrResponse = await fetch('https://api.ocr.space/parse/image', {
+        method: 'POST',
+        headers: { 'apikey': 'helloworld' },
+        body: new URLSearchParams({
+          base64Image: 'data:image/jpeg;base64,' + base64,
+          language: 'ita',
+          isOverlayRequired: 'false',
+          scale: 'true',
+          OCREngine: '2'
+        })
+      });
+      
+      const ocrData = await ocrResponse.json();
+      if (ocrData.ParsedResults && ocrData.ParsedResults[0] && ocrData.ParsedResults[0].ParsedText) {
+        ocrText += `--- Pagina ${i} ---\n${ocrData.ParsedResults[0].ParsedText}\n\n`;
+      }
+    }
+    
+    if (ocrText.trim().length > 50) {
+      let result = `[PDF: ${file.name}]\nPagine: ${pdf.numPages}\nDimensione: ${pdfSize}KB\n\n📸 Testo estratto con OCR:\n\n${ocrText}`;
+      if (tables) result += `\n\n📊 TABELLE RILEVATE:\n${tables}`;
+      window._ocrCache.set(fileHash, result);
+      return result;
+    }
+  } catch (ocrErr) {
+    console.log('OCR failed:', ocrErr);
+  }
+  
+  return `[PDF: ${file.name}]\nPagine: ${pdf.numPages}\n⚠️ PDF potrebbe essere scansione.\n\n${text || 'Testo non disponibile'}`;
+};
+
+window.extractImageText = async (file) => {
+  // Check cache first
+  const fileHash = window._ocrCache.hash(file.name + file.size + (file.lastModified || 0));
+  const cached = window._ocrCache.get(fileHash);
+  if (cached) {
+    console.log('Image from cache:', file.name);
+    return cached;
+  }
+  
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const img = new Image();
+        img.onload = async () => {
+          const maxDim = 1200;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            const ratio = Math.min(maxDim / w, maxDim / h);
+            w = Math.round(w * ratio); h = Math.round(h * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+          
+          const response = await fetch('https://api.ocr.space/parse/image', {
+            method: 'POST',
+            headers: { 'apikey': 'helloworld' },
+            body: new URLSearchParams({
+              base64Image: 'data:image/jpeg;base64,' + base64,
+              language: 'ita',
+              isOverlayRequired: 'false',
+              scale: 'true',
+              OCREngine: '2'
+            })
+          });
+          
+          const data = await response.json();
+          let result;
+          if (data.ParsedResults && data.ParsedResults[0] && data.ParsedResults[0].ParsedText) {
+            const text = data.ParsedResults[0].ParsedText.trim();
+            if (text.length > 10) {
+              result = `[IMMAGINE: ${file.name}]\n\n📝 TESTO ESTRATTO:\n${text}\n\n[Fine testo]`;
+            } else {
+              result = `[IMMAGINE: ${file.name}]\n\n⚠️ Nessun testo rilevato.`;
+            }
+          } else {
+            result = `[IMMAGINE: ${file.name}]\n\n⚠️ OCR fallito.`;
+          }
+          window._ocrCache.set(fileHash, result);
+          res(result);
+        };
+        img.onerror = () => {
+          const result = `[IMMAGINE: ${file.name}]\n\n⚠️ Errore caricamento.`;
+          window._ocrCache.set(fileHash, result);
+          res(result);
+        };
+        img.src = e.target.result;
+      } catch (err) {
+        const result = `[IMMAGINE: ${file.name}]\n\n⚠️ OCR non disponibile.`;
+        window._ocrCache.set(fileHash, result);
+        res(result);
+      }
+    };
+    reader.onerror = () => rej(new Error('Errore lettura immagine'));
+    reader.readAsDataURL(file);
+  });
+};
+
+window.readFileContent = async (file) => {
+  const textTypes = ['text/plain', 'text/html', 'text/css', 'text/javascript', 'application/json', 'application/xml', 'text/markdown'];
+  const ext = file.name.split('.').pop().toLowerCase();
+  
+  // Text files
+  if (textTypes.includes(file.type) || ['txt', 'md', 'html', 'css', 'js', 'json', 'xml', 'csv', 'log', 'py', 'java', 'c', 'cpp', 'h', 'ts', 'jsx', 'tsx'].includes(ext)) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = e => res(e.target.result);
+      r.onerror = () => rej(new Error('Errore lettura file'));
+      r.readAsText(file);
+    });
+  }
+  
+  // Images
+  if (file.type.startsWith('image/')) {
+    return window.extractImageText(file);
+  }
+  
+  // PDF files
+  if (file.type === 'application/pdf' || ext === 'pdf') {
+    return window.extractPDFFile(file);
+  }
+  
+  // Office files
+  if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(ext)) {
+    return `[FILE: ${file.name}]\nTipo: ${ext.toUpperCase()}\nDimensione: ${(file.size / 1024).toFixed(1)}KB\n\nConverti in PDF o incolla il contenuto.`;
+  }
+  
+  // Fallback
+  return `[FILE: ${file.name}]\nTipo: ${file.type || ext}\nDimensione: ${(file.size / 1024).toFixed(1)}KB`;
+};
+
+window.searchWeb = async (query) => {
+  const results = [];
+  
+  try {
+    // Wikipedia IT
+    const wikiItRes = await fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query.split(' ').slice(0, 4).join(' '))}`);
+    if (wikiItRes.ok) {
+      const wikiIt = await wikiItRes.json();
+      if (wikiIt.extract) {
+        results.push(`📚 **Wikipedia IT:**\n${wikiIt.extract.substring(0, 600)}`);
+      }
+    }
+  } catch (e) {}
+  
+  try {
+    // Wikipedia EN
+    const wikiEnRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query.split(' ').slice(0, 4).join(' '))}`);
+    if (wikiEnRes.ok) {
+      const wikiEn = await wikiEnRes.json();
+      if (wikiEn.extract) {
+        results.push(`🌍 **Wikipedia EN:**\n${wikiEn.extract.substring(0, 600)}`);
+      }
+    }
+  } catch (e) {}
+  
+  try {
+    // DuckDuckGo
+    const res = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_html=1&skip_disambig=1');
+    const data = await res.json();
+    if (data.AbstractText) {
+      results.push(`🔍 **DuckDuckGo:**\n${data.AbstractText.substring(0, 500)}`);
+    }
+    if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+      const topics = data.RelatedTopics.slice(0, 3).map(t => t.Text).join('\n');
+      if (topics) results.push(`📌 **Argomenti correlati:**\n${topics.substring(0, 300)}`);
+    }
+  } catch (e) {}
+  
+  return results.length > 0 ? '\n\n' + results.join('\n\n') : null;
+};
+
+window.saveFileToIDB = async (fileObj) => {
+  if (window._idb) {
+    try {
+      await window._idb.saveFile(fileObj);
+      return true;
+    } catch (e) {
+      console.log('IDB save error:', e);
+      return false;
+    }
+  }
+  return false;
+};
+
+window.deleteFileFromIDB = async (fileId) => {
+  if (window._idb) {
+    try {
+      await window._idb.deleteFile(fileId);
+      return true;
+    } catch (e) {
+      console.log('IDB delete error:', e);
+      return false;
+    }
+  }
+  return false;
+};
+
+// ═══════════════════════════════════════════════════════════════
+// END SHARED UTILITIES
+// ═══════════════════════════════════════════════════════════════
+
+const deriveKey = async (uid) => {
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(uid + 'lamiavita_salt_2024'), 'PBKDF2', false, ['deriveKey']);
+  return await crypto.subtle.deriveKey({name:'PBKDF2',salt:encoder.encode('lmv_salt_v1'),iterations:100000,hash:'SHA-256'}, keyMaterial, {name:'AES-GCM',length:256}, false, ['encrypt','decrypt']);
+};
+
+const encryptData = async (data, uid) => {
+  try {
+    const key = await deriveKey(uid);
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoded = new TextEncoder().encode(JSON.stringify(data));
+    const encrypted = await crypto.subtle.encrypt({name:'AES-GCM',iv}, key, encoded);
+    const combined = new Uint8Array(iv.length + encrypted.byteLength);
+    combined.set(iv);
+    combined.set(new Uint8Array(encrypted), iv.length);
+    return btoa(String.fromCharCode(...combined));
+  } catch(e) { return null; }
+};
+
+const decryptData = async (encrypted, uid) => {
+  try {
+    const key = await deriveKey(uid);
+    const combined = new Uint8Array(atob(encrypted).split('').map(c=>c.charCodeAt(0)));
+    const iv = combined.slice(0, 12);
+    const data = combined.slice(12);
+    const decrypted = await crypto.subtle.decrypt({name:'AES-GCM',iv}, key, data);
+    return JSON.parse(new TextDecoder().decode(decrypted));
+  } catch(e) { return null; }
+};
+
+window._fb = {
+  signInGoogle: () => auth.signInWithPopup(gp),
+  signInEmail: (e,p) => auth.signInWithEmailAndPassword(e,p),
+  registerEmail: (e,p) => auth.createUserWithEmailAndPassword(e,p),
+  signOut: () => auth.signOut(),
+  onAuth: (cb) => auth.onAuthStateChanged(cb),
+  save: async (uid, key, val) => {
+    if(key === 'passwords' && uid) {
+      const encrypted = await encryptData(val, uid);
+      if(encrypted) await db.collection('users').doc(uid).set({'passwords_encrypted': encrypted}, {merge:true});
+      await db.collection('users').doc(uid).set({[key]: JSON.stringify(val)}, {merge:true});
+    } else {
+      await db.collection('users').doc(uid).set({[key]: JSON.stringify(val)}, {merge:true});
+    }
+  },
+  loadPasswords: async (uid) => {
+    try {
+      const snap = await db.collection('users').doc(uid).get();
+      if(snap.exists && snap.data().passwords_encrypted) {
+        const decrypted = await decryptData(snap.data().passwords_encrypted, uid);
+        if(decrypted) return decrypted;
+      }
+    } catch(e) {}
+    return null;
+  },
+  load: async (uid) => {
+    const snap = await db.collection('users').doc(uid).get();
+    return snap.exists ? snap.data() : {};
+  },
+  uploadFile: async (uid, file) => {
+    const path = `users/${uid}/files/${Date.now()}_${file.name}`;
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, file);
+    return await getDownloadURL(storageRef);
+  },
+  deleteFile: async (url) => {
+    if(!url || !url.includes('firebasestorage')) return;
+    try {
+      const storageRef = ref(storage, url);
+      await deleteObject(storageRef);
+    } catch(e) {}
+  },
+  getStorageUsed: async (uid) => {
+    try {
+      const snap = await getDoc(doc(db,'users',uid));
+      if(snap.exists() && snap.data().storageUsed) {
+        return parseInt(snap.data().storageUsed) || 0;
+      }
+    } catch(e) {}
+    return 0;
+  },
+  addStorageUsed: async (uid, bytes) => {
+    try {
+      const snap = await getDoc(doc(db,'users',uid));
+      const current = snap.exists() && snap.data().storageUsed ? parseInt(snap.data().storageUsed) : 0;
+      await setDoc(doc(db,'users',uid), {storageUsed: current + bytes}, {merge:true});
+      return current + bytes;
+    } catch(e) { return 0; }
+  },
+  removeStorageUsed: async (uid, bytes) => {
+    try {
+      const snap = await getDoc(doc(db,'users',uid));
+      const current = snap.exists() && snap.data().storageUsed ? parseInt(snap.data().storageUsed) : 0;
+      const newTotal = Math.max(0, current - bytes);
+      await setDoc(doc(db,'users',uid), {storageUsed: newTotal}, {merge:true});
+      return newTotal;
+    } catch(e) { return 0; }
+  }
+};
+window._fbReady = true;
+window.dispatchEvent(new Event('_fbReady'));
 </body>
 </html>
