@@ -28667,8 +28667,9 @@ function App(){
   // Keyboard shortcut: Ctrl/Cmd+K to open global search
   useEffect(()=>{
     const handler = (e) => {
-      if((e.ctrlKey||e.metaKey) && e.key==='k'){
+      if((e.ctrlKey||e.metaKey) && (e.key==='k'||e.key==='K')){
         e.preventDefault();
+        e.stopImmediatePropagation();
         setGlobalSearchOpen(o=>!o);
       }
     };
@@ -29343,19 +29344,6 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   // Global Search
-  const [searchOpen, setSearchOpen] = useState(false);
-  
-  // Keyboard shortcut for search (Ctrl/Cmd + K)
-  useEffect(()=>{
-    const handler = (e) => {
-      if((e.ctrlKey||e.metaKey) && e.key==='k'){
-        e.preventDefault();
-        setSearchOpen(true);
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return ()=>window.removeEventListener('keydown', handler);
-  },[]);
   
   // Sync FROM global pomodoro state (dashboard updates this)
   useEffect(()=>{
