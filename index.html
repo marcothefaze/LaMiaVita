@@ -23949,17 +23949,42 @@ function ExtraTab({toast}) {
   );
 }
 
-// - STUDY SESSIONS MODAL -
-function StudySessionsModal({onClose}) {
-  const [log] = useState(() => {
+// - STUDY SESSIONS MODAL (FULL DASHBOARD) -
+function StudySessionsModal({onClose, toast}) {
+  const {addEvent} = typeof DataCtx!=='undefined'?useContext(DataCtx):{};  const [log, setLog] = useState(() => {
     try { return JSON.parse(localStorage.getItem('pom_log') || '[]'); }
     catch(e) { return []; }
   });
+  // Manual entry form state
+  const todayStr = new Date().toISOString().split('T')[0];
+  const [mf, setMf] = useState({date:todayStr, hours:1, minutes:0});
+  const [view, setView] = useState('dashboard'); // dashboard, add
+
   const workLog = log.filter(e => e.type === 'work');
   const breakLog = log.filter(e => e.type === 'break');
   const totalSessions = workLog.length;
   const totalMinutes = workLog.reduce((s, e) => s + (e.duration || 25), 0);
   const totalBreaks = breakLog.length;
+
+  const addManualSession = () => {
+    const duration = (parseInt(mf.hours)||0)*60 + (parseInt(mf.minutes)||0);
+    if(duration<=0){toast('Inserisci una durata valida','var(--red)');return;}
+    const now = new Date();
+    const session = {
+      id: Date.now() + Math.random(),
+      date: mf.date,
+      type: 'work',
+      duration,
+      manual: true,
+      completedAt: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0')
+    };
+    const newLog = [...log, session];
+    localStorage.setItem('pom_log', JSON.stringify(newLog));
+    setLog(newLog);
+    // Also add to calendar
+    if(addEvent)addEvent({id:session.id,title:'📖 Studio manuale ('+duration+'m)',date:session.date,time:session.completedAt,color:'#10B981',fromStudy:true});
+    toast('Sessione aggiunta! ✅','var(--green)');
+  };
 
   const byDate = {};
   workLog.forEach(e => {
@@ -23989,81 +24014,145 @@ function StudySessionsModal({onClose}) {
     ? sortedDates.reduce((a, b) => byDate[a].minutes > byDate[b].minutes ? a : b)
     : null;
 
+  // Current streak
+  let streak = 0;
+  const check = new Date();
+  while(true){
+    const ds = check.toISOString().split('T')[0];
+    if(byDate[ds] && byDate[ds].minutes>0){streak++;check.setDate(check.getDate()-1);}
+    else break;
+  }
+
   return (
     <div className="modal-overlay" onClick={onClose} style={{position:'fixed',inset:0,zIndex:99999,background:'rgba(0,0,0,.6)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
-      <div className="modal" onClick={e => e.stopPropagation()} style={{maxWidth:560,width:'100%',maxHeight:'90vh',overflowY:'auto'}}>
-        <div className="mh"><div className="mt">📊 Dettaglio studio</div><div className="mx" onClick={onClose}>✕</div></div>
+      <div className="modal" onClick={e => e.stopPropagation()} style={{maxWidth:700,width:'100%',maxHeight:'90vh',overflowY:'auto',padding:0}}>
 
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,margin:16}}>
-          <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
-            <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--red)'}}>{totalSessions}</div>
-            <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Sessioni</div>
-          </div>
-          <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
-            <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--accent)'}}>{Math.floor(totalMinutes/60)}h {totalMinutes%60}m</div>
-            <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Tempo studio</div>
-          </div>
-          <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
-            <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--green)'}}>{totalBreaks}</div>
-            <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Pause</div>
-          </div>
-        </div>
-
-        <div className="card" style={{margin:'0 16px 16px',padding:'18px 16px'}}>
-          <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📈 Minuti studio (7 giorni)</div>
-          <div style={{display:'flex',alignItems:'flex-end',gap:6,height:100}}>
-            {last7.map((d, i) => (
-              <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-                <div style={{width:'100%',background:'linear-gradient(180deg,var(--accent),var(--accent2))',borderRadius:'6px 6px 0 0',height:(d.minutes/maxMin*100)+'%',minHeight:d.minutes>0?4:0,transition:'height .4s',position:'relative'}}>
-                  {d.minutes > 0 && <div style={{position:'absolute',top:-18,left:'50%',transform:'translateX(-50%)',fontSize:'.6rem',color:'var(--text2)',whiteSpace:'nowrap'}}>{d.minutes}m</div>}
-                </div>
-                <div style={{fontSize:'.65rem',color:'var(--text2)'}}>{d.day}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="card" style={{margin:'0 16px 16px',padding:'18px 16px'}}>
-          <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📅 Sessioni per giorno</div>
-          {sortedDates.length === 0 && (
-            <div style={{color:'var(--text2)',fontSize:'.85rem',textAlign:'center',padding:20}}>
-              Nessuna sessione ancora. Usa il Pomodoro per studiare! 🍅
+        {/* Header */}
+        <div style={{padding:'20px 24px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div style={{display:'flex',alignItems:'center',gap:12}}>
+            <div style={{fontSize:'1.6rem'}}>📚</div>
+            <div>
+              <div style={{fontWeight:700,fontSize:'1.1rem'}}>Studio Dashboard</div>
+              <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Traccia e gestisci le tue sessioni di studio</div>
             </div>
-          )}
-          {sortedDates.map(date => {
-            const d = byDate[date];
-            const b = breaksByDate[date] || 0;
-            const dayName = new Date(date + 'T12:00').toLocaleDateString('it-IT', {weekday:'long',day:'numeric',month:'short'});
-            return (
-              <div key={date} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.06)'}}>
-                <div>
-                  <div style={{fontWeight:600,fontSize:'.85rem'}}>{dayName}</div>
-                  <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{d.sessions} sessioni · {b} pause</div>
-                </div>
-                <div style={{fontWeight:700,color:'var(--accent)',fontSize:'1.1rem'}}>{Math.floor(d.minutes/60)}h {d.minutes%60}m</div>
-              </div>
-            );
-          })}
+          </div>
+          <div style={{display:'flex',gap:8}}>
+            <button className="btn bg bs" onClick={()=>setView(v=>v==='add'?'dashboard':'add')} style={{fontSize:'.78rem'}}>{view==='add'?'← Dashboard':'+ Manuale'}</button>
+            <div className="mx" onClick={onClose} style={{fontSize:'1.2rem'}}>✕</div>
+          </div>
         </div>
 
-        {sortedDates.length > 0 && (
-          <div className="card" style={{margin:'0 16px 16px',padding:'18px 16px'}}>
-            <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📊 Statistiche avanzate</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-              {[
-                {label:'Media al giorno',val:avgPerDay.toFixed(1)+' min'},
-                {label:'Miglior giorno',val:(bestDay ? byDate[bestDay].minutes : 0)+' min'},
-                {label:'Media per sessione',val:(totalSessions > 0 ? (totalMinutes/totalSessions).toFixed(1) : 0)+' min'},
-                {label:'Giorni attivi',val:sortedDates.length},
-                {label:'Sessioni al giorno',val:(sortedDates.length > 0 ? (totalSessions/sortedDates.length).toFixed(1) : 0)},
-                {label:'Pause totali',val:totalBreaks},
-              ].map((s, i) => (
-                <div key={i} style={{padding:'10px 12px',background:'rgba(255,255,255,.04)',borderRadius:10}}>
-                  <div style={{fontSize:'.72rem',color:'var(--text2)',marginBottom:2}}>{s.label}</div>
-                  <div style={{fontWeight:700,fontSize:'1rem',color:'var(--accent)'}}>{s.val}</div>
-                </div>
-              ))}
+        {view==='add' ? (
+          /* Manual Entry Form */
+          <div style={{padding:24}}>
+            <div style={{fontWeight:700,marginBottom:16,fontSize:'1rem'}}>✏️ Aggiungi sessione manuale</div>
+            <div className="fl">
+              <label>📅 Data</label>
+              <input type="date" className="field" value={mf.date} onChange={e=>setMf(p=>({...p,date:e.target.value}))}/>
             </div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
+              <div className="fl">
+                <label>⏰ Ore</label>
+                <input type="number" className="field" min="0" max="24" value={mf.hours} onChange={e=>setMf(p=>({...p,hours:e.target.value}))}/>
+              </div>
+              <div className="fl">
+                <label>⏰ Minuti</label>
+                <input type="number" className="field" min="0" max="59" value={mf.minutes} onChange={e=>setMf(p=>({...p,minutes:e.target.value}))}/>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
+              <button className="btn bg" onClick={()=>setView('dashboard')}>Annulla</button>
+              <button className="btn bt" onClick={addManualSession}>✅ Aggiungi sessione</button>
+            </div>
+            <div style={{marginTop:16,padding:'12px 16px',background:'rgba(76,201,240,.08)',borderRadius:12,border:'1px solid rgba(76,201,240,.2)'}}>
+              <div style={{fontSize:'.82rem',color:'var(--text2)'}}>💡 La sessione verrà aggiunta al <strong>calendario</strong> e ai <strong>log di studio</strong>. Potrai vederla nelle statistiche e nella cronologia.</div>
+            </div>
+          </div>
+        ) : (
+          /* Dashboard View */
+          <div style={{padding:24}}>
+
+            {/* Summary Cards */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:12,marginBottom:20}}>
+              <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
+                <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--red)'}}>{totalSessions}</div>
+                <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Sessioni</div>
+              </div>
+              <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
+                <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--accent)'}}>{Math.floor(totalMinutes/60)}h {totalMinutes%60}m</div>
+                <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Tempo studio</div>
+              </div>
+              <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
+                <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--green)'}}>{totalBreaks}</div>
+                <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Pause</div>
+              </div>
+              <div className="card" style={{textAlign:'center',padding:'16px 10px'}}>
+                <div style={{fontSize:'1.6rem',fontWeight:800,color:'var(--blue)'}}>{streak>0?'🔥 '+streak:'0'}</div>
+                <div style={{fontSize:'.75rem',color:'var(--text2)'}}>Giorni consecutivi</div>
+              </div>
+            </div>
+
+            {/* 7-Day Chart */}
+            <div className="card" style={{marginBottom:16,padding:'18px 16px'}}>
+              <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📈 Minuti studio (7 giorni)</div>
+              <div style={{display:'flex',alignItems:'flex-end',gap:6,height:100}}>
+                {last7.map((d, i) => (
+                  <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
+                    <div style={{width:'100%',background:'linear-gradient(180deg,var(--accent),var(--accent2))',borderRadius:'6px 6px 0 0',height:(d.minutes/maxMin*100)+'%',minHeight:d.minutes>0?4:0,transition:'height .4s',position:'relative'}}>
+                      {d.minutes > 0 && <div style={{position:'absolute',top:-18,left:'50%',transform:'translateX(-50%)',fontSize:'.6rem',color:'var(--text2)',whiteSpace:'nowrap'}}>{d.minutes}m</div>}
+                    </div>
+                    <div style={{fontSize:'.65rem',color:'var(--text2)'}}>{d.day}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Sessions */}
+            <div className="card" style={{marginBottom:16,padding:'18px 16px'}}>
+              <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📅 Sessioni per giorno</div>
+              {sortedDates.length === 0 && (
+                <div style={{color:'var(--text2)',fontSize:'.85rem',textAlign:'center',padding:20}}>
+                  Nessuna sessione ancora. Usa il Pomodoro o aggiungi manualmente! 📚
+                </div>
+              )}
+              {sortedDates.slice(0,20).map(date => {
+                const d = byDate[date];
+                const b = breaksByDate[date] || 0;
+                const dayName = new Date(date + 'T12:00').toLocaleDateString('it-IT', {weekday:'long',day:'numeric',month:'short'});
+                return (
+                  <div key={date} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.06)'}}>
+                    <div>
+                      <div style={{fontWeight:600,fontSize:'.85rem'}}>{dayName}</div>
+                      <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{d.sessions} sessioni · {b} pause</div>
+                    </div>
+                    <div style={{fontWeight:700,color:'var(--accent)',fontSize:'1.1rem'}}>{Math.floor(d.minutes/60)}h {d.minutes%60}m</div>
+                  </div>
+                );
+              })}
+              {sortedDates.length > 20 && <div style={{textAlign:'center',fontSize:'.78rem',color:'var(--text2)',padding:'8px 0'}}>...e altre {sortedDates.length-20} giornate</div>}
+            </div>
+
+            {/* Advanced Stats */}
+            {sortedDates.length > 0 && (
+              <div className="card" style={{marginBottom:0,padding:'18px 16px'}}>
+                <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📊 Statistiche avanzate</div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
+                  {[
+                    {label:'Media al giorno',val:avgPerDay.toFixed(1)+' min'},
+                    {label:'Miglior giorno',val:(bestDay ? byDate[bestDay].minutes : 0)+' min'},
+                    {label:'Media per sessione',val:(totalSessions > 0 ? (totalMinutes/totalSessions).toFixed(1) : 0)+' min'},
+                    {label:'Giorni attivi',val:sortedDates.length},
+                    {label:'Sessioni al giorno',val:(sortedDates.length > 0 ? (totalSessions/sortedDates.length).toFixed(1) : 0)},
+                    {label:'Pause totali',val:totalBreaks},
+                  ].map((s, i) => (
+                    <div key={i} style={{padding:'10px 12px',background:'rgba(255,255,255,.04)',borderRadius:10}}>
+                      <div style={{fontSize:'.72rem',color:'var(--text2)',marginBottom:2}}>{s.label}</div>
+                      <div style={{fontWeight:700,fontSize:'1rem',color:'var(--accent)'}}>{s.val}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -24164,7 +24253,7 @@ function StatsTab({toast}) {
         {pomCycles<10&&todos.length>0&&<div style={{color:'var(--text2)',fontSize:'.85rem'}}>Hai completato {pomCycles} pomodori. Prova a usare il Pomodoro per studiare più efficacemente!</div>}
         {pomCycles>=10&&<div style={{color:'var(--green)',fontSize:'.85rem'}}>🎉 Ottimo! {pomCycles} sessioni di studio completate. Continua così!</div>}
       </div>
-      {sessionsOpen && <StudySessionsModal onClose={() => setSessionsOpen(false)}/>}
+      {sessionsOpen && <StudySessionsModal onClose={() => setSessionsOpen(false)} toast={toast}/>}
     </div>
   );
 }
@@ -25392,7 +25481,7 @@ function UniDashboard({onClose, addNote, toast}) {
               setPomCycles(c=>{
                 const newCount = pomMode==='work'?c+1:c;
                 localStorage.setItem('pom_cycles', newCount.toString());
-                if(pomMode==='work') logStudySession('work',pomDurationsRef.current.work);
+                if(pomMode==='work'){const s=logStudySession('work',pomDurationsRef.current.work);if(s)addEvent({id:s.id,title:'📖 Studio ('+s.duration+'m)',date:s.date,time:s.completedAt,color:'#10B981',fromStudy:true});}
                 return newCount;
               });
               if(pomMode!=='work') logStudySession('break',pomDurationsRef.current.short||5);
@@ -28515,16 +28604,18 @@ function logStudySession(type, duration) {
   try {
     const log = JSON.parse(localStorage.getItem('pom_log') || '[]');
     const now = new Date();
-    log.push({
+    const session = {
       id: Date.now() + Math.random(),
       date: now.toISOString().split('T')[0],
       type,
       duration,
       completedAt: now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0')
-    });
+    };
+    log.push(session);
     if(log.length > 10000) log.splice(0, log.length - 10000);
     localStorage.setItem('pom_log', JSON.stringify(log));
-  } catch(e) {}
+    return session;
+  } catch(e) { return null; }
 }
 
 function App(){
@@ -29100,7 +29191,7 @@ function GlobalPomodoroMini({mode,running,secs,total,pct,color,mins,secStr,label
 }
 
 function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,toasts,init,name}) {
-  const {events,birthdays,isOnline,notes,passwords,todos} = useContext(DataCtx);
+  const {events,birthdays,isOnline,notes,passwords,todos,addEvent} = useContext(DataCtx);
   const pwList = passwords;
   const {notifList,notifOpen,setNotifOpen,unread,markAllRead,addNotif} = useNotifications(events,birthdays);
   const [syncPending, setSyncPending] = useState(0);
@@ -29394,7 +29485,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
             try{if(Notification.permission==='granted')new Notification(miniPomMode==='work'?'Pausa!':'Torna a studiare!');}catch(e){}
             const cycles = parseInt(localStorage.getItem('pom_cycles')||'0')+(miniPomMode==='work'?1:0);
             localStorage.setItem('pom_cycles',String(cycles));
-            if(miniPomMode==='work') logStudySession('work',miniPomDurations.work);
+            if(miniPomMode==='work'){const s=logStudySession('work',miniPomDurations.work);if(s&&addEvent)addEvent({id:s.id,title:'📖 Studio ('+s.duration+'m)',date:s.date,time:s.completedAt,color:'#10B981',fromStudy:true});}
             else logStudySession('break',miniPomDurations.short||5);
             const next = miniPomMode==='work'?(cycles)%4===0?'long':'short':'work';
             setMiniPomMode(next);
