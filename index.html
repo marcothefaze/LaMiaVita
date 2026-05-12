@@ -23959,6 +23959,7 @@ function StudySessionsModal({onClose, toast}) {
   const todayStr = new Date().toISOString().split('T')[0];
   const [mf, setMf] = useState({date:todayStr, hours:1, minutes:0, subject:''});
   const [view, setView] = useState('dashboard'); // dashboard, add
+  const [period, setPeriod] = useState(7); // days: 7,30,90,180,365,Infinity
 
   const workLog = log.filter(e => e.type === 'work');
   const breakLog = log.filter(e => e.type === 'break');
@@ -24021,21 +24022,37 @@ function StudySessionsModal({onClose, toast}) {
   });
 
   const sortedDates = Object.keys(byDate).sort().reverse();
-  const last7 = [];
-  let weekMinutes = 0;
-  for(let i = 6; i >= 0; i--) {
+  
+  // Period-based data
+  const cutoffDate = period === Infinity ? null : new Date(Date.now() - period*24*60*60*1000).toISOString().split('T')[0];
+  const periodData = [];
+  let periodMinutes = 0;
+  const periodDays = period === Infinity ? sortedDates.length : period;
+  for(let i = periodDays-1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const ds = d.toISOString().split('T')[0];
-    const dn = d.toLocaleDateString('it-IT', {weekday:'short'}).slice(0,2);
+    let label;
+    if(period <= 30) {
+      label = d.toLocaleDateString('it-IT', {weekday:'short'}).slice(0,2);
+    } else {
+      label = d.toLocaleDateString('it-IT', {day:'numeric',month:'short'});
+    }
     const dd = byDate[ds] || {sessions: 0, minutes: 0};
-    last7.push({day: dn, sessions: dd.sessions, minutes: dd.minutes});
-    weekMinutes += dd.minutes;
+    periodData.push({day: label, sessions: dd.sessions, minutes: dd.minutes, date: ds});
+    periodMinutes += dd.minutes;
   }
-  const maxMin = Math.max(...last7.map(d => d.minutes), 1);
-  const avgPerDay = sortedDates.length > 0 ? (totalMinutes / sortedDates.length) : 0;
-  const bestDay = sortedDates.length > 0
-    ? sortedDates.reduce((a, b) => byDate[a].minutes > byDate[b].minutes ? a : b)
+  const maxMin = Math.max(...periodData.map(d => d.minutes), 1);
+  
+  // Stats for the selected period only
+  const periodWorkLog = cutoffDate ? workLog.filter(e => e.date >= cutoffDate) : workLog;
+  const periodSessions = periodWorkLog.length;
+  const periodTotalMinutes = periodWorkLog.reduce((s, e) => s + (e.duration || 25), 0);
+  const periodBreaks = cutoffDate ? breakLog.filter(e => e.date >= cutoffDate).length : totalBreaks;
+  const periodDates = cutoffDate ? sortedDates.filter(d => d >= cutoffDate) : sortedDates;
+  const avgPerDay = periodDates.length > 0 ? (periodTotalMinutes / periodDates.length) : 0;
+  const bestDay = periodDates.length > 0
+    ? periodDates.reduce((a, b) => byDate[a].minutes > byDate[b].minutes ? a : b)
     : null;
 
   // Current streak
@@ -24046,11 +24063,6 @@ function StudySessionsModal({onClose, toast}) {
     if(byDate[ds] && byDate[ds].minutes>0){streak++;check.setDate(check.getDate()-1);}
     else break;
   }
-
-  // This week total & monthly
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthMinutes = workLog.filter(e => e.date >= monthStart.toISOString().split('T')[0]).reduce((s, e) => s + (e.duration || 25), 0);
 
   return (
     <div className="modal-overlay" onClick={onClose} style={{position:'fixed',inset:0,zIndex:99999,background:'rgba(0,0,0,.6)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
@@ -24121,55 +24133,72 @@ function StudySessionsModal({onClose, toast}) {
           /* Dashboard View */
           <div style={{padding:28}}>
 
-            {/* Summary Cards - Big */}
+            {/* Period selector */}
+            <div style={{display:'flex',gap:6,marginBottom:20,justifyContent:'center',flexWrap:'wrap'}}>
+              {[
+                {label:'7 giorni',val:7},
+                {label:'1 mese',val:30},
+                {label:'3 mesi',val:90},
+                {label:'6 mesi',val:180},
+                {label:'1 anno',val:365},
+                {label:'Sempre',val:Infinity},
+              ].map(p => (
+                <button key={p.val} className="btn bs" onClick={()=>setPeriod(p.val)} style={period===p.val?{background:'var(--accent)',color:'#fff',border:'1px solid var(--accent)',fontSize:'.72rem',padding:'4px 12px'}:{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.1)',color:'var(--text2)',fontSize:'.72rem',padding:'4px 12px'}}>{p.label}</button>
+              ))}
+            </div>
+
+            {/* Summary Cards */}
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr 1fr',gap:12,marginBottom:20}}>
               <div className="card" style={{textAlign:'center',padding:'18px 10px'}}>
-                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--red)'}}>{totalSessions}</div>
-                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Sessioni totali</div>
+                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--red)'}}>{periodSessions}</div>
+                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Sessioni</div>
               </div>
               <div className="card" style={{textAlign:'center',padding:'18px 10px'}}>
-                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--accent)'}}>{Math.floor(totalMinutes/60)}h {totalMinutes%60}m</div>
-                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Tempo totale</div>
+                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--accent)'}}>{Math.floor(periodTotalMinutes/60)}h {periodTotalMinutes%60}m</div>
+                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Tempo studio</div>
               </div>
               <div className="card" style={{textAlign:'center',padding:'18px 10px'}}>
-                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--green)'}}>{Math.floor(weekMinutes/60)}h {weekMinutes%60}m</div>
-                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Questa settimana</div>
+                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--green)'}}>{periodBreaks}</div>
+                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Pause</div>
               </div>
               <div className="card" style={{textAlign:'center',padding:'18px 10px'}}>
-                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--blue)'}}>{Math.floor(monthMinutes/60)}h {monthMinutes%60}m</div>
-                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Questo mese</div>
-              </div>
-              <div className="card" style={{textAlign:'center',padding:'18px 10px'}}>
-                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--purple)'}}>{streak>0?'🔥 '+streak:'0'}</div>
+                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--blue)'}}>{streak>0?'🔥 '+streak:'0'}</div>
                 <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Giorni consecutivi</div>
+              </div>
+              <div className="card" style={{textAlign:'center',padding:'18px 10px'}}>
+                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--purple)'}}>{periodDays>0?(periodTotalMinutes/periodDays).toFixed(0):'-'}<span style={{fontSize:'.9rem'}}>m</span></div>
+                <div style={{fontSize:'.78rem',color:'var(--text2)'}}>Media/giorno</div>
               </div>
             </div>
 
-            {/* 7-Day Chart + Daily breakdown side by side */}
+            {/* Chart + Breakdown side by side */}
             <div style={{display:'grid',gridTemplateColumns:'1.2fr 1fr',gap:14,marginBottom:16}}>
               <div className="card" style={{padding:'18px 16px'}}>
-                <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📈 Minuti studio (7 giorni)</div>
+                <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📈 Minuti studio ({period===Infinity?'tutto':period+' giorni'})</div>
                 <div style={{display:'flex',alignItems:'flex-end',gap:6,height:110}}>
-                  {last7.map((d, i) => (
+                  {periodData.map((d, i) => (
                     <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
                       <div style={{width:'100%',background:'linear-gradient(180deg,var(--accent),var(--accent2))',borderRadius:'6px 6px 0 0',height:(d.minutes/maxMin*100)+'%',minHeight:d.minutes>0?4:0,transition:'height .4s',position:'relative'}}>
-                        {d.minutes > 0 && <div style={{position:'absolute',top:-18,left:'50%',transform:'translateX(-50%)',fontSize:'.65rem',color:'var(--text2)',whiteSpace:'nowrap',fontWeight:600}}>{d.minutes}m</div>}
+                        {d.minutes > 0 && <div style={{position:'absolute',top:-18,left:'50%',transform:'translateX(-50%)',fontSize:'.6rem',color:'var(--text2)',whiteSpace:'nowrap',fontWeight:600}}>{d.minutes}m</div>}
                       </div>
-                      <div style={{fontSize:'.7rem',color:'var(--text2)'}}>{d.day}</div>
+                      <div style={{fontSize:'.6rem',color:'var(--text2)',writingMode:period>90?'vertical-rl':'horizontal-tb',textOverflow:'ellipsis',overflow:'hidden',maxWidth:40,lineHeight:1.2}}>{d.day}</div>
                     </div>
                   ))}
                 </div>
-                <div style={{marginTop:12,fontSize:'.75rem',color:'var(--text2)'}}>Media: {(weekMinutes/7).toFixed(0)} min/giorno · TOT: {Math.floor(weekMinutes/60)}h {weekMinutes%60}m</div>
+                <div style={{marginTop:12,fontSize:'.75rem',color:'var(--text2)'}}>
+                  Media: {periodDays>0?(periodTotalMinutes/periodDays).toFixed(0):0} min/giorno · TOT: {Math.floor(periodTotalMinutes/60)}h {periodTotalMinutes%60}m
+                  {period!==Infinity && period!==7 && <span> · {periodDates.length} giorni attivi</span>}
+                </div>
               </div>
               
               {/* Daily breakdown */}
-              <div className="card" style={{padding:'18px 16px',maxHeight:180,overflowY:'auto'}}>
-                <div style={{fontWeight:700,marginBottom:10,fontSize:'.9rem'}}>📅 Questa settimana</div>
-                {last7.filter(d=>d.minutes>0).length===0 && <div style={{fontSize:'.8rem',color:'var(--text2)'}}>Nessuna sessione questa settimana</div>}
-                {last7.filter(d=>d.minutes>0).map((d,i)=>(
-                  <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid rgba(255,255,255,.05)',fontSize:'.82rem'}}>
-                    <span style={{color:'var(--text2)'}}>{d.day}</span>
-                    <span style={{fontWeight:600}}>{Math.floor(d.minutes/60)}h {d.minutes%60}m ({d.sessions} sessioni)</span>
+              <div className="card" style={{padding:'18px 16px',maxHeight:200,overflowY:'auto'}}>
+                <div style={{fontWeight:700,marginBottom:10,fontSize:'.9rem'}}>📅 Riepilogo giorni</div>
+                {periodData.filter(d=>d.minutes>0).length===0 && <div style={{fontSize:'.8rem',color:'var(--text2)'}}>Nessuna sessione in questo periodo</div>}
+                {periodData.filter(d=>d.minutes>0).reverse().map((d,i)=>(
+                  <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'4px 0',borderBottom:'1px solid rgba(255,255,255,.04)',fontSize:'.78rem'}}>
+                    <span style={{color:'var(--text2)'}}>{d.date?new Date(d.date+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'}):d.day}</span>
+                    <span style={{fontWeight:600}}>{Math.floor(d.minutes/60)}h {d.minutes%60}m ({d.sessions})</span>
                   </div>
                 ))}
               </div>
@@ -24205,19 +24234,19 @@ function StudySessionsModal({onClose, toast}) {
             </div>
 
             {/* Advanced Stats */}
-            {sortedDates.length > 0 && (
+            {periodDates.length > 0 && (
               <div className="card" style={{marginBottom:0,padding:'18px 20px'}}>
                 <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>📊 Statistiche avanzate</div>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:10}}>
                   {[
                     {label:'Media al giorno',val:avgPerDay.toFixed(0)+' min'},
                     {label:'Miglior giorno',val:(bestDay ? byDate[bestDay].minutes : 0)+' min',sub:bestDay?new Date(bestDay+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''},
-                    {label:'Media per sessione',val:(totalSessions > 0 ? (totalMinutes/totalSessions).toFixed(0) : 0)+' min'},
-                    {label:'Giorni attivi',val:sortedDates.length},
-                    {label:'Sessioni al giorno',val:(sortedDates.length > 0 ? (totalSessions/sortedDates.length).toFixed(1) : 0)},
-                    {label:'Pause totali',val:totalBreaks},
-                    {label:'Sessioni manuali',val:workLog.filter(e=>e.manual).length},
-                    {label:'Questo mese',val:Math.floor(monthMinutes/60)+'h '+monthMinutes%60+'m'},
+                    {label:'Media per sessione',val:(periodSessions > 0 ? (periodTotalMinutes/periodSessions).toFixed(0) : 0)+' min'},
+                    {label:'Giorni attivi',val:periodDates.length+'/'+periodDays},
+                    {label:'Sessioni al giorno',val:(periodDates.length > 0 ? (periodSessions/periodDates.length).toFixed(1) : 0)},
+                    {label:'Pause totali',val:periodBreaks},
+                    {label:'Sessioni manuali',val:periodWorkLog.filter(e=>e.manual).length},
+                    {label:'Totale assoluto',val:Math.floor(totalMinutes/60)+'h '+totalMinutes%60+'m'},
                   ].map((s, i) => (
                     <div key={i} style={{padding:'10px 12px',background:'rgba(255,255,255,.04)',borderRadius:10}}>
                       <div style={{fontSize:'.72rem',color:'var(--text2)',marginBottom:2}}>{s.label}</div>
@@ -29634,6 +29663,8 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
   const [focusDurations, setFocusDurations] = useState(()=>{try{return JSON.parse(localStorage.getItem('focus_durations')||'null')||{work:25,short:5,long:15};}catch(e){return {work:25,short:5,long:15};}});
   const [focusTempDurations, setFocusTempDurations] = useState(focusDurations);
   const [focusShowSettings, setFocusShowSettings] = useState(false);
+  const [focusEditingTime, setFocusEditingTime] = useState(false);
+  const [focusEditInput, setFocusEditInput] = useState('');
   const [focusShowChat, setFocusShowChat] = useState(false);
   const [focusChatMsgs, setFocusChatMsgs] = useState([{role:'bot',text:'Ciao! Sono qui per aiutarti durante lo studio. Chiedimi qualsiasi cosa! 📚'}]);
   const [focusChatInp, setFocusChatInp] = useState('');
@@ -31365,8 +31396,8 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
               <div style={{position:'absolute',top:20,left:20,right:20,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                 <div style={{fontSize:'1.1rem',fontWeight:700,display:'flex',alignItems:'center',gap:8}}>{focusShowSettings?'⚙':focusRunning?'🎯':'🎯'} {focusShowSettings?'Personalizza timer':'Focus Mode'}</div>
                 <div style={{display:'flex',gap:8}}>
-                  <button className="btn bg bs" onClick={()=>{if(focusShowSettings){setFocusShowSettings(false);setFocusTempDurations(focusDurations);}else{setFocusShowSettings(true);setFocusTempDurations(focusDurations);}}} style={{fontSize:'.7rem',padding:'4px 8px'}}>
-                    {focusShowSettings?'← Indietro':'⚙ Timer'}
+                  <button className="btn bg bs" onClick={()=>{if(focusShowSettings){setFocusShowSettings(false);setFocusTempDurations(focusDurations);}else{setFocusShowSettings(true);setFocusTempDurations(focusDurations);}}} style={{fontSize:'.75rem',padding:'6px 12px',background:focusShowSettings?'rgba(255,77,109,.2)':'rgba(255,255,255,.08)',border:'1px solid '+(focusShowSettings?'rgba(255,77,109,.3)':'rgba(255,255,255,.1)')}}>
+                    {focusShowSettings?'← Chiudi':'⚙ Personalizza tempi'}
                   </button>
                   <button className={`btn ${focusShowChat?'br':'bg'} bs`} onClick={()=>setFocusShowChat(s=>!s)} style={{fontSize:'.75rem'}}>
                     💬 AI {focusShowChat?'ON':'OFF'}
@@ -31394,12 +31425,28 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
                 </div>
               ) : (
                 <>
-              {/* Timer */}
-              <div style={{textAlign:'center',marginBottom:30,marginTop:40}}>
-                <div style={{fontSize:'5rem',fontWeight:900,fontFamily:'monospace',color:focusColors[focusMode],textShadow:'0 0 40px '+focusColors[focusMode]+'66'}}>
-                  {String(Math.floor(focusSecs/60)).padStart(2,'0')}:{String(focusSecs%60).padStart(2,'0')}
-                </div>
-                <div style={{fontSize:'.9rem',color:'rgba(255,255,255,.6)',marginTop:8}}>{focusLabels[focusMode]}</div>
+              {/* Timer — click to edit */}
+              <div style={{textAlign:'center',marginBottom:20,marginTop:40}}>
+                {focusEditingTime ? (
+                  <div>
+                    <input type="number" min="1" max="999" value={focusEditInput}
+                      onChange={e=>setFocusEditInput(e.target.value)}
+                      onKeyDown={e=>{if(e.key==='Enter'){const m=parseInt(focusEditInput)||1;setFocusRunning(false);setFocusSecs(m*60);setFocusEditingTime(false);}}}
+                      onBlur={()=>{if(focusEditInput){const m=parseInt(focusEditInput)||1;setFocusRunning(false);setFocusSecs(m*60);}setFocusEditingTime(false);}}
+                      autoFocus
+                      style={{width:120,background:'rgba(255,255,255,.08)',border:'1px solid '+focusColors[focusMode]+'40',borderRadius:14,color:'#fff',fontSize:'4rem',fontWeight:900,fontFamily:'monospace',textAlign:'center',padding:'8px 12px',outline:'none'}}/>
+                    <div style={{fontSize:'.8rem',color:'rgba(255,255,255,.4)',marginTop:8}}>minuti · premi Invio per confermare</div>
+                  </div>
+                ) : (
+                  <div>
+                    <div onClick={()=>{if(!focusRunning){setFocusEditInput(String(Math.ceil(focusSecs/60)));setFocusEditingTime(true);}}} style={{fontSize:'5rem',fontWeight:900,fontFamily:'monospace',color:focusColors[focusMode],textShadow:'0 0 40px '+focusColors[focusMode]+'66',cursor:focusRunning?'default':'pointer',transition:'opacity .2s',userSelect:'none'}}
+                      title={focusRunning?'Metti in pausa per personalizzare':'Clicca per personalizzare i minuti'}>
+                      {String(Math.floor(focusSecs/60)).padStart(2,'0')}:{String(focusSecs%60).padStart(2,'0')}
+                    </div>
+                    <div style={{fontSize:'.9rem',color:'rgba(255,255,255,.6)',marginTop:8}}>{focusLabels[focusMode]}</div>
+                    {!focusRunning && <div style={{fontSize:'.65rem',color:'rgba(255,255,255,.3)',marginTop:4}}>⏱ clicca per cambiare durata</div>}
+                  </div>
+                )}
               </div>
               
               {/* Progress bar */}
@@ -31413,6 +31460,17 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
                   <button key={m} className="btn bs" onClick={()=>{setFocusRunning(false);setFocusMode(m);setFocusSecs(focusDurations[m]*60);}} style={focusMode===m?{background:c,color:'#fff',border:'1px solid '+c,fontSize:'.7rem',padding:'4px 10px'}:{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.1)',color:'rgba(255,255,255,.7)',fontSize:'.7rem',padding:'4px 10px'}}>{l}</button>
                 ))}
               </div>
+              
+              {/* Quick presets */}
+              {!focusRunning && (
+                <div style={{display:'flex',gap:6,marginBottom:20,justifyContent:'center',flexWrap:'wrap'}}>
+                  {[5,10,15,20,25,30,45,60,90,120].map(m => (
+                    <button key={m} className="btn bs" onClick={()=>{setFocusRunning(false);setFocusSecs(m*60);}} style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.08)',color:'var(--text2)',fontSize:'.65rem',padding:'3px 8px',borderRadius:6}}>
+                      {m>=60 ? Math.floor(m/60)+'h'+(m%60>0?m%60+'m':'') : m+'m'}
+                    </button>
+                  ))}
+                </div>
+              )}
               
               {/* Controls */}
               <div style={{display:'flex',gap:12,marginBottom:30}}>
