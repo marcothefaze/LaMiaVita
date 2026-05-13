@@ -716,26 +716,23 @@ body.light .sp-global-player,body.cream .sp-global-player,body.lavender .sp-glob
 
 /* Background Patterns - Vivid, animated backgrounds */
 body[class*="bg-pattern-"]{background:transparent}
-body[class*="bg-pattern-"]::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg)}
+body[class*="bg-pattern-"]::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none}
 .bg-pattern-none::before{display:none!important}
-body.bg-pattern-dots::before{background-image:radial-gradient(circle,var(--accent) 10px,transparent 10px);background-size:80px 80px;opacity:.55}
-body.bg-pattern-cross::before{background-image:linear-gradient(0deg,transparent 22px,var(--purple) 22px,var(--purple) 28px,transparent 28px),linear-gradient(90deg,transparent 22px,var(--purple) 22px,var(--purple) 28px,transparent 28px);background-size:80px 80px;opacity:.5}
-body.bg-pattern-diagonal::before{background-image:repeating-linear-gradient(45deg,var(--accent) 0,var(--accent) 10px,transparent 10px,transparent 60px);background-size:100px 100px;opacity:.55;animation:scrollDiagonal 14s linear infinite}
-body.bg-pattern-circles::before{background-image:radial-gradient(circle at 50% 50%,transparent 0,transparent 14px,var(--accent2) 14px,var(--accent2) 20px,transparent 20px,transparent 30px,var(--accent2) 30px,var(--accent2) 33px,transparent 33px);background-size:100px 100px;opacity:.5}
-body.bg-pattern-stars::before{background-image:radial-gradient(10px 10px at 10% 16%,var(--accent),transparent),radial-gradient(16px 16px at 78% 10%,var(--accent2),transparent),radial-gradient(12px 12px at 85% 55%,var(--accent),transparent),radial-gradient(14px 14px at 32% 78%,var(--purple),transparent),radial-gradient(8px 8px at 4% 62%,var(--accent2),transparent),radial-gradient(18px 18px at 80% 88%,var(--accent),transparent),radial-gradient(12px 12px at 50% 28%,var(--accent2),transparent),radial-gradient(14px 14px at 20% 42%,var(--purple),transparent),radial-gradient(8px 8px at 40% 6%,var(--accent),transparent);background-size:500px 450px;opacity:.6;animation:pulseStars 10s ease-in-out infinite}
-body.bg-pattern-grid::before{background-image:linear-gradient(0deg,var(--accent2) 3px,transparent 3px),linear-gradient(90deg,var(--accent2) 3px,transparent 3px);background-size:40px 40px;opacity:.4}
-body.bg-pattern-grid::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(0deg,var(--accent2) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--accent2) 1.5px,transparent 1.5px);background-size:10px 10px;opacity:.3;animation:shiftGrid 12s ease-in-out infinite}
-body.bg-pattern-aurora::before{background-image:linear-gradient(90deg,var(--accent) 0%,var(--accent) 5%,transparent 5%,transparent 20%,var(--purple) 20%,var(--purple) 22%,transparent 22%,transparent 35%,var(--blue) 35%,var(--blue) 37%,transparent 37%,transparent 50%,var(--green) 50%,var(--green) 52%,transparent 52%,transparent 68%,var(--accent2) 68%,var(--accent2) 70%,transparent 70%),linear-gradient(180deg,transparent 0,transparent 30%,var(--purple) 30%,var(--purple) 31%,transparent 31%,transparent 60%,var(--blue) 60%,var(--blue) 61%,transparent 61%);background-size:300% 100%;opacity:.25;animation:driftAurora 16s ease-in-out infinite}
-body.bg-pattern-circuit::before{background-image:linear-gradient(0deg,var(--purple) 0,var(--purple) 12px,transparent 12px,transparent 40px),linear-gradient(90deg,var(--accent) 0,var(--accent) 12px,transparent 12px,transparent 40px),radial-gradient(circle 14px at 3px 3px,var(--accent2) 50%,transparent 50%),radial-gradient(circle 8px at 42px 28px,var(--accent) 50%,transparent 50%),radial-gradient(circle 10px at 22px 50px,var(--purple) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 14px,var(--accent2) 14px,var(--accent2) 15px,transparent 15px,transparent 48px);background-size:80px 80px;background-position:0 0,0 0,0 0,0 0,0 0,0 0;opacity:.45;animation:pulseCircuit 6s ease-in-out infinite}
-body.bg-pattern-nebula::before{background-image:radial-gradient(circle at 16% 16%,var(--purple) 0%,transparent 40%),radial-gradient(circle at 75% 30%,var(--accent2) 0%,transparent 38%),radial-gradient(circle at 40% 70%,var(--blue) 0%,transparent 35%),radial-gradient(circle at 80% 80%,var(--accent) 0%,transparent 32%),radial-gradient(circle at 6% 76%,var(--purple) 0%,transparent 35%);background-size:180% 180%;opacity:.28;animation:shiftNebula 20s ease-in-out infinite}
-body.bg-pattern-matrix::before{background-image:repeating-linear-gradient(90deg,transparent 0,transparent 42px,var(--green) 42px,var(--green) 46px,transparent 46px,transparent 70px);background-size:100% 100%;opacity:.25;animation:scrollMatrix 14s linear infinite}
-body.bg-pattern-matrix::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:repeating-linear-gradient(0deg,transparent 0,transparent 46px,var(--green) 46px,var(--green) 48px);background-size:100% 96px;opacity:.18;animation:scrollMatrixAfter 10s linear infinite}
-body.bg-pattern-topo::before{background-image:radial-gradient(circle at 20% 26%,var(--accent2) 0,var(--accent2) 6px,transparent 8px,transparent 24px,var(--accent2) 26px,var(--accent2) 32px,transparent 48px),radial-gradient(circle at 74% 60%,var(--purple) 0,var(--purple) 6px,transparent 8px,transparent 22px,var(--accent2) 24px,var(--accent2) 28px,transparent 42px);background-size:160px 160px;opacity:.5;animation:shiftTopo 14s ease-in-out infinite}
-body.bg-pattern-zigzag::before{background-image:linear-gradient(135deg,var(--accent) 33%,transparent 33%),linear-gradient(-135deg,var(--accent) 33%,transparent 33%);background-size:80px 80px;background-position:0 0,40px 0;opacity:.55;animation:slideZigzag 5s ease-in-out infinite}
-body.bg-pattern-waves::before{background-image:repeating-linear-gradient(0deg,var(--blue) 0,var(--blue) 8px,transparent 8px,transparent 24px,var(--accent2) 24px,var(--accent2) 30px,transparent 30px,transparent 56px);background-size:100% 80px;opacity:.4;animation:flowWaves 12s ease-in-out infinite}
-body.bg-pattern-hex::before{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 6px,var(--purple) 6px,var(--purple) 12px,transparent 12px,transparent 50px),repeating-linear-gradient(-60deg,transparent 0,transparent 6px,var(--purple) 6px,var(--purple) 12px,transparent 12px,transparent 50px);background-size:100px 72px;background-position:0 0,50px 36px;opacity:.45;animation:pulseHex 10s ease-in-out infinite}
-body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,var(--accent2) 25%,transparent 25%),linear-gradient(-45deg,var(--accent2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--accent2) 75%),linear-gradient(-45deg,transparent 75%,var(--accent2) 75%);background-size:80px 80px;background-position:0 0,0 40px,40px -40px,-40px 0px;opacity:.5;animation:pulseDiamond 8s ease-in-out infinite}
-
+body.bg-pattern-dots::before{background-image:radial-gradient(circle,color-mix(in srgb,var(--accent) 35%,transparent) 2px,transparent 2px);background-size:22px 22px}
+body.bg-pattern-cross::before{background-image:linear-gradient(0deg,transparent 6px,color-mix(in srgb,var(--purple) 28%,transparent) 6px,color-mix(in srgb,var(--purple) 28%,transparent) 8px,transparent 8px),linear-gradient(90deg,transparent 6px,color-mix(in srgb,var(--purple) 28%,transparent) 6px,color-mix(in srgb,var(--purple) 28%,transparent) 8px,transparent 8px);background-size:20px 20px}
+body.bg-pattern-diagonal::before{background-image:repeating-linear-gradient(35deg,color-mix(in srgb,var(--accent) 30%,transparent) 0,color-mix(in srgb,var(--accent) 30%,transparent) 2.5px,transparent 2.5px,transparent 22px);background-size:28px 28px;animation:animDiagonal 15s linear infinite}
+body.bg-pattern-circles::before{background-image:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--accent2) 28%,transparent) 0,color-mix(in srgb,var(--accent2) 28%,transparent) 1px,transparent 1px,transparent 6px,color-mix(in srgb,var(--accent2) 20%,transparent) 6px,color-mix(in srgb,var(--accent2) 20%,transparent) 7px,transparent 7px);background-size:26px 26px}
+body.bg-pattern-stars::before{background-image:radial-gradient(1.5px 1.5px at 15% 22%,color-mix(in srgb,var(--accent) 42%,transparent),transparent),radial-gradient(3px 3px at 72% 8%,color-mix(in srgb,var(--accent2) 35%,transparent),transparent),radial-gradient(2px 2px at 91% 62%,color-mix(in srgb,var(--accent) 42%,transparent),transparent),radial-gradient(3px 3px at 38% 85%,color-mix(in srgb,var(--accent2) 35%,transparent),transparent),radial-gradient(1.5px 1.5px at 5% 70%,color-mix(in srgb,var(--accent) 42%,transparent),transparent),radial-gradient(4px 4px at 80% 92%,color-mix(in srgb,var(--accent2) 35%,transparent),transparent),radial-gradient(2px 2px at 55% 35%,color-mix(in srgb,var(--accent) 42%,transparent),transparent),radial-gradient(3px 3px at 25% 50%,color-mix(in srgb,var(--accent2) 35%,transparent),transparent),radial-gradient(1.5px 1.5px at 45% 10%,color-mix(in srgb,var(--accent) 42%,transparent),transparent),radial-gradient(3px 3px at 95% 40%,color-mix(in srgb,var(--accent2) 35%,transparent),transparent);background-size:200px 180px;animation:animStars 15s ease-in-out infinite}
+body.bg-pattern-grid::before{background-image:linear-gradient(0deg,color-mix(in srgb,var(--accent2) 15%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent2) 15%,transparent) 1px,transparent 1px),linear-gradient(0deg,color-mix(in srgb,var(--accent2) 28%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent2) 28%,transparent) 1px,transparent 1px);background-size:14px 14px,14px 14px,56px 56px,56px 56px;animation:animGrid 10s ease-in-out infinite}
+body.bg-pattern-aurora::before{background-image:linear-gradient(90deg,color-mix(in srgb,var(--accent) 15%,transparent) 0%,transparent 30%,transparent 45%,color-mix(in srgb,var(--purple) 12%,transparent) 45%,transparent 70%,transparent 75%,color-mix(in srgb,var(--accent2) 12%,transparent) 75%),linear-gradient(90deg,transparent 20%,color-mix(in srgb,var(--accent2) 12%,transparent) 20%,transparent 50%,color-mix(in srgb,var(--blue) 10%,transparent) 50%,transparent 80%);background-size:200% 100%;animation:auroraDrift 10s ease-in-out infinite}
+body.bg-pattern-circuit::before{background-image:linear-gradient(0deg,color-mix(in srgb,var(--accent) 32%,transparent) 0,color-mix(in srgb,var(--accent) 32%,transparent) 8px,transparent 8px,transparent 12px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 32%,transparent) 0,color-mix(in srgb,var(--accent) 32%,transparent) 8px,transparent 8px,transparent 12px),radial-gradient(circle 3px at 0 0,color-mix(in srgb,var(--accent2) 28%,transparent) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 6px,color-mix(in srgb,var(--accent2) 18%,transparent) 6px,color-mix(in srgb,var(--accent2) 18%,transparent) 6.5px,transparent 6.5px,transparent 16px);background-size:28px 28px;background-position:0 0,0 0,0 0,0 0}
+body.bg-pattern-nebula::before{background-image:radial-gradient(circle at 30% 30%,color-mix(in srgb,var(--accent2) 16%,transparent) 0%,transparent 30%),radial-gradient(circle at 70% 50%,color-mix(in srgb,var(--purple) 14%,transparent) 0%,transparent 30%),radial-gradient(circle at 50% 80%,color-mix(in srgb,var(--blue) 12%,transparent) 0%,transparent 25%),radial-gradient(circle at 20% 70%,color-mix(in srgb,var(--accent) 16%,transparent) 0%,transparent 25%),radial-gradient(circle at 80% 20%,color-mix(in srgb,var(--purple) 12%,transparent) 0%,transparent 30%);background-size:140% 140%;animation:nebulaShift 14s ease-in-out infinite}
+body.bg-pattern-matrix::before{background-image:repeating-linear-gradient(0deg,transparent 0,transparent 18px,color-mix(in srgb,var(--green) 12%,transparent) 18px,color-mix(in srgb,var(--green) 12%,transparent) 19px),repeating-linear-gradient(90deg,transparent,transparent 9px,color-mix(in srgb,var(--green) 12%,transparent) 9px,color-mix(in srgb,var(--green) 12%,transparent) 10px);background-size:100% 20px,10px 100%;animation:animMatrix 12s linear infinite}
+body.bg-pattern-topo::before{background-image:radial-gradient(circle at 25% 30%,color-mix(in srgb,var(--accent2) 25%,transparent) 0,color-mix(in srgb,var(--accent2) 25%,transparent) 1.5px,transparent 2px,transparent 7px,color-mix(in srgb,var(--accent2) 16%,transparent) 8px,color-mix(in srgb,var(--accent2) 16%,transparent) 9px,transparent 14px),radial-gradient(circle at 70% 65%,color-mix(in srgb,var(--accent2) 20%,transparent) 0,color-mix(in srgb,var(--accent2) 20%,transparent) 1.5px,transparent 2px,transparent 6px,color-mix(in srgb,var(--accent2) 14%,transparent) 7px,color-mix(in srgb,var(--accent2) 14%,transparent) 8px,transparent 12px);background-size:48px 48px;animation:animTopo 8s ease-in-out infinite}
+body.bg-pattern-zigzag::before{background-image:linear-gradient(135deg,color-mix(in srgb,var(--accent) 32%,transparent) 28%,transparent 28%),linear-gradient(-135deg,color-mix(in srgb,var(--accent) 32%,transparent) 28%,transparent 28%);background-size:28px 28px;background-position:0 0,14px 0;animation:animZigzag 8s ease-in-out infinite}
+body.bg-pattern-waves::before{background-image:repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent2) 25%,transparent) 0,color-mix(in srgb,var(--accent2) 25%,transparent) 2px,transparent 2px,transparent 16px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 20%,transparent) 0,color-mix(in srgb,var(--accent) 20%,transparent) 1.5px,transparent 1.5px,transparent 18px);background-size:100% 22px;animation:animWaves 8s ease-in-out infinite}
+body.bg-pattern-hex::before{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 1.5px,color-mix(in srgb,var(--accent) 30%,transparent) 1.5px,color-mix(in srgb,var(--accent) 30%,transparent) 2.5px,transparent 2.5px,transparent 16px),repeating-linear-gradient(-60deg,transparent 0,transparent 1.5px,color-mix(in srgb,var(--accent) 30%,transparent) 1.5px,color-mix(in srgb,var(--accent) 30%,transparent) 2.5px,transparent 2.5px,transparent 16px);background-size:28px 18px;background-position:0 0,14px 9px;animation:animHex 10s ease-in-out infinite}
+body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,color-mix(in srgb,var(--accent2) 28%,transparent) 25%,transparent 25%),linear-gradient(-45deg,color-mix(in srgb,var(--accent2) 28%,transparent) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,color-mix(in srgb,var(--accent2) 28%,transparent) 75%),linear-gradient(-45deg,transparent 75%,color-mix(in srgb,var(--accent2) 28%,transparent) 75%);background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0px;animation:animDiamond 8s ease-in-out infinite}
 .pp-none,.pp-dots,.pp-cross,.pp-diagonal,.pp-circles,.pp-stars,.pp-grid,.pp-aurora,.pp-circuit,.pp-nebula,.pp-matrix,.pp-topo,.pp-zigzag,.pp-waves,.pp-hex,.pp-diamond{width:36px;height:36px;border-radius:6px;border:1px solid var(--border);display:inline-block;vertical-align:middle;background-size:cover;overflow:hidden}
 .pp-none{background:var(--bg)}
 .pp-dots{background-image:radial-gradient(circle 5px,var(--accent) 50%,transparent 50%);background-size:18px 18px}
@@ -754,19 +751,17 @@ body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,var(--acc
 .pp-hex{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 1px,var(--purple) 1px,var(--purple) 2.5px,transparent 2.5px,transparent 10px),repeating-linear-gradient(-60deg,transparent 0,transparent 1px,var(--purple) 1px,var(--purple) 2.5px,transparent 2.5px,transparent 10px);background-size:18px 12px;background-position:0 0,9px 6px}
 .pp-diamond{background-image:linear-gradient(45deg,var(--accent2) 25%,transparent 25%),linear-gradient(-45deg,var(--accent2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--accent2) 75%),linear-gradient(-45deg,transparent 75%,var(--accent2) 75%);background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0px}
 
-@keyframes scrollDiagonal{0%{background-position:0 0}100%{background-position:140px 140px}}
-@keyframes pulseStars{0%,100%{background-size:500px 450px}50%{background-size:520px 470px}}
-@keyframes shiftGrid{0%,100%{background-position:0 0,0 0}50%{background-position:2px 2px,0 0}}
-@keyframes driftAurora{0%{background-position:0% 50%}25%{background-position:50% 40%}50%{background-position:100% 30%}75%{background-position:50% 60%}100%{background-position:0% 50%}}
-@keyframes pulseCircuit{0%,100%{background-size:80px 80px}50%{background-size:84px 84px}}
-@keyframes shiftNebula{0%{background-position:0% 50%}25%{background-position:40% 30%}50%{background-position:80% 20%}75%{background-position:20% 70%}100%{background-position:0% 50%}}
-@keyframes scrollMatrix{0%{background-position:0 0}100%{background-position:-70px 0}}
-@keyframes scrollMatrixAfter{0%{background-position:0 0}100%{background-position:0 96px}}
-@keyframes shiftTopo{0%,100%{background-position:0 0}50%{background-position:18px 18px}}
-@keyframes slideZigzag{0%,100%{background-position:0 0,40px 0}50%{background-position:20px 0,60px 0}}
-@keyframes flowWaves{0%,100%{background-position:0 0}50%{background-position:8px 22px}}
-@keyframes pulseHex{0%,100%{background-size:100px 72px;background-position:0 0,50px 36px}50%{background-size:104px 76px;background-position:2px 2px,52px 38px}}
-@keyframes pulseDiamond{0%,100%{background-size:80px 80px}50%{background-size:84px 84px}}
+@keyframes animDiagonal{0%{background-position:0 0}100%{background-position:40px 40px}}
+@keyframes animStars{0%,100%{background-size:200px 180px}50%{background-size:210px 190px}}
+@keyframes animGrid{0%,100%{background-position:0 0,0 0,0 0,0 0}50%{background-position:1px 1px,1px 1px,0 0,0 0}}
+@keyframes auroraDrift{0%{background-position:0% 50%}25%{background-position:50% 40%}50%{background-position:100% 30%}75%{background-position:50% 60%}100%{background-position:0% 50%}}
+@keyframes nebulaShift{0%{background-position:0% 50%}25%{background-position:40% 30%}50%{background-position:80% 20%}75%{background-position:20% 70%}100%{background-position:0% 50%}}
+@keyframes animMatrix{0%{background-position:0 0,0 0}100%{background-position:0 40px,0 0}}
+@keyframes animTopo{0%,100%{background-position:0 0}50%{background-position:6px 6px}}
+@keyframes animZigzag{0%,100%{background-position:0 0,14px 0}50%{background-position:7px 0,21px 0}}
+@keyframes animWaves{0%,100%{background-position:0 0,0 0}50%{background-position:3px 7px,0 0}}
+@keyframes animHex{0%,100%{background-size:28px 18px;background-position:0 0,14px 9px}50%{background-size:30px 20px;background-position:1px 1px,15px 10px}}
+@keyframes animDiamond{0%,100%{background-size:22px 22px}50%{background-size:24px 24px}}
 
 /* Icon animations and active glow */
 .nb svg{display:block;transition:all .2s cubic-bezier(.4,0,.2,1)}
@@ -5647,8 +5642,11 @@ body.lmv-v2 .content > div > div {
 /* V1 (original): Same full-screen layout as V2 - fill available space */
 body:not(.lmv-v2) .content > div {
   min-height: calc(100vh - 120px) !important;
+  height: calc(100vh - 120px) !important;
   width: 100% !important;
   max-width: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 body:not(.lmv-v2) .content > div > div {
@@ -6534,7 +6532,8 @@ body:not(.lmv-v2) .content {
 body:not(.lmv-v2) .fi2 {
   max-width: 100% !important;
   margin: 0 auto !important;
-  height: 100% !important;
+  flex: 1 !important;
+  height: auto !important;
   min-height: 0 !important;
   overflow-y: auto !important;
   display: flex !important;
@@ -6857,11 +6856,14 @@ body.lmv-v2 .main {
     height: 100% !important;
     min-height: 0 !important;
     width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
   
   /* Ensure .fi2 (tab container) fills available space */
   body.lmv-v2 .fi2 {
-    height: 100% !important;
+    flex: 1 !important;
+    height: auto !important;
     min-height: 0 !important;
     overflow-y: auto !important;
     display: flex !important;
@@ -12885,14 +12887,15 @@ function MusicTab({toast}) {
   };
 
   const play = async(uri=null, uris=null) => {
+    navigator.vibrate(10);
     try{
       const body = uris ? {uris} : uri ? {context_uri:uri} : {};
       await spFetch('https://api.spotify.com/v1/me/player/play'+(deviceId?'?device_id='+deviceId:''),{method:'PUT',body:JSON.stringify(body)});
     }catch(e){ toast('Errore riproduzione','var(--red)'); }
   };
-  const pause = ()=>player&&player.pause();
-  const next  = ()=>player&&player.nextTrack();
-  const prev  = ()=>player&&player.previousTrack();
+  const pause = ()=>{ navigator.vibrate(10); player&&player.pause(); };
+  const next  = ()=>{ navigator.vibrate(10); player&&player.nextTrack(); };
+  const prev  = ()=>{ navigator.vibrate(10); player&&player.previousTrack(); };
   const setVol = async(v)=>{ setVolume(v); if(player) await player.setVolume(v/100); };
   const seek  = async(pct)=>{ const pos=Math.floor(pct*duration); if(player) await player.seek(pos); setProgress(pos); };
   const toggleShuffle = async() => {
@@ -12931,7 +12934,7 @@ function MusicTab({toast}) {
           <div style={{fontSize:'.72rem',color:'var(--text2)',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{track.artists?.map(a=>a.name).join(', ')}</div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
-          <div style={{cursor:'pointer',color:liked?'#1ED760':'rgba(255,255,255,.35)',display:'flex',transition:'all .2s'}} onClick={toggleLike}
+          <div style={{cursor:'pointer',color:liked?'#1ED760':'rgba(255,255,255,.35)',display:'flex',transition:'all .2s'}} onClick={()=>{navigator.vibrate(10);toggleLike();}}
             onMouseEnter={e=>{e.currentTarget.style.color='#1ED760';e.currentTarget.style.transform='scale(1.2)';}}
             onMouseLeave={e=>{e.currentTarget.style.color=liked?'#1ED760':'rgba(255,255,255,.35)';e.currentTarget.style.transform='scale(1)';}}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -12957,9 +12960,10 @@ function MusicTab({toast}) {
           </div>
         </div>
         <div style={{width:110,display:'flex',alignItems:'center',gap:6}}>
-          <span style={{fontSize:'.7rem',color:'rgba(255,255,255,.4)'}}>🔈</span>
-          <div style={{flex:1,height:4,background:'rgba(255,255,255,.1)',borderRadius:3,cursor:'pointer'}} onClick={e=>{const rect=e.currentTarget.getBoundingClientRect();setVol(Math.round((e.clientX-rect.left)/rect.width*100));}}>
-            <div style={{height:'100%',width:volume+'%',background:'linear-gradient(90deg,#1ED760,#169c46)',borderRadius:3,transition:'width .1s',boxShadow:volume>0?'0 0 6px rgba(30,215,96,.3)':'none'}}/>
+          <span style={{fontSize:'.7rem',color:'rgba(255,255,255,.4)',width:14,textAlign:'center'}}>🔈</span>
+          <div style={{flex:1,height:8,background:'rgba(255,255,255,.15)',borderRadius:4,cursor:'pointer',position:'relative',overflow:'visible'}} onClick={e=>{const rect=e.currentTarget.getBoundingClientRect();setVol(Math.round((e.clientX-rect.left)/rect.width*100));}}>
+            <div style={{height:'100%',width:volume+'%',background:'linear-gradient(90deg,#1ED760,#169c46)',borderRadius:4,transition:'width .1s',boxShadow:volume>0?'0 0 10px rgba(30,215,96,.45)':'none'}}/>
+            {volume>0&&<div style={{position:'absolute',left:volume+'%',top:'50%',width:14,height:14,borderRadius:'50%',background:'#1ED760',border:'2px solid #fff',transform:'translate(-50%,-50%)',boxShadow:'0 0 8px rgba(30,215,96,.6)',pointerEvents:'none',transition:'left .1s'}}/>}
           </div>
         </div>
       </div>
@@ -24321,7 +24325,7 @@ function StudySessionsModal({onClose, toast}) {
               </div>
               
               {/* Daily breakdown */}
-              <div className="card" style={{padding:'18px 16px',maxHeight:200,overflowY:'auto'}}>
+              <div className="card" style={{padding:'18px 16px',maxHeight:400,overflowY:'auto'}}>
                 <div style={{fontWeight:700,marginBottom:10,fontSize:'.9rem'}}>📅 Riepilogo giorni</div>
                 {periodData.filter(d=>d.minutes>0).length===0 && <div style={{fontSize:'.8rem',color:'var(--text2)'}}>Nessuna sessione in questo periodo</div>}
                 {periodData.filter(d=>d.minutes>0).reverse().map((d,i)=>(
@@ -24341,7 +24345,7 @@ function StudySessionsModal({onClose, toast}) {
                   Nessuna sessione ancora. Usa il Pomodoro, il Focus Mode o aggiungi manualmente! 📚
                 </div>
               )}
-              {sortedDates.slice(0,30).map(date => {
+              {sortedDates.map(date => {
                 const d = byDate[date];
                 const b = breaksByDate[date] || 0;
                 const dayName = new Date(date + 'T12:00').toLocaleDateString('it-IT', {weekday:'long',day:'numeric',month:'short'});
@@ -24359,7 +24363,6 @@ function StudySessionsModal({onClose, toast}) {
                   </div>
                 );
               })}
-              {sortedDates.length > 30 && <div style={{textAlign:'center',fontSize:'.78rem',color:'var(--text2)',padding:'8px 0'}}>...e altre {sortedDates.length-30} giornate</div>}
             </div>
 
             {/* Advanced Stats */}
@@ -29420,9 +29423,9 @@ function GlobalMiniPlayer({currentTab, setTab}) {
 
   if(!track || currentTab==='music' || hidden) return null;
 
-  const prev = () => { if(window._spPlayer) window._spPlayer.previousTrack(); };
-  const next = () => { if(window._spPlayer) window._spPlayer.nextTrack(); };
-  const toggle = () => { if(window._spPlayer){ paused ? window._spPlayer.resume() : window._spPlayer.pause(); }};
+  const prev = () => { navigator.vibrate(10); if(window._spPlayer) window._spPlayer.previousTrack(); };
+  const next = () => { navigator.vibrate(10); if(window._spPlayer) window._spPlayer.nextTrack(); };
+  const toggle = () => { navigator.vibrate(10); if(window._spPlayer){ paused ? window._spPlayer.resume() : window._spPlayer.pause(); }};
   const setVolume = (v) => { setVol(v); if(window._spPlayer) window._spPlayer.setVolume(v/100); };
 
   return (
@@ -29456,16 +29459,17 @@ function GlobalMiniPlayer({currentTab, setTab}) {
         </div>
       </div>
       <div style={{width:90,display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
-        <span style={{fontSize:'.7rem',color:'rgba(255,255,255,.4)'}}>🔈</span>
-        <div style={{flex:1,height:4,background:'rgba(255,255,255,.1)',borderRadius:3,cursor:'pointer',padding:'4px 0'}}
+        <span style={{fontSize:'.7rem',color:'rgba(255,255,255,.4)',width:14,textAlign:'center'}}>🔈</span>
+        <div style={{flex:1,height:8,background:'rgba(255,255,255,.15)',borderRadius:4,cursor:'pointer',position:'relative',overflow:'visible'}}
           onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setVolume(Math.round((e.clientX-r.left)/r.width*100));}}>
-          <div style={{height:'100%',width:vol+'%',background:'linear-gradient(90deg,#1ED760,#169c46)',borderRadius:3,transition:'width .1s',boxShadow:vol>0?'0 0 6px rgba(30,215,96,.3)':'none'}}/>
+          <div style={{height:'100%',width:vol+'%',background:'linear-gradient(90deg,#1ED760,#169c46)',borderRadius:4,transition:'width .1s',boxShadow:vol>0?'0 0 10px rgba(30,215,96,.45)':'none'}}/>
+          {vol>0&&<div style={{position:'absolute',left:vol+'%',top:'50%',width:14,height:14,borderRadius:'50%',background:'#1ED760',border:'2px solid #fff',transform:'translate(-50%,-50%)',boxShadow:'0 0 8px rgba(30,215,96,.6)',pointerEvents:'none',transition:'left .1s'}}/>}
         </div>
       </div>
       <div style={{display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
-        <div style={{fontSize:'.78rem',color:'#1ED760',cursor:'pointer',padding:'5px 12px',borderRadius:8,background:'rgba(30,215,96,.1)',border:'1px solid rgba(30,215,96,.2)',fontWeight:600,transition:'all .2s'}} onClick={()=>setTab('music')}>Apri</div>
+        <div style={{fontSize:'.78rem',color:'#1ED760',cursor:'pointer',padding:'5px 12px',borderRadius:8,background:'rgba(30,215,96,.1)',border:'1px solid rgba(30,215,96,.2)',fontWeight:600,transition:'all .2s'}} onClick={()=>{navigator.vibrate(10);setTab('music');}}>Apri</div>
         <div style={{width:30,height:30,borderRadius:'50%',background:'rgba(255,77,109,.1)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'var(--red)',fontSize:'.75rem',border:'1px solid rgba(255,77,109,.2)',transition:'all .2s'}}
-          onClick={()=>setHidden(true)}
+          onClick={()=>{navigator.vibrate(10);setHidden(true);}}
           onMouseEnter={e=>{e.currentTarget.style.background='rgba(255,77,109,.25)';e.currentTarget.style.transform='scale(1.1)';}}
           onMouseLeave={e=>{e.currentTarget.style.background='rgba(255,77,109,.1)';e.currentTarget.style.transform='scale(1)';}}>✕</div>
       </div>
