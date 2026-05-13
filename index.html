@@ -652,7 +652,7 @@ body.light .bottom-nav,body.cream .bottom-nav,body.lavender .bottom-nav,body.pea
 body.light .toggle,body.cream .toggle,body.lavender .toggle,body.peach .toggle{background:rgba(0,0,0,.15)}
 body.light .toggle.on,body.cream .toggle.on,body.lavender .toggle.on,body.peach .toggle.on{background:#1ED760}
 body.light ::-webkit-scrollbar-thumb,body.cream ::-webkit-scrollbar-thumb,body.lavender ::-webkit-scrollbar-thumb,body.peach ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.2)}
-body.light .sp-global-player,body.cream .sp-global-player,body.lavender .sp-global-player,body.peach .sp-global-player{background:rgba(255,255,255,.98);border-top:1px solid rgba(0,0,0,.08)}
+body.light .sp-global-player,body.cream .sp-global-player,body.lavender .sp-global-player,body.peach .sp-global-player{background:rgba(255,255,255,.98);border:1px solid rgba(0,0,0,.08)}
 
 .nb.active.tset{background:rgba(156,163,175,.15);box-shadow:0 0 0 1px rgba(156,163,175,.3) inset;color:#9CA3AF}
 .set-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:14px}
@@ -718,55 +718,55 @@ body.light .sp-global-player,body.cream .sp-global-player,body.lavender .sp-glob
 body[class*="bg-pattern-"]{background:transparent}
 body[class*="bg-pattern-"]::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--bg)}
 .bg-pattern-none::before{display:none!important}
-body.bg-pattern-dots::before{background-image:radial-gradient(circle,color-mix(in srgb,var(--accent) 32%,transparent) 2px,transparent 2px);background-size:22px 22px;animation:animDots 6s ease-in-out infinite}
-body.bg-pattern-cross::before{background-image:linear-gradient(0deg,transparent 7px,color-mix(in srgb,var(--accent2) 25%,transparent) 7px,color-mix(in srgb,var(--accent2) 25%,transparent) 9px,transparent 9px),linear-gradient(90deg,transparent 7px,color-mix(in srgb,var(--accent2) 25%,transparent) 7px,color-mix(in srgb,var(--accent2) 25%,transparent) 9px,transparent 9px);background-size:20px 20px;animation:animCross 7s ease-in-out infinite}
-body.bg-pattern-diagonal::before{background-image:repeating-linear-gradient(35deg,color-mix(in srgb,var(--accent) 30%,transparent) 0,color-mix(in srgb,var(--accent) 30%,transparent) 2.5px,transparent 2.5px,transparent 22px);background-size:28px 28px;animation:animDiagonal 15s linear infinite}
-body.bg-pattern-circles::before{background-image:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--accent2) 25%,transparent) 0,color-mix(in srgb,var(--accent2) 25%,transparent) 1px,transparent 1px,transparent 6px,color-mix(in srgb,var(--accent2) 18%,transparent) 6px,color-mix(in srgb,var(--accent2) 18%,transparent) 7px,transparent 7px);background-size:26px 26px;animation:animCircles 8s ease-in-out infinite}
-body.bg-pattern-stars::before{background-image:radial-gradient(1.5px 1.5px at 15% 22%,color-mix(in srgb,var(--accent) 40%,transparent),transparent),radial-gradient(3px 3px at 72% 8%,color-mix(in srgb,var(--accent2) 30%,transparent),transparent),radial-gradient(2px 2px at 91% 62%,color-mix(in srgb,var(--accent) 40%,transparent),transparent),radial-gradient(3px 3px at 38% 85%,color-mix(in srgb,var(--accent2) 30%,transparent),transparent),radial-gradient(1.5px 1.5px at 5% 70%,color-mix(in srgb,var(--accent) 40%,transparent),transparent),radial-gradient(4px 4px at 80% 92%,color-mix(in srgb,var(--accent2) 30%,transparent),transparent),radial-gradient(2px 2px at 55% 35%,color-mix(in srgb,var(--accent) 40%,transparent),transparent),radial-gradient(3px 3px at 25% 50%,color-mix(in srgb,var(--accent2) 30%,transparent),transparent),radial-gradient(1.5px 1.5px at 45% 10%,color-mix(in srgb,var(--accent) 40%,transparent),transparent),radial-gradient(3px 3px at 95% 40%,color-mix(in srgb,var(--accent2) 30%,transparent),transparent);background-size:200px 180px;animation:animStars 15s ease-in-out infinite}
-body.bg-pattern-grid::before{background-image:linear-gradient(0deg,color-mix(in srgb,var(--accent2) 12%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent2) 12%,transparent) 1px,transparent 1px),linear-gradient(0deg,color-mix(in srgb,var(--accent2) 25%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent2) 25%,transparent) 1px,transparent 1px);background-size:14px 14px,14px 14px,56px 56px,56px 56px;animation:animGrid 10s ease-in-out infinite}
-body.bg-pattern-aurora::before{background-image:linear-gradient(90deg,color-mix(in srgb,var(--accent) 12%,transparent) 0%,transparent 30%,transparent 45%,color-mix(in srgb,var(--purple) 10%,transparent) 45%,transparent 70%,transparent 75%,color-mix(in srgb,var(--accent2) 10%,transparent) 75%),linear-gradient(90deg,transparent 20%,color-mix(in srgb,var(--accent2) 10%,transparent) 20%,transparent 50%,color-mix(in srgb,var(--blue) 8%,transparent) 50%,transparent 80%);background-size:200% 100%;animation:auroraDrift 10s ease-in-out infinite}
-body.bg-pattern-circuit::before{background-image:linear-gradient(0deg,color-mix(in srgb,var(--accent) 30%,transparent) 0,color-mix(in srgb,var(--accent) 30%,transparent) 8px,transparent 8px,transparent 12px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 30%,transparent) 0,color-mix(in srgb,var(--accent) 30%,transparent) 8px,transparent 8px,transparent 12px),radial-gradient(circle 3px at 0 0,color-mix(in srgb,var(--accent2) 25%,transparent) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 6px,color-mix(in srgb,var(--accent2) 14%,transparent) 6px,color-mix(in srgb,var(--accent2) 14%,transparent) 6.5px,transparent 6.5px,transparent 16px);background-size:28px 28px;background-position:0 0,0 0,0 0,0 0;animation:animCircuit 5s ease-in-out infinite}
-body.bg-pattern-nebula::before{background-image:radial-gradient(circle at 30% 30%,color-mix(in srgb,var(--accent2) 14%,transparent) 0%,transparent 30%),radial-gradient(circle at 70% 50%,color-mix(in srgb,var(--purple) 12%,transparent) 0%,transparent 30%),radial-gradient(circle at 50% 80%,color-mix(in srgb,var(--blue) 10%,transparent) 0%,transparent 25%),radial-gradient(circle at 20% 70%,color-mix(in srgb,var(--accent) 14%,transparent) 0%,transparent 25%),radial-gradient(circle at 80% 20%,color-mix(in srgb,var(--purple) 10%,transparent) 0%,transparent 30%);background-size:140% 140%;animation:nebulaShift 14s ease-in-out infinite}
-body.bg-pattern-matrix::before{background-image:repeating-linear-gradient(0deg,transparent 0,transparent 18px,color-mix(in srgb,var(--green) 8%,transparent) 18px,color-mix(in srgb,var(--green) 8%,transparent) 19px),repeating-linear-gradient(90deg,transparent,transparent 9px,color-mix(in srgb,var(--green) 8%,transparent) 9px,color-mix(in srgb,var(--green) 8%,transparent) 10px);background-size:100% 20px,10px 100%;animation:animMatrix 12s linear infinite}
-body.bg-pattern-topo::before{background-image:radial-gradient(circle at 25% 30%,color-mix(in srgb,var(--accent2) 22%,transparent) 0,color-mix(in srgb,var(--accent2) 22%,transparent) 1.5px,transparent 2px,transparent 7px,color-mix(in srgb,var(--accent2) 14%,transparent) 8px,color-mix(in srgb,var(--accent2) 14%,transparent) 9px,transparent 14px),radial-gradient(circle at 70% 65%,color-mix(in srgb,var(--accent2) 18%,transparent) 0,color-mix(in srgb,var(--accent2) 18%,transparent) 1.5px,transparent 2px,transparent 6px,color-mix(in srgb,var(--accent2) 12%,transparent) 7px,color-mix(in srgb,var(--accent2) 12%,transparent) 8px,transparent 12px);background-size:48px 48px;animation:animTopo 8s ease-in-out infinite}
-body.bg-pattern-zigzag::before{background-image:linear-gradient(135deg,color-mix(in srgb,var(--accent) 30%,transparent) 28%,transparent 28%),linear-gradient(-135deg,color-mix(in srgb,var(--accent) 30%,transparent) 28%,transparent 28%);background-size:28px 28px;background-position:0 0,14px 0;animation:animZigzag 8s ease-in-out infinite}
-body.bg-pattern-waves::before{background-image:repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent2) 22%,transparent) 0,color-mix(in srgb,var(--accent2) 22%,transparent) 2px,transparent 2px,transparent 16px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 18%,transparent) 0,color-mix(in srgb,var(--accent) 18%,transparent) 1.5px,transparent 1.5px,transparent 18px);background-size:100% 22px;animation:animWaves 8s ease-in-out infinite}
-body.bg-pattern-hex::before{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 1.5px,color-mix(in srgb,var(--accent) 28%,transparent) 1.5px,color-mix(in srgb,var(--accent) 28%,transparent) 2.5px,transparent 2.5px,transparent 16px),repeating-linear-gradient(-60deg,transparent 0,transparent 1.5px,color-mix(in srgb,var(--accent) 28%,transparent) 1.5px,color-mix(in srgb,var(--accent) 28%,transparent) 2.5px,transparent 2.5px,transparent 16px);background-size:28px 18px;background-position:0 0,14px 9px;animation:animHex 10s ease-in-out infinite}
-body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,color-mix(in srgb,var(--accent2) 25%,transparent) 25%,transparent 25%),linear-gradient(-45deg,color-mix(in srgb,var(--accent2) 25%,transparent) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,color-mix(in srgb,var(--accent2) 25%,transparent) 75%),linear-gradient(-45deg,transparent 75%,color-mix(in srgb,var(--accent2) 25%,transparent) 75%);background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0px;animation:animDiamond 8s ease-in-out infinite}
+body.bg-pattern-dots::before{background-image:radial-gradient(circle,var(--accent) 10px,transparent 10px);background-size:80px 80px;opacity:.55}
+body.bg-pattern-cross::before{background-image:linear-gradient(0deg,transparent 22px,var(--purple) 22px,var(--purple) 28px,transparent 28px),linear-gradient(90deg,transparent 22px,var(--purple) 22px,var(--purple) 28px,transparent 28px);background-size:80px 80px;opacity:.5}
+body.bg-pattern-diagonal::before{background-image:repeating-linear-gradient(45deg,var(--accent) 0,var(--accent) 10px,transparent 10px,transparent 60px);background-size:100px 100px;opacity:.55;animation:scrollDiagonal 14s linear infinite}
+body.bg-pattern-circles::before{background-image:radial-gradient(circle at 50% 50%,transparent 0,transparent 14px,var(--accent2) 14px,var(--accent2) 20px,transparent 20px,transparent 30px,var(--accent2) 30px,var(--accent2) 33px,transparent 33px);background-size:100px 100px;opacity:.5}
+body.bg-pattern-stars::before{background-image:radial-gradient(10px 10px at 10% 16%,var(--accent),transparent),radial-gradient(16px 16px at 78% 10%,var(--accent2),transparent),radial-gradient(12px 12px at 85% 55%,var(--accent),transparent),radial-gradient(14px 14px at 32% 78%,var(--purple),transparent),radial-gradient(8px 8px at 4% 62%,var(--accent2),transparent),radial-gradient(18px 18px at 80% 88%,var(--accent),transparent),radial-gradient(12px 12px at 50% 28%,var(--accent2),transparent),radial-gradient(14px 14px at 20% 42%,var(--purple),transparent),radial-gradient(8px 8px at 40% 6%,var(--accent),transparent);background-size:500px 450px;opacity:.6;animation:pulseStars 10s ease-in-out infinite}
+body.bg-pattern-grid::before{background-image:linear-gradient(0deg,var(--accent2) 3px,transparent 3px),linear-gradient(90deg,var(--accent2) 3px,transparent 3px);background-size:40px 40px;opacity:.4}
+body.bg-pattern-grid::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(0deg,var(--accent2) 1.5px,transparent 1.5px),linear-gradient(90deg,var(--accent2) 1.5px,transparent 1.5px);background-size:10px 10px;opacity:.3;animation:shiftGrid 12s ease-in-out infinite}
+body.bg-pattern-aurora::before{background-image:linear-gradient(90deg,var(--accent) 0%,var(--accent) 5%,transparent 5%,transparent 20%,var(--purple) 20%,var(--purple) 22%,transparent 22%,transparent 35%,var(--blue) 35%,var(--blue) 37%,transparent 37%,transparent 50%,var(--green) 50%,var(--green) 52%,transparent 52%,transparent 68%,var(--accent2) 68%,var(--accent2) 70%,transparent 70%),linear-gradient(180deg,transparent 0,transparent 30%,var(--purple) 30%,var(--purple) 31%,transparent 31%,transparent 60%,var(--blue) 60%,var(--blue) 61%,transparent 61%);background-size:300% 100%;opacity:.25;animation:driftAurora 16s ease-in-out infinite}
+body.bg-pattern-circuit::before{background-image:linear-gradient(0deg,var(--purple) 0,var(--purple) 12px,transparent 12px,transparent 40px),linear-gradient(90deg,var(--accent) 0,var(--accent) 12px,transparent 12px,transparent 40px),radial-gradient(circle 14px at 3px 3px,var(--accent2) 50%,transparent 50%),radial-gradient(circle 8px at 42px 28px,var(--accent) 50%,transparent 50%),radial-gradient(circle 10px at 22px 50px,var(--purple) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 14px,var(--accent2) 14px,var(--accent2) 15px,transparent 15px,transparent 48px);background-size:80px 80px;background-position:0 0,0 0,0 0,0 0,0 0,0 0;opacity:.45;animation:pulseCircuit 6s ease-in-out infinite}
+body.bg-pattern-nebula::before{background-image:radial-gradient(circle at 16% 16%,var(--purple) 0%,transparent 40%),radial-gradient(circle at 75% 30%,var(--accent2) 0%,transparent 38%),radial-gradient(circle at 40% 70%,var(--blue) 0%,transparent 35%),radial-gradient(circle at 80% 80%,var(--accent) 0%,transparent 32%),radial-gradient(circle at 6% 76%,var(--purple) 0%,transparent 35%);background-size:180% 180%;opacity:.28;animation:shiftNebula 20s ease-in-out infinite}
+body.bg-pattern-matrix::before{background-image:repeating-linear-gradient(90deg,transparent 0,transparent 42px,var(--green) 42px,var(--green) 46px,transparent 46px,transparent 70px);background-size:100% 100%;opacity:.25;animation:scrollMatrix 14s linear infinite}
+body.bg-pattern-matrix::after{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:repeating-linear-gradient(0deg,transparent 0,transparent 46px,var(--green) 46px,var(--green) 48px);background-size:100% 96px;opacity:.18;animation:scrollMatrixAfter 10s linear infinite}
+body.bg-pattern-topo::before{background-image:radial-gradient(circle at 20% 26%,var(--accent2) 0,var(--accent2) 6px,transparent 8px,transparent 24px,var(--accent2) 26px,var(--accent2) 32px,transparent 48px),radial-gradient(circle at 74% 60%,var(--purple) 0,var(--purple) 6px,transparent 8px,transparent 22px,var(--accent2) 24px,var(--accent2) 28px,transparent 42px);background-size:160px 160px;opacity:.5;animation:shiftTopo 14s ease-in-out infinite}
+body.bg-pattern-zigzag::before{background-image:linear-gradient(135deg,var(--accent) 33%,transparent 33%),linear-gradient(-135deg,var(--accent) 33%,transparent 33%);background-size:80px 80px;background-position:0 0,40px 0;opacity:.55;animation:slideZigzag 5s ease-in-out infinite}
+body.bg-pattern-waves::before{background-image:repeating-linear-gradient(0deg,var(--blue) 0,var(--blue) 8px,transparent 8px,transparent 24px,var(--accent2) 24px,var(--accent2) 30px,transparent 30px,transparent 56px);background-size:100% 80px;opacity:.4;animation:flowWaves 12s ease-in-out infinite}
+body.bg-pattern-hex::before{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 6px,var(--purple) 6px,var(--purple) 12px,transparent 12px,transparent 50px),repeating-linear-gradient(-60deg,transparent 0,transparent 6px,var(--purple) 6px,var(--purple) 12px,transparent 12px,transparent 50px);background-size:100px 72px;background-position:0 0,50px 36px;opacity:.45;animation:pulseHex 10s ease-in-out infinite}
+body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,var(--accent2) 25%,transparent 25%),linear-gradient(-45deg,var(--accent2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--accent2) 75%),linear-gradient(-45deg,transparent 75%,var(--accent2) 75%);background-size:80px 80px;background-position:0 0,0 40px,40px -40px,-40px 0px;opacity:.5;animation:pulseDiamond 8s ease-in-out infinite}
 
-.pp-none,.pp-dots,.pp-cross,.pp-diagonal,.pp-circles,.pp-stars,.pp-grid,.pp-aurora,.pp-circuit,.pp-nebula,.pp-matrix,.pp-topo,.pp-zigzag,.pp-waves,.pp-hex,.pp-diamond{width:22px;height:22px;border-radius:4px;border:1px solid var(--border);display:inline-block;vertical-align:middle;background-size:cover;overflow:hidden}
+.pp-none,.pp-dots,.pp-cross,.pp-diagonal,.pp-circles,.pp-stars,.pp-grid,.pp-aurora,.pp-circuit,.pp-nebula,.pp-matrix,.pp-topo,.pp-zigzag,.pp-waves,.pp-hex,.pp-diamond{width:36px;height:36px;border-radius:6px;border:1px solid var(--border);display:inline-block;vertical-align:middle;background-size:cover;overflow:hidden}
 .pp-none{background:var(--bg)}
-.pp-dots{background-image:radial-gradient(circle 1.5px,var(--accent) 50%,transparent 50%);background-size:7px 7px}
-.pp-cross{background-image:linear-gradient(0deg,transparent 2.5px,var(--accent2) 2.5px,var(--accent2) 3.5px,transparent 3.5px),linear-gradient(90deg,transparent 2.5px,var(--accent2) 2.5px,var(--accent2) 3.5px,transparent 3.5px);background-size:6px 6px}
-.pp-diagonal{background-image:repeating-linear-gradient(35deg,var(--accent) 0,var(--accent) 1px,transparent 1px,transparent 7px);background-size:8px 8px}
-.pp-circles{background-image:radial-gradient(circle at 50% 50%,var(--accent2) 0,var(--accent2) 0.5px,transparent 0.5px,transparent 2px,var(--accent2) 2px,var(--accent2) 2.5px,transparent 2.5px);background-size:8px 8px}
-.pp-stars{background-image:radial-gradient(0.5px 0.5px at 25% 30%,var(--accent),transparent),radial-gradient(1px 1px at 70% 20%,var(--accent2),transparent),radial-gradient(0.5px 0.5px at 40% 70%,var(--accent),transparent),radial-gradient(1px 1px at 80% 80%,var(--accent2),transparent);background-size:50px 50px}
-.pp-grid{background-image:linear-gradient(0deg,var(--accent2) 0.5px,transparent 0.5px),linear-gradient(90deg,var(--accent2) 0.5px,transparent 0.5px),linear-gradient(0deg,color-mix(in srgb,var(--accent2) 50%,transparent) 0.5px,transparent 0.5px),linear-gradient(90deg,color-mix(in srgb,var(--accent2) 50%,transparent) 0.5px,transparent 0.5px);background-size:5px 5px,5px 5px,18px 18px,18px 18px}
-.pp-aurora{background:linear-gradient(90deg,var(--accent),var(--purple),var(--accent2),var(--blue))}
-.pp-circuit{background-image:linear-gradient(0deg,var(--accent) 0,var(--accent) 2px,transparent 2px,transparent 3.5px),linear-gradient(90deg,var(--accent) 0,var(--accent) 2px,transparent 2px,transparent 3.5px),radial-gradient(circle 1px at 0 0,var(--accent2) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 2px,var(--accent2) 2px,var(--accent2) 2.2px,transparent 2.2px,transparent 5px);background-size:7px 7px}
-.pp-nebula{background:radial-gradient(circle at 30% 30%,var(--accent2),transparent 60%),radial-gradient(circle at 70% 70%,var(--purple),transparent 60%)}
-.pp-matrix{background-image:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(0,255,0,.12) 3px,rgba(0,255,0,.12) 3.5px);background-size:5px 5px}
-.pp-topo{background-image:radial-gradient(circle at 25% 30%,var(--accent2) 0,var(--accent2) 1px,transparent 1.5px,transparent 4px,color-mix(in srgb,var(--accent2) 50%,transparent) 5px,color-mix(in srgb,var(--accent2) 50%,transparent) 5.5px,transparent 7px),radial-gradient(circle at 75% 70%,var(--accent2) 0,var(--accent2) 0.8px,transparent 1.2px,transparent 3.5px,color-mix(in srgb,var(--accent2) 50%,transparent) 4.5px,color-mix(in srgb,var(--accent2) 50%,transparent) 5px,transparent 7px);background-size:16px 16px}
-.pp-zigzag{background-image:linear-gradient(135deg,var(--accent) 28%,transparent 28%),linear-gradient(-135deg,var(--accent) 28%,transparent 28%);background-size:10px 10px;background-position:0 0,5px 0}
-.pp-waves{background-image:repeating-linear-gradient(0deg,var(--accent2) 0,var(--accent2) 1px,transparent 1px,transparent 5px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 60%,transparent) 0,color-mix(in srgb,var(--accent) 60%,transparent) 0.5px,transparent 0.5px,transparent 6px);background-size:100% 7px}
-.pp-hex{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 0.5px,var(--accent) 0.5px,var(--accent) 1px,transparent 1px,transparent 5px),repeating-linear-gradient(-60deg,transparent 0,transparent 0.5px,var(--accent) 0.5px,var(--accent) 1px,transparent 1px,transparent 5px);background-size:8px 5px;background-position:0 0,4px 2.5px}
-.pp-diamond{background-image:linear-gradient(45deg,var(--accent2) 25%,transparent 25%),linear-gradient(-45deg,var(--accent2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--accent2) 75%),linear-gradient(-45deg,transparent 75%,var(--accent2) 75%);background-size:6px 6px;background-position:0 0,0 3px,3px -3px,-3px 0px}
+.pp-dots{background-image:radial-gradient(circle 5px,var(--accent) 50%,transparent 50%);background-size:18px 18px}
+.pp-cross{background-image:linear-gradient(0deg,transparent 5px,var(--purple) 5px,var(--purple) 7px,transparent 7px),linear-gradient(90deg,transparent 5px,var(--purple) 5px,var(--purple) 7px,transparent 7px);background-size:14px 14px}
+.pp-diagonal{background-image:repeating-linear-gradient(45deg,var(--accent) 0,var(--accent) 3px,transparent 3px,transparent 14px);background-size:18px 18px}
+.pp-circles{background-image:radial-gradient(circle at 50% 50%,transparent 0,transparent 2.5px,var(--accent2) 2.5px,var(--accent2) 4px,transparent 4px,transparent 7px,var(--accent2) 7px,var(--accent2) 8px,transparent 8px);background-size:18px 18px}
+.pp-stars{background-image:radial-gradient(2px 2px at 18% 22%,var(--accent),transparent),radial-gradient(4px 4px at 72% 12%,var(--accent2),transparent),radial-gradient(3px 3px at 42% 62%,var(--purple),transparent),radial-gradient(4px 4px at 82% 78%,var(--accent),transparent);background-size:70px 70px}
+.pp-grid{background-image:linear-gradient(0deg,var(--accent2) 1px,transparent 1px),linear-gradient(90deg,var(--accent2) 1px,transparent 1px);background-size:10px 10px}
+.pp-aurora{background:linear-gradient(90deg,var(--accent),var(--purple),var(--blue),var(--green))}
+.pp-circuit{background-image:linear-gradient(0deg,var(--purple) 0,var(--purple) 3px,transparent 3px,transparent 7px),linear-gradient(90deg,var(--accent) 0,var(--accent) 3px,transparent 3px,transparent 7px),radial-gradient(circle 3px at 2px 2px,var(--accent2) 50%,transparent 50%),radial-gradient(circle 2px at 9px 5px,var(--accent) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 3px,var(--accent2) 3px,var(--accent2) 3.5px,transparent 3.5px,transparent 9px);background-size:14px 14px}
+.pp-nebula{background:radial-gradient(circle at 22% 22%,var(--purple),transparent 60%),radial-gradient(circle at 72% 62%,var(--accent2),transparent 60%),radial-gradient(circle at 48% 78%,var(--blue),transparent 60%)}
+.pp-matrix{background-image:repeating-linear-gradient(90deg,transparent,transparent 8px,rgba(0,220,0,.2) 8px,rgba(0,220,0,.2) 9px,transparent 9px,transparent 13px);background-size:100% 100%}
+.pp-topo{background-image:radial-gradient(circle at 22% 28%,var(--accent2) 0,var(--accent2) 2px,transparent 3px,transparent 6px,color-mix(in srgb,var(--accent2) 40%,transparent) 7px,color-mix(in srgb,var(--accent2) 40%,transparent) 8px,transparent 12px),radial-gradient(circle at 72% 62%,var(--purple) 0,var(--purple) 1.5px,transparent 2.5px,transparent 5px,color-mix(in srgb,var(--accent2) 30%,transparent) 6px,color-mix(in srgb,var(--accent2) 30%,transparent) 7px,transparent 11px);background-size:28px 28px}
+.pp-zigzag{background-image:linear-gradient(135deg,var(--accent) 32%,transparent 32%),linear-gradient(-135deg,var(--accent) 32%,transparent 32%);background-size:18px 18px;background-position:0 0,9px 0}
+.pp-waves{background-image:repeating-linear-gradient(0deg,var(--blue) 0,var(--blue) 2px,transparent 2px,transparent 8px,var(--accent2) 8px,var(--accent2) 9px,transparent 9px,transparent 14px);background-size:100% 16px}
+.pp-hex{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 1px,var(--purple) 1px,var(--purple) 2.5px,transparent 2.5px,transparent 10px),repeating-linear-gradient(-60deg,transparent 0,transparent 1px,var(--purple) 1px,var(--purple) 2.5px,transparent 2.5px,transparent 10px);background-size:18px 12px;background-position:0 0,9px 6px}
+.pp-diamond{background-image:linear-gradient(45deg,var(--accent2) 25%,transparent 25%),linear-gradient(-45deg,var(--accent2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--accent2) 75%),linear-gradient(-45deg,transparent 75%,var(--accent2) 75%);background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0px}
 
-@keyframes animDots{0%,100%{background-size:22px 22px}50%{background-size:24px 24px}}
-@keyframes animCross{0%,100%{background-size:20px 20px}50%{background-size:22px 22px}}
-@keyframes animDiagonal{0%{background-position:0 0}100%{background-position:40px 40px}}
-@keyframes animCircles{0%,100%{background-size:26px 26px}50%{background-size:28px 28px}}
-@keyframes animStars{0%,100%{background-size:200px 180px}50%{background-size:210px 190px}}
-@keyframes animGrid{0%,100%{background-position:0 0,0 0,0 0,0 0}50%{background-position:1px 1px,1px 1px,0 0,0 0}}
-@keyframes auroraDrift{0%{background-position:0% 50%}33%{background-position:100% 30%}66%{background-position:50% 80%}100%{background-position:0% 50%}}
-@keyframes animCircuit{0%,100%{background-size:28px 28px}50%{background-size:30px 30px}}
-@keyframes nebulaShift{0%,100%{background-position:0% 50%}33%{background-position:80% 30%}66%{background-position:30% 80%}}
-@keyframes animMatrix{0%{background-position:0 0,0 0}100%{background-position:0 40px,0 0}}
-@keyframes animTopo{0%,100%{background-position:0 0}50%{background-position:6px 6px}}
-@keyframes animZigzag{0%,100%{background-position:0 0,14px 0}50%{background-position:7px 0,21px 0}}
-@keyframes animWaves{0%,100%{background-position:0 0,0 0}50%{background-position:3px 7px,0 0}}
-@keyframes animHex{0%,100%{background-size:28px 18px;background-position:0 0,14px 9px}50%{background-size:30px 20px;background-position:1px 1px,15px 10px}}
-@keyframes animDiamond{0%,100%{background-size:22px 22px}50%{background-size:24px 24px}}
+@keyframes scrollDiagonal{0%{background-position:0 0}100%{background-position:140px 140px}}
+@keyframes pulseStars{0%,100%{background-size:500px 450px}50%{background-size:520px 470px}}
+@keyframes shiftGrid{0%,100%{background-position:0 0,0 0}50%{background-position:2px 2px,0 0}}
+@keyframes driftAurora{0%{background-position:0% 50%}25%{background-position:50% 40%}50%{background-position:100% 30%}75%{background-position:50% 60%}100%{background-position:0% 50%}}
+@keyframes pulseCircuit{0%,100%{background-size:80px 80px}50%{background-size:84px 84px}}
+@keyframes shiftNebula{0%{background-position:0% 50%}25%{background-position:40% 30%}50%{background-position:80% 20%}75%{background-position:20% 70%}100%{background-position:0% 50%}}
+@keyframes scrollMatrix{0%{background-position:0 0}100%{background-position:-70px 0}}
+@keyframes scrollMatrixAfter{0%{background-position:0 0}100%{background-position:0 96px}}
+@keyframes shiftTopo{0%,100%{background-position:0 0}50%{background-position:18px 18px}}
+@keyframes slideZigzag{0%,100%{background-position:0 0,40px 0}50%{background-position:20px 0,60px 0}}
+@keyframes flowWaves{0%,100%{background-position:0 0}50%{background-position:8px 22px}}
+@keyframes pulseHex{0%,100%{background-size:100px 72px;background-position:0 0,50px 36px}50%{background-size:104px 76px;background-position:2px 2px,52px 38px}}
+@keyframes pulseDiamond{0%,100%{background-size:80px 80px}50%{background-size:84px 84px}}
 
 /* Icon animations and active glow */
 .nb svg{display:block;transition:all .2s cubic-bezier(.4,0,.2,1)}
@@ -992,8 +992,8 @@ body.light ::-webkit-scrollbar-thumb,body.cream ::-webkit-scrollbar-thumb,body.l
 .todo-add-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s}
 .todo-add-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(76,201,240,.1)}
 
-.sp-global-player{position:fixed;bottom:0;left:72px;right:0;height:72px;background:rgba(8,11,20,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(30,215,96,.2);display:flex;align-items:center;padding:0 16px;gap:12px;z-index:400;box-shadow:0 -6px 24px rgba(0,0,0,.5);transform:translateY(0);transition:transform .3s}
-.sp-global-player.hidden{transform:translateY(100%)}
+.sp-global-player{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);width:auto;max-width:620px;min-width:360px;height:68px;background:rgba(8,11,20,.97);backdrop-filter:blur(20px);border:1px solid rgba(30,215,96,.15);display:flex;align-items:center;padding:0 14px;gap:10px;z-index:400;border-radius:18px;box-shadow:0 4px 30px rgba(0,0,0,.5);transition:transform .3s,opacity .3s}
+.sp-global-player.hidden{transform:translateX(-50%) translateY(calc(100% + 24px));opacity:0;pointer-events:none}
 
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -1742,7 +1742,7 @@ body.light ::-webkit-scrollbar-thumb,body.cream ::-webkit-scrollbar-thumb,body.l
   .topbar { padding: 0 16px }
   .pt { font-size: 1rem }
   .sp-layout { grid-template-columns: 1fr 280px }
-  .sp-global-player { left: 72px }
+  .sp-global-player { left: 50%; transform: translateX(-50%); right: auto; width: auto; max-width: 620px; }
   .akb { padding: 14px 16px }
   .cb { padding: 12px 16px }
 }
@@ -1816,8 +1816,9 @@ body.light ::-webkit-scrollbar-thumb,body.cream ::-webkit-scrollbar-thumb,body.l
   .sp-cover, .sp-cover-placeholder { max-width: 180px }
   .sp-artwork { width: 100px; height: 100px }
   
-  /* Spotify Mini Player mobile - ensure FAB doesn't block it */
-  .sp-global-player { height: 68px; padding: 0 12px; gap: 10px; left: 0; z-index: 350; }
+  /* Spotify Mini Player mobile - full width, no sidebar */
+  .sp-global-player { left: 0 !important; right: 0 !important; transform: none !important; width: 100% !important; max-width: 100% !important; min-width: 0 !important; bottom: 0 !important; height: 68px; padding: 0 12px; gap: 10px; z-index: 350; border-radius: 0 !important; border-left: none !important; border-right: none !important; border-bottom: none !important; }
+  .sp-global-player.hidden { transform: translateY(100%) !important; opacity: 0 !important; }
   .sp-global-player img { width: 46px; height: 46px; }
   
   /* FAB positioning with Spotify mini player */
@@ -2334,8 +2335,22 @@ iframe { loading: lazy }
     padding-bottom: max(150px, calc(150px + env(safe-area-inset-bottom)));
   }
   .sp-global-player {
-    bottom: calc(60px + env(safe-area-inset-bottom));
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    bottom: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
     z-index: 460 !important;
+  }
+  .sp-global-player.hidden {
+    transform: translateY(100%) !important;
+    opacity: 0 !important;
   }
 }
 
@@ -2644,7 +2659,21 @@ iframe { loading: lazy }
   
   /* Spotify mini player above bottom nav */
   .sp-global-player {
-    bottom: max(60px, calc(60px + env(safe-area-inset-bottom))) !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    bottom: 0 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+  }
+  .sp-global-player.hidden {
+    transform: translateY(100%) !important;
+    opacity: 0 !important;
   }
   
   /* Mini pomodoro above everything */
@@ -5457,9 +5486,10 @@ body.lmv-v2 .sp-cover {
 body.lmv-v2 .sp-global-player {
   background: linear-gradient(90deg, rgba(99,102,241,.15), rgba(10,10,15,.97) 30%) !important;
   backdrop-filter: blur(24px) !important;
-  border-top: 1px solid rgba(99,102,241,.2) !important;
-  border-radius: 20px 20px 0 0 !important;
-  box-shadow: 0 -4px 24px rgba(99,102,241,.1) !important;
+  border: 1px solid rgba(99,102,241,.2) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 30px rgba(99,102,241,.15) !important;
+  left: calc(50% - 120px) !important;
 }
 
 body.lmv-v2 .sp-global-player img {
@@ -5532,7 +5562,7 @@ body.lmv-v2:not([class*="bg-pattern-"]) .content {
 body.lmv-v2[class*="bg-pattern-"] .content {
   background: transparent !important;
 }
-  body.lmv-v2::before {
+  body.lmv-v2:not([class*="bg-pattern-"])::before {
     content: '';
     position: fixed;
     top: 64px;
@@ -5610,6 +5640,18 @@ body.lmv-v2 .content > div {
 }
 
 body.lmv-v2 .content > div > div {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* V1 (original): Same full-screen layout as V2 - fill available space */
+body:not(.lmv-v2) .content > div {
+  min-height: calc(100vh - 120px) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+body:not(.lmv-v2) .content > div > div {
   width: 100% !important;
   max-width: 100% !important;
 }
@@ -6455,8 +6497,9 @@ body:not(.lmv-v2) .sp-cover {
 body:not(.lmv-v2) .sp-global-player {
   background: linear-gradient(135deg, rgba(17,24,39,.95), rgba(24,32,48,.9)) !important;
   backdrop-filter: blur(20px) !important;
-  border-top: 2px solid rgba(30,215,96,.1) !important;
-  border-radius: 22px 22px 0 0 !important;
+  border: 1px solid rgba(30,215,96,.12) !important;
+  border-radius: 18px !important;
+  left: calc(50% + 36px) !important;
 }
 
 /* V1: Calendar - warm */
@@ -6489,8 +6532,34 @@ body:not(.lmv-v2) .content {
 }
 
 body:not(.lmv-v2) .fi2 {
-  max-width: 860px !important;
+  max-width: 100% !important;
   margin: 0 auto !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+}
+
+/* V1: Content constraints for readability */
+body:not(.lmv-v2) .fi2 .cm,
+body:not(.lmv-v2) .fi2 .cir {
+  max-width: 820px !important;
+  width: 100% !important;
+  align-self: center !important;
+}
+
+body:not(.lmv-v2) .fi2 .sp-player {
+  max-width: 520px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+}
+
+body:not(.lmv-v2) .fi2 .cb {
+  max-width: 820px !important;
+  width: 100% !important;
+  align-self: center !important;
 }
 
 /* V1: Selection color */
@@ -6806,6 +6875,26 @@ body.lmv-v2 .main {
   body.lmv-v2 .uni-overlay {
     height: calc(100vh - 64px) !important;
     max-height: calc(100vh - 64px) !important;
+  }
+  
+  /* Constrain content-heavy tabs (chat, music player) for readable line lengths */
+  body.lmv-v2 .fi2 .cm,
+  body.lmv-v2 .fi2 .cir {
+    max-width: 820px !important;
+    width: 100% !important;
+    align-self: center !important;
+  }
+  
+  body.lmv-v2 .fi2 .sp-player {
+    max-width: 520px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+  
+  body.lmv-v2 .fi2 .cb {
+    max-width: 820px !important;
+    width: 100% !important;
+    align-self: center !important;
   }
   body.lmv-v2 .uni-body {
     flex: 1 !important;
@@ -8008,8 +8097,23 @@ body.lmv-v2 ::-webkit-scrollbar-thumb:hover {
   
   body.lmv-v2 .sp-global-player {
     left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    bottom: 0 !important;
     height: 68px !important;
     z-index: 350 !important;
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+  }
+  
+  body.lmv-v2 .sp-global-player.hidden {
+    transform: translateY(100%) !important;
+    opacity: 0 !important;
   }
   
   body.lmv-v2 .sp-global-player img {
@@ -8822,6 +8926,10 @@ function DataProvider({uid, children}) {
           if(d && d.todos) {
             const parsed = typeof d.todos === 'string' ? JSON.parse(d.todos) : d.todos;
               if(parsed.length > 0) { setTodos(parsed); localStorage.setItem('lmv_todos',JSON.stringify(parsed)); }
+          }
+          if(d && d.pom_log) {
+            const parsed = typeof d.pom_log === 'string' ? JSON.parse(d.pom_log) : d.pom_log;
+            if(parsed.length > 0) { localStorage.setItem('pom_log',JSON.stringify(parsed)); }
           }
         } catch(e) {}
       }, 2000);
@@ -12503,7 +12611,12 @@ ${sys}
 
 // - MUSIC TAB (SPOTIFY) -
 const SPOTIFY_CLIENT_ID = '6a4d05cce78b4029804210c89e81ed02';
-const SPOTIFY_REDIRECT = 'https://marcothefaze.github.io/LaMiaVita/';
+const getSpotifyRedirect = () => {
+  const loc = window.location;
+  const uri = loc.origin + loc.pathname.replace(/\/?$/, '/');
+  if(uri.startsWith('file://') || loc.origin === 'null') { return 'https://marcothefaze.github.io/LaMiaVita/'; }
+  return uri;
+};
 const SPOTIFY_SCOPES = 'streaming user-read-email user-read-private user-library-read user-read-playback-state user-modify-playback-state playlist-read-private user-read-currently-playing user-read-recently-played user-top-read user-library-modify';
 const TOP50_ITALY  = '37i9dQZEVXbIQnj7RRhdSX';
 const TOP50_GLOBAL = '37i9dQZEVXbMDoHDwVN2tF';
@@ -12575,7 +12688,7 @@ function MusicTab({toast}) {
       const r = await fetch('https://accounts.spotify.com/api/token',{
         method:'POST',
         headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:new URLSearchParams({client_id:SPOTIFY_CLIENT_ID,grant_type:'authorization_code',code,redirect_uri:SPOTIFY_REDIRECT,code_verifier:verifier})
+        body:new URLSearchParams({client_id:SPOTIFY_CLIENT_ID,grant_type:'authorization_code',code,redirect_uri:getSpotifyRedirect(),code_verifier:verifier})
       });
       const d = await r.json();
       if(d.error){toast('Errore Spotify: '+d.error_description,'var(--red)');return;}
@@ -12761,7 +12874,7 @@ function MusicTab({toast}) {
     localStorage.setItem('sp_verifier', verifier);
     const params = new URLSearchParams({
       response_type:'code', client_id:SPOTIFY_CLIENT_ID,
-      scope:SPOTIFY_SCOPES, redirect_uri:SPOTIFY_REDIRECT,
+      scope:SPOTIFY_SCOPES, redirect_uri:getSpotifyRedirect(),
       code_challenge_method:'S256', code_challenge:challenge,
       state: generateRandom(16)
     });
@@ -23983,6 +24096,15 @@ function StudySessionsModal({onClose, toast}) {
     const newLog = [...log, session];
     localStorage.setItem('pom_log', JSON.stringify(newLog));
     window._idb?.saveOffline('pom_log', newLog).catch(()=>{});
+    try {
+      if(window._fb && window._uid) {
+        window._fb.save(window._uid, 'pom_log', newLog).catch(() => {
+          window._idb?.addToSyncQueue({ uid: window._uid, store: 'pom_log', data: newLog }).catch(()=>{});
+        });
+      } else if(window._uid) {
+        window._idb?.addToSyncQueue({ uid: window._uid, store: 'pom_log', data: newLog }).catch(()=>{});
+      }
+    } catch(e) {}
     setLog(newLog);
     // Also add to calendar
     const titleSuffix = mf.subject ? ' - '+mf.subject : '';
@@ -24005,6 +24127,15 @@ function StudySessionsModal({onClose, toast}) {
     const newLog = [...log, session];
     localStorage.setItem('pom_log', JSON.stringify(newLog));
     window._idb?.saveOffline('pom_log', newLog).catch(()=>{});
+    try {
+      if(window._fb && window._uid) {
+        window._fb.save(window._uid, 'pom_log', newLog).catch(() => {
+          window._idb?.addToSyncQueue({ uid: window._uid, store: 'pom_log', data: newLog }).catch(()=>{});
+        });
+      } else if(window._uid) {
+        window._idb?.addToSyncQueue({ uid: window._uid, store: 'pom_log', data: newLog }).catch(()=>{});
+      }
+    } catch(e) {}
     setLog(newLog);
     if(addEvent)addEvent({id:session.id,title:'📖 Studio veloce ('+minutes+'m)',date:session.date,time:session.completedAt,color:'#10B981',fromStudy:true});
     toast('Sessione da '+minutes+'min aggiunta! ✅','var(--green)');
@@ -24631,7 +24762,7 @@ function SettingsTab({toast}) {
   const isV2 = localStorage.getItem('lmv_ui_version') === 'v2';
 
   return (
-    <div className="fi2" style={isV2 ? {width:'100%',maxWidth:'100%'} : {maxWidth:640}}>
+    <div className="fi2" style={isV2 ? {width:'100%',maxWidth:'100%'} : {width:'100%',maxWidth:'100%'}}>
       <div className="sh"><div className="sht">set <em>Impostazioni</em></div></div>
 
       {/* Version Switcher */}
@@ -28772,6 +28903,15 @@ function logStudySession(type, duration) {
     if(log.length > 10000) log.splice(0, log.length - 10000);
     localStorage.setItem('pom_log', JSON.stringify(log));
     window._idb?.saveOffline('pom_log', log).catch(()=>{});
+    try {
+      if(window._fb && window._uid) {
+        window._fb.save(window._uid, 'pom_log', log).catch(() => {
+          window._idb?.addToSyncQueue({ uid: window._uid, store: 'pom_log', data: log }).catch(()=>{});
+        });
+      } else if(window._uid) {
+        window._idb?.addToSyncQueue({ uid: window._uid, store: 'pom_log', data: log }).catch(()=>{});
+      }
+    } catch(e) {}
     return session;
   } catch(e) { return null; }
 }
@@ -28837,8 +28977,11 @@ function App(){
         setUser(u);
         setChecked(true);
         if(u){
+          window._uid = u.uid;
           window._playWelcomeOnClick=true;
           toast('Bentornato '+(u.displayName||u.email.split('@')[0])+'! 👋','var(--purple)');
+        } else {
+          window._uid = null;
         }
       });
       timeout = setTimeout(() => setChecked(true), 6000);
@@ -31347,7 +31490,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
                     <div style={{fontSize:'.8rem',color:'var(--text2)',marginBottom:8}}>{globalSearchResults.length} risultati</div>
                     {globalSearchResults.map((r,i)=>(
                       <div key={i} style={{padding:'12px 16px',background:'rgba(255,255,255,.03)',borderRadius:12,cursor:'pointer',transition:'.2s'}} 
-                           onClick={()=>{setGlobalSearchOpen(false);toast('Vai a: '+r.title,'var(--green)');}}>
+                           onClick={()=>{setGlobalSearchOpen(false);if(r.type==='note'||r.type==='password')setTab('pw');else if(r.type==='event'||r.type==='birthday')setTab('cal');else if(r.type==='todo')setTab('todo');toast('Aperto: '+r.title,'var(--green)');}}>
                         <div style={{display:'flex',alignItems:'center',gap:10}}>
                           <span style={{fontSize:'1.2rem'}}>{r.icon}</span>
                           <div style={{flex:1}}>
@@ -32541,6 +32684,13 @@ window._fb = {
 };
 window._fbReady = true;
 window.dispatchEvent(new Event('_fbReady'));
+</script>
+<script>
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
