@@ -715,7 +715,7 @@ body.light .sp-global-player,body.cream .sp-global-player,body.lavender .sp-glob
 .qci-desc{font-size:.75rem;color:var(--text2);margin-top:2px}
 
 /* Background Patterns - Vivid, animated backgrounds */
-body[class*="bg-pattern-"]{background:transparent}
+body[class*="bg-pattern-"]{background:transparent!important}
 body[class*="bg-pattern-"]::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none}
 .bg-pattern-none::before{display:none!important}
 body.bg-pattern-dots::before{background-image:radial-gradient(circle,color-mix(in srgb,var(--accent) 35%,transparent) 2px,transparent 2px);background-size:22px 22px}
@@ -2539,6 +2539,10 @@ iframe { loading: lazy }
   body.lmv-v2 .fi2 {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
   
   /* Allow scroll within modals */
@@ -5580,21 +5584,14 @@ body.lmv-v2[class*="bg-pattern-"] .content {
     z-index: 1;
   }
 
-  /* V2: Ensure all sections fill available space and scroll */
+  /* V2: Ensure all sections fill available space */
   body.lmv-v2 .content > div {
     min-height: auto !important;
-    overflow-y: visible !important;
   }
 
   body.lmv-v2 .content > div > div {
     width: 100% !important;
     max-width: 100% !important;
-  }
-
-  /* V2: Fix for all tab content */
-  body.lmv-v2 [class*="fi2"],
-  body.lmv-v2 [style*="padding"] {
-    overflow-y: visible !important;
   }
 
   /* V2: Ensure scrolling works on all pages */
@@ -6532,8 +6529,6 @@ body:not(.lmv-v2) .content {
 body:not(.lmv-v2) .fi2 {
   max-width: 100% !important;
   margin: 0 auto !important;
-  flex: 1 !important;
-  height: auto !important;
   min-height: 0 !important;
   overflow-y: auto !important;
   display: flex !important;
