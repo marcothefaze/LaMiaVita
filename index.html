@@ -32903,7 +32903,7 @@ if('serviceWorker' in navigator) {
 }
 </script>
 <style>
-/* FORCE FIX: scroll nei tab (solo desktop) */
+/* FORCE FIX: scroll nei tab (desktop) */
 @media (min-width: 768px) {
 html body #root .app .main .content {
   display: flex !important;
@@ -32922,6 +32922,14 @@ html body #root .app .main .content > div {
 html body #root .app .main .content .fi2 > * {
   flex-shrink: 0;
 }
-}</style>
+}
+/* FORCE FIX: scroll nei tab (mobile) - ensure fi2 uses block layout so children don't shrink */
+@media (max-width: 767px) {
+html body #root .app .main .content > div {
+  display: block !important;
+  min-height: 0 !important;
+}
+}
+</style>
 </body>
 </html>
