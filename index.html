@@ -716,7 +716,8 @@ body.light .sp-global-player,body.cream .sp-global-player,body.lavender .sp-glob
 
 /* Background Patterns - Vivid, animated backgrounds */
 body[class*="bg-pattern-"]::before{content:'';position:fixed;inset:0;pointer-events:none}
-body[class*="bg-pattern-"]::after{display:none!important}
+/* V2: restore subtle glow on ::after when pattern active (pattern occupies ::before) */
+body.lmv-v2[class*="bg-pattern-"]::after{content:'';position:fixed;top:64px;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 20%,rgba(139,92,246,.05) 0%,transparent 40%),radial-gradient(ellipse at 80% 80%,rgba(99,102,241,.04) 0%,transparent 40%),radial-gradient(ellipse at 50% 50%,rgba(139,92,246,.02) 0%,transparent 60%);pointer-events:none;z-index:0}
 .bg-pattern-none::before{display:none!important}
 body.bg-pattern-dots::before{background-image:radial-gradient(circle,color-mix(in srgb,var(--accent) 55%,transparent) 3px,transparent 3px);background-size:18px 18px}
 body.bg-pattern-cross::before{background-image:linear-gradient(0deg,transparent 5px,color-mix(in srgb,var(--purple) 50%,transparent) 5px,color-mix(in srgb,var(--purple) 50%,transparent) 8px,transparent 8px),linear-gradient(90deg,transparent 5px,color-mix(in srgb,var(--purple) 50%,transparent) 5px,color-mix(in srgb,var(--purple) 50%,transparent) 8px,transparent 8px);background-size:22px 22px}
@@ -24620,6 +24621,14 @@ function SettingsTab({toast}) {
     {key:'lavender',label:'Lavanda',    bg:'#E8E4F0', surface:'#F4F1FA', text:'#3D3250', desc:'Lavanda'},
     {key:'peach',   label:'Pesca',     bg:'#FFF0EA', surface:'#FFFAF6', text:'#4A2820', desc:'Pesca'},
     {key:'nord',    label:'Nord',       bg:'#2E3440', surface:'#3B4252', text:'#ECEFF4', desc:'Nord artico'},
+    {key:'charcoal',label:'Carbone',    bg:'#1A1C23', surface:'#252830', text:'#E8ECF4', desc:'Grigio scuro'},
+    {key:'slate',   label:'Ardesia',    bg:'#1E293B', surface:'#334155', text:'#F1F5F9', desc:'Blu-grigio'},
+    {key:'coffee',  label:'Caffè',      bg:'#2C1810', surface:'#3E2723', text:'#EFEBE9', desc:'Marrone caldo'},
+    {key:'plum',    label:'Prugna',     bg:'#1C0A2E', surface:'#2D1B4E', text:'#F3E8FF', desc:'Viola prugna'},
+    {key:'ash',     label:'Grigio',     bg:'#F0F2F5', surface:'#FFFFFF', text:'#1A1C23', desc:'Grigio chiaro'},
+    {key:'honey',   label:'Miele',      bg:'#FFF8E1', surface:'#FFFDE7', text:'#3E2723', desc:'Oro chiaro'},
+    {key:'sky',     label:'Cielo',      bg:'#E3F2FD', surface:'#F8FBFF', text:'#1A237E', desc:'Azzurro'},
+    {key:'mintLight',label:'Menta',     bg:'#E8F5E9', surface:'#F1F8F4', text:'#1B5E20', desc:'Verde chiaro'},
   ];
 
   const ACCENTS = [
@@ -24635,6 +24644,12 @@ function SettingsTab({toast}) {
     {color:'#F72585',name:'Magenta'},
     {color:'#3A86FF',name:'Zaffiro'},
     {color:'#FB5607',name:'Fuoco'},
+    {color:'#E63946',name:'Corallo'},
+    {color:'#2EC4B6',name:'Teal'},
+    {color:'#8338EC',name:'Elio'},
+    {color:'#FFBE0B',name:'Ambra'},
+    {color:'#3A0CA3',name:'Indaco'},
+    {color:'#7209B7',name:'Violetto'},
   ];
 
   const FONT_SIZES = [{v:'small',l:'Piccolo'},{v:'normal',l:'Normale'},{v:'large',l:'Grande'}];
@@ -24649,7 +24664,7 @@ function SettingsTab({toast}) {
     // Force update body background
     document.body.style.background = t.bg;
 
-    const isLight = key==='light'||key==='cream';
+    const isLight = key==='light'||key==='cream'||key==='lavender'||key==='peach'||key==='ash'||key==='honey'||key==='sky'||key==='mintLight';
     root.classList.toggle('light', isLight);
     document.body.classList.toggle('light', isLight);
     if(isLight){
