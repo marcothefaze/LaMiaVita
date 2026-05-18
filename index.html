@@ -22490,6 +22490,44 @@ function ExtraTab({toast}) {
   const [priceForm, setPriceForm] = useState({name:'',targetPrice:'',currentPrice:'',url:'',category:'tech'});
   const [priceMod, setPriceMod] = useState(false);
   
+  // Weather state
+  const [weather, setWeather] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherCity, setWeatherCity] = useState(() => localStorage.getItem('weather_city') || '');
+  const [weatherCoords, setWeatherCoords] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('weather_coords') || 'null'); }
+    catch { return null; }
+  });
+  const [weatherError, setWeatherError] = useState('');
+  const [weatherUnit, setWeatherUnit] = useState(() => localStorage.getItem('weather_unit') || 'celsius');
+  
+  const WEATHER_ICONS = {
+    0: '☀️', 1: '🌤️', 2: '⛅', 3: '☁️',
+    45: '🌫️', 48: '🌫️',
+    51: '🌦️', 53: '🌦️', 55: '🌦️',
+    56: '🌦️', 57: '🌦️',
+    61: '🌧️', 63: '🌧️', 65: '🌧️',
+    66: '🌧️', 67: '🌧️',
+    71: '🌨️', 73: '🌨️', 75: '🌨️',
+    77: '🌨️',
+    80: '🌧️', 81: '🌧️', 82: '🌧️',
+    85: '🌨️', 86: '🌨️',
+    95: '⛈️', 96: '⛈️', 99: '⛈️',
+  };
+  const WEATHER_LABELS = {
+    0: 'Sereno', 1: 'Preval. sereno', 2: 'Parz. nuvoloso', 3: 'Nuvoloso',
+    45: 'Nebbia', 48: 'Nebbia',
+    51: 'Pioggia leggera', 53: 'Pioggia modesta', 55: 'Pioggia intensa',
+    56: 'Pioggia gelata', 57: 'Pioggia gelata',
+    61: 'Pioggia', 63: 'Pioggia', 65: 'Pioggia forte',
+    66: 'Pioggia gelata', 67: 'Pioggia gelata',
+    71: 'Neve leggera', 73: 'Neve', 75: 'Neve forte',
+    77: 'Granelli di neve',
+    80: 'Rovesci', 81: 'Rovesci', 82: 'Rovesci',
+    85: 'Nevicate', 86: 'Nevicate',
+    95: 'Temporale', 96: 'Temporale', 99: 'Temporale',
+  };
+  
   const searchRadios = async (query) => {
     if (!query.trim()) { setRadioResults([]); return; }
     setLoadingRadios(true);
@@ -22939,6 +22977,7 @@ function ExtraTab({toast}) {
     { id: 'pricetracker', icon: '📊', title: 'Prezzo Tracker', desc: 'Monitora e confronta', color: '#FBBF24' },
     { id: 'creativestudio', icon: '🎨', title: 'Creative Studio', desc: 'Suite creativa completa', color: '#FF6B9D' },
     { id: 'aichatbuilder', icon: '🤖', title: 'AI Chat Builder', desc: 'Crea chatbot personalizzati', color: '#06B6D4' },
+    { id: 'weather', icon: '🌤️', title: 'Meteo', desc: 'Previsioni e condizioni', color: '#4CC9F0' },
   ];
 
   // Google Maps integration
@@ -22978,6 +23017,135 @@ function ExtraTab({toast}) {
       window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
     }
   };
+  
+  const fetchWeather = async (lat, lon, city) => {
+    setWeatherLoading(true);
+    setWeatherError('');
+    try {
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&timezone=auto&forecast_days=7`);
+      if (!res.ok) throw new Error('Errore API');
+      const data = await res.json();
+      setWeather({...data, city});
+      localStorage.setItem('weather_coords', JSON.stringify({lat, lon}));
+      localStorage.setItem('weather_city', city);
+      setWeatherCoords({lat, lon});
+      setWeatherCity(city);
+    } catch (e) {
+      setWeatherError('Impossibile caricare il meteo');
+    }
+    setWeatherLoading(false);
+  };
+  
+  const detectLocation = () => {
+    setWeatherLoading(true);
+    if (!navigator.geolocation) {
+      setWeatherError('Geolocalizzazione non disponibile');
+      setWeatherLoading(false);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const {latitude, longitude} = pos.coords;
+        try {
+          const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&language=it&format=json`);
+          const geoData = await geoRes.json();
+          const city = geoData.results?.[0]?.name || 'Posizione attuale';
+          fetchWeather(latitude, longitude, city);
+        } catch { fetchWeather(latitude, longitude, 'Posizione attuale'); }
+      },
+      () => {
+        setWeatherError('Abilita la geolocalizzazione o inserisci una città');
+        setWeatherLoading(false);
+      }
+    );
+  };
+  
+  const searchCity = async () => {
+    if (!weatherCity.trim()) { toast('Inserisci una città', 'var(--yellow)'); return; }
+    setWeatherLoading(true);
+    setWeatherError('');
+    try {
+      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&count=5&language=it&format=json`);
+      const data = await res.json();
+      if (!data.results?.length) { setWeatherError('Città non trovata'); setWeatherLoading(false); return; }
+      const {latitude, longitude, name, country} = data.results[0];
+      fetchWeather(latitude, longitude, `${name}${country ? ', '+country : ''}`);
+    } catch { setWeatherError('Errore ricerca città'); setWeatherLoading(false); }
+  };
+  
+  const renderWeather = () => (
+    <div style={{padding:20}}>
+      <div className="sh" style={{marginBottom:16}}>
+        <button className="ib" onClick={() => setView('home')}>← Indietro</button>
+        <div style={{fontWeight:600}}>🌤️ Meteo</div>
+      </div>
+      
+      <div style={{display:'flex',gap:8,marginBottom:16,flexWrap:'wrap'}}>
+        <input className="field" placeholder="Inserisci città..." value={weatherCity} onChange={e=>setWeatherCity(e.target.value)} onKeyDown={e=>e.key==='Enter'&&searchCity()} style={{flex:1,minWidth:150}} />
+        <button className="btn bt bs" onClick={searchCity} style={{flexShrink:0}}>🔍 Cerca</button>
+        <button className="btn bg bs" onClick={detectLocation} style={{flexShrink:0}}>📍 Posizione</button>
+      </div>
+
+      <div style={{display:'flex',gap:6,marginBottom:14}}>
+        <button className={'btn bs'+(weatherUnit==='celsius'?' br':' bg')} onClick={()=>{setWeatherUnit('celsius');localStorage.setItem('weather_unit','celsius');}}>°C</button>
+        <button className={'btn bs'+(weatherUnit==='fahrenheit'?' br':' bg')} onClick={()=>{setWeatherUnit('fahrenheit');localStorage.setItem('weather_unit','fahrenheit');}}>°F</button>
+      </div>
+      
+      {weatherLoading && <div style={{textAlign:'center',padding:40,color:'var(--text2)'}}>⏳ Caricamento...</div>}
+      
+      {weatherError && <div className="card" style={{padding:20,textAlign:'center',color:'var(--red)',background:'rgba(255,77,109,.1)'}}>{weatherError}</div>}
+      
+      {!weather && !weatherLoading && !weatherError && (
+        <div style={{textAlign:'center',padding:60,color:'var(--text2)',fontSize:'.9rem'}}>
+          <div style={{fontSize:'3rem',marginBottom:16}}>🌤️</div>
+          <div>Cerca una città o usa la tua posizione</div>
+          {weatherCoords && <button className="btn bt bs" style={{marginTop:12}} onClick={()=>{const c=weatherCoords;fetchWeather(c.lat,c.lon,weatherCity||'Posizione');}}>🔄 Aggiorna</button>}
+        </div>
+      )}
+      
+      {weather && (
+        <>
+          {/* Current weather */}
+          <div className="card" style={{padding:24,textAlign:'center',marginBottom:16}}>
+            <div style={{fontSize:'1.2rem',fontWeight:700,marginBottom:4}}>{weather.city}</div>
+            <div style={{fontSize:'.78rem',color:'var(--text2)',marginBottom:16}}>{new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})}</div>
+            <div style={{fontSize:'3rem',marginBottom:4}}>{WEATHER_ICONS[weather.current.weather_code]||'🌤️'}</div>
+            <div style={{fontSize:'2.8rem',fontWeight:700,letterSpacing:-2}}>{Math.round(weatherUnit==='fahrenheit'?weather.current.temperature_2m*9/5+32:weather.current.temperature_2m)}°</div>
+            <div style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:12}}>{WEATHER_LABELS[weather.current.weather_code]||''}</div>
+            <div style={{display:'flex',justifyContent:'center',gap:24,flexWrap:'wrap'}}>
+              <div style={{textAlign:'center'}}><div style={{fontSize:'.7rem',color:'var(--text2)'}}>Percepita</div><div style={{fontWeight:600,fontSize:'.9rem'}}>{Math.round(weatherUnit==='fahrenheit'?weather.current.apparent_temperature*9/5+32:weather.current.apparent_temperature)}°</div></div>
+              <div style={{textAlign:'center'}}><div style={{fontSize:'.7rem',color:'var(--text2)'}}>Umidità</div><div style={{fontWeight:600,fontSize:'.9rem'}}>{weather.current.humidity_2m}%</div></div>
+              <div style={{textAlign:'center'}}><div style={{fontSize:'.7rem',color:'var(--text2)'}}>Vento</div><div style={{fontWeight:600,fontSize:'.9rem'}}>{Math.round(weather.current.wind_speed_10m)} km/h</div></div>
+              <div style={{textAlign:'center'}}><div style={{fontSize:'.7rem',color:'var(--text2)'}}>Precip.</div><div style={{fontWeight:600,fontSize:'.9rem'}}>{weather.current.precipitation} mm</div></div>
+            </div>
+          </div>
+          
+          {/* 7 day forecast */}
+          <div style={{fontWeight:600,fontSize:'.95rem',marginBottom:10}}>📅 Previsioni 7 giorni</div>
+          <div style={{display:'flex',flexDirection:'column',gap:6}}>
+            {weather.daily.time.map((date,i)=>{
+              const dayName = i===0?'Oggi':new Date(date).toLocaleDateString('it-IT',{weekday:'short'});
+              const max = weatherUnit==='fahrenheit'?weather.daily.temperature_2m_max[i]*9/5+32:weather.daily.temperature_2m_max[i];
+              const min = weatherUnit==='fahrenheit'?weather.daily.temperature_2m_min[i]*9/5+32:weather.daily.temperature_2m_min[i];
+              return (
+                <div key={i} className="card" style={{display:'flex',alignItems:'center',gap:12,padding:'10px 14px'}}>
+                  <div style={{fontWeight:600,fontSize:'.85rem',width:50,flexShrink:0}}>{dayName}</div>
+                  <div style={{fontSize:'1.3rem',width:30,textAlign:'center',flexShrink:0}}>{WEATHER_ICONS[weather.daily.weather_code[i]]||'🌤️'}</div>
+                  <div style={{flex:1,fontSize:'.78rem',color:'var(--text2)'}}>{WEATHER_LABELS[weather.daily.weather_code[i]]||''}</div>
+                  <div style={{display:'flex',gap:8,fontSize:'.85rem',fontWeight:600,flexShrink:0}}>
+                    <span style={{color:'var(--red)'}}>{Math.round(max)}°</span>
+                    <span style={{color:'var(--text2)',opacity:.5}}>|</span>
+                    <span style={{color:'var(--blue)'}}>{Math.round(min)}°</span>
+                  </div>
+                  <div style={{fontSize:'.7rem',color:'var(--accent2)',fontWeight:600,flexShrink:0}}>{weather.daily.precipitation_probability_max[i]}%🌧️</div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
   
   const renderHome = () => (
     <div style={{padding:20}}>
@@ -24079,6 +24247,7 @@ function ExtraTab({toast}) {
       {view === 'podcasts' && renderPodcasts()}
       {view === 'maps' && renderMaps()}
       {view === 'space' && renderSpace()}
+      {view === 'weather' && renderWeather()}
       {view === 'brainstorm' && renderBrainstorm()}
       {view === 'quiz' && renderQuiz()}
       {view === 'pixelart' && renderPixelArt()}
