@@ -720,50 +720,50 @@ body[class*="bg-pattern-"]::before{content:'';position:fixed;inset:0;pointer-eve
 body.lmv-v2[class*="bg-pattern-"]::after{content:'';position:fixed;top:64px;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 20% 20%,rgba(139,92,246,.05) 0%,transparent 40%),radial-gradient(ellipse at 80% 80%,rgba(99,102,241,.04) 0%,transparent 40%),radial-gradient(ellipse at 50% 50%,rgba(139,92,246,.02) 0%,transparent 60%);pointer-events:none;z-index:0}
 .bg-pattern-none::before{display:none!important}
 
-/* Dots - pulsing */
-body.bg-pattern-dots::before{background-image:radial-gradient(circle,color-mix(in srgb,var(--accent) 90%,transparent) 4px,transparent 4px) !important;background-size:24px 24px !important;animation:animDots 4s ease-in-out infinite}
+/* Dots - pulsing (white) */
+body.bg-pattern-dots::before{background-image:radial-gradient(circle,rgba(255,255,255,.75) 3px,transparent 3px) !important;background-size:22px 22px !important;animation:animDots 4s ease-in-out infinite}
 
-/* Cross - rotating */
-body.bg-pattern-cross::before{background-image:repeating-linear-gradient(0deg,transparent 7px,color-mix(in srgb,var(--purple) 85%,transparent) 7px,color-mix(in srgb,var(--purple) 85%,transparent) 11px,transparent 11px,transparent 28px),repeating-linear-gradient(90deg,transparent 7px,color-mix(in srgb,var(--purple) 85%,transparent) 7px,color-mix(in srgb,var(--purple) 85%,transparent) 11px,transparent 11px,transparent 28px)!important;animation:animCross 20s linear infinite}
+/* Cross - rotating (white) */
+body.bg-pattern-cross::before{background-image:repeating-linear-gradient(0deg,transparent 6px,rgba(255,255,255,.7) 6px,rgba(255,255,255,.7) 10px,transparent 10px,transparent 26px),repeating-linear-gradient(90deg,transparent 6px,rgba(255,255,255,.7) 6px,rgba(255,255,255,.7) 10px,transparent 10px,transparent 26px)!important;animation:animCross 20s linear infinite}
 
-/* Diagonal - scrolling */
-body.bg-pattern-diagonal::before{background-image:repeating-linear-gradient(35deg,color-mix(in srgb,var(--accent) 90%,transparent) 0,color-mix(in srgb,var(--accent) 90%,transparent) 4px,transparent 4px,transparent 32px)!important;background-size:40px 40px !important;animation:animDiagonal 15s linear infinite}
+/* Diagonal - scrolling (white) */
+body.bg-pattern-diagonal::before{background-image:repeating-linear-gradient(35deg,rgba(255,255,255,.75) 0,rgba(255,255,255,.75) 3px,transparent 3px,transparent 28px)!important;background-size:36px 36px !important;animation:animDiagonal 15s linear infinite}
 
-/* Circles - concentric pulsing */
-body.bg-pattern-circles::before{background-image:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--accent2) 90%,transparent) 0,color-mix(in srgb,var(--accent2) 90%,transparent) 3px,transparent 3px,transparent 10px,color-mix(in srgb,var(--accent2) 65%,transparent) 10px,color-mix(in srgb,var(--accent2) 65%,transparent) 12px,transparent 12px)!important;background-size:40px 40px !important;animation:animCircles 6s ease-in-out infinite}
+/* Circles - concentric pulsing (white) */
+body.bg-pattern-circles::before{background-image:radial-gradient(circle at 50% 50%,rgba(255,255,255,.8) 0,rgba(255,255,255,.8) 3px,transparent 3px,transparent 9px,rgba(255,255,255,.55) 9px,rgba(255,255,255,.55) 11px,transparent 11px)!important;background-size:36px 36px !important;animation:animCircles 6s ease-in-out infinite}
 
-/* Stars - twinkling */
-body.bg-pattern-stars::before{background-image:radial-gradient(3px 3px at 12% 18%,color-mix(in srgb,var(--accent) 95%,transparent),transparent),radial-gradient(5px 5px at 68% 10%,color-mix(in srgb,var(--accent2) 90%,transparent),transparent),radial-gradient(4px 4px at 88% 58%,color-mix(in srgb,var(--accent) 95%,transparent),transparent),radial-gradient(5px 5px at 35% 80%,color-mix(in srgb,var(--accent2) 90%,transparent),transparent),radial-gradient(3px 3px at 8% 65%,color-mix(in srgb,var(--accent) 95%,transparent),transparent),radial-gradient(6px 6px at 78% 88%,color-mix(in srgb,var(--accent2) 90%,transparent),transparent),radial-gradient(4px 4px at 52% 30%,color-mix(in srgb,var(--accent2) 90%,transparent),transparent),radial-gradient(5px 5px at 22% 48%,color-mix(in srgb,var(--accent2) 90%,transparent),transparent),radial-gradient(3px 3px at 42% 8%,color-mix(in srgb,var(--accent) 95%,transparent),transparent),radial-gradient(5px 5px at 92% 35%,color-mix(in srgb,var(--accent2) 90%,transparent),transparent),radial-gradient(4px 4px at 60% 62%,color-mix(in srgb,var(--accent) 95%,transparent),transparent)!important;background-size:220px 200px !important;animation:animStars 15s ease-in-out infinite}
+/* Stars - twinkling (white) */
+body.bg-pattern-stars::before{background-image:radial-gradient(3px 3px at 12% 18%,rgba(255,255,255,.85),transparent),radial-gradient(5px 5px at 68% 10%,rgba(255,255,255,.8),transparent),radial-gradient(4px 4px at 88% 58%,rgba(255,255,255,.85),transparent),radial-gradient(5px 5px at 35% 80%,rgba(255,255,255,.8),transparent),radial-gradient(3px 3px at 8% 65%,rgba(255,255,255,.85),transparent),radial-gradient(6px 6px at 78% 88%,rgba(255,255,255,.8),transparent),radial-gradient(4px 4px at 52% 30%,rgba(255,255,255,.8),transparent),radial-gradient(5px 5px at 22% 48%,rgba(255,255,255,.8),transparent),radial-gradient(3px 3px at 42% 8%,rgba(255,255,255,.85),transparent),radial-gradient(5px 5px at 92% 35%,rgba(255,255,255,.8),transparent),radial-gradient(4px 4px at 60% 62%,rgba(255,255,255,.85),transparent)!important;background-size:200px 180px !important;animation:animStars 15s ease-in-out infinite}
 
-/* Grid - subtle shift */
-body.bg-pattern-grid::before{background-image:linear-gradient(0deg,color-mix(in srgb,var(--accent2) 75%,transparent) 2px,transparent 2px),linear-gradient(90deg,color-mix(in srgb,var(--accent2) 75%,transparent) 2px,transparent 2px),linear-gradient(0deg,color-mix(in srgb,var(--accent2) 90%,transparent) 3px,transparent 3px),linear-gradient(90deg,color-mix(in srgb,var(--accent2) 90%,transparent) 3px,transparent 3px)!important;background-size:16px 16px,16px 16px,64px 64px,64px 64px !important;animation:animGrid 10s ease-in-out infinite}
+/* Grid - subtle shift (white) */
+body.bg-pattern-grid::before{background-image:linear-gradient(0deg,rgba(255,255,255,.65) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.65) 2px,transparent 2px),linear-gradient(0deg,rgba(255,255,255,.8) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.8) 2px,transparent 2px)!important;background-size:14px 14px,14px 14px,56px 56px,56px 56px !important;animation:animGrid 10s ease-in-out infinite}
 
-/* Aurora - drifting */
-body.bg-pattern-aurora::before{background-image:linear-gradient(90deg,color-mix(in srgb,var(--accent) 65%,transparent) 0%,transparent 25%,transparent 40%,color-mix(in srgb,var(--purple) 55%,transparent) 40%,transparent 60%,transparent 68%,color-mix(in srgb,var(--accent2) 55%,transparent) 68%),linear-gradient(90deg,transparent 15%,color-mix(in srgb,var(--accent2) 55%,transparent) 15%,transparent 40%,color-mix(in srgb,var(--blue) 50%,transparent) 40%,transparent 72%)!important;background-size:200% 100% !important;animation:auroraDrift 10s ease-in-out infinite}
+/* Aurora - drifting (white) */
+body.bg-pattern-aurora::before{background-image:linear-gradient(90deg,rgba(255,255,255,.55) 0%,transparent 25%,transparent 40%,rgba(255,255,255,.45) 40%,transparent 60%,transparent 68%,rgba(255,255,255,.45) 68%),linear-gradient(90deg,transparent 15%,rgba(255,255,255,.45) 15%,transparent 40%,rgba(255,255,255,.4) 40%,transparent 72%)!important;background-size:200% 100% !important;animation:auroraDrift 10s ease-in-out infinite}
 
-/* Circuit - pulsing tech */
-body.bg-pattern-circuit::before{background-image:linear-gradient(0deg,color-mix(in srgb,var(--accent) 85%,transparent) 0,color-mix(in srgb,var(--accent) 85%,transparent) 12px,transparent 12px,transparent 24px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 85%,transparent) 0,color-mix(in srgb,var(--accent) 85%,transparent) 12px,transparent 12px,transparent 24px),radial-gradient(circle 5px at 0 0,color-mix(in srgb,var(--accent2) 75%,transparent) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 10px,color-mix(in srgb,var(--accent2) 60%,transparent) 10px,color-mix(in srgb,var(--accent2) 60%,transparent) 11px,transparent 11px,transparent 26px)!important;background-size:36px 36px !important;animation:animCircuit 12s ease-in-out infinite}
+/* Circuit - pulsing tech (white) */
+body.bg-pattern-circuit::before{background-image:linear-gradient(0deg,rgba(255,255,255,.75) 0,rgba(255,255,255,.75) 10px,transparent 10px,transparent 22px),linear-gradient(90deg,rgba(255,255,255,.75) 0,rgba(255,255,255,.75) 10px,transparent 10px,transparent 22px),radial-gradient(circle 4px at 0 0,rgba(255,255,255,.65) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(255,255,255,.5) 9px,rgba(255,255,255,.5) 10px,transparent 10px,transparent 24px)!important;background-size:32px 32px !important;animation:animCircuit 12s ease-in-out infinite}
 
-/* Nebula - slow shift */
-body.bg-pattern-nebula::before{background-image:radial-gradient(circle at 25% 25%,color-mix(in srgb,var(--accent2) 65%,transparent) 0%,transparent 40%),radial-gradient(circle at 72% 45%,color-mix(in srgb,var(--purple) 55%,transparent) 0%,transparent 40%),radial-gradient(circle at 50% 78%,color-mix(in srgb,var(--blue) 55%,transparent) 0%,transparent 35%),radial-gradient(circle at 18% 72%,color-mix(in srgb,var(--accent) 65%,transparent) 0%,transparent 35%),radial-gradient(circle at 82% 22%,color-mix(in srgb,var(--purple) 55%,transparent) 0%,transparent 40%)!important;background-size:150% 150% !important;animation:nebulaShift 14s ease-in-out infinite}
+/* Nebula - slow shift (white) */
+body.bg-pattern-nebula::before{background-image:radial-gradient(circle at 25% 25%,rgba(255,255,255,.55) 0%,transparent 40%),radial-gradient(circle at 72% 45%,rgba(255,255,255,.45) 0%,transparent 40%),radial-gradient(circle at 50% 78%,rgba(255,255,255,.45) 0%,transparent 35%),radial-gradient(circle at 18% 72%,rgba(255,255,255,.55) 0%,transparent 35%),radial-gradient(circle at 82% 22%,rgba(255,255,255,.45) 0%,transparent 40%)!important;background-size:150% 150% !important;animation:nebulaShift 14s ease-in-out infinite}
 
-/* Matrix - falling */
-body.bg-pattern-matrix::before{background-image:repeating-linear-gradient(0deg,transparent 0,transparent 18px,color-mix(in srgb,var(--green) 70%,transparent) 18px,color-mix(in srgb,var(--green) 70%,transparent) 20px),repeating-linear-gradient(90deg,transparent,transparent 10px,color-mix(in srgb,var(--green) 70%,transparent) 10px,color-mix(in srgb,var(--green) 70%,transparent) 12px)!important;background-size:100% 28px,12px 100% !important;animation:animMatrix 12s linear infinite}
+/* Matrix - falling (white) */
+body.bg-pattern-matrix::before{background-image:repeating-linear-gradient(0deg,transparent 0,transparent 16px,rgba(255,255,255,.6) 16px,rgba(255,255,255,.6) 18px),repeating-linear-gradient(90deg,transparent,transparent 9px,rgba(255,255,255,.6) 9px,rgba(255,255,255,.6) 11px)!important;background-size:100% 26px,11px 100% !important;animation:animMatrix 12s linear infinite}
 
-/* Topo - smooth flow */
-body.bg-pattern-topo::before{background-image:radial-gradient(circle at 22% 28%,color-mix(in srgb,var(--accent2) 75%,transparent) 0,color-mix(in srgb,var(--accent2) 75%,transparent) 3px,transparent 4px,transparent 10px,color-mix(in srgb,var(--accent2) 55%,transparent) 11px,color-mix(in srgb,var(--accent2) 55%,transparent) 13px,transparent 18px),radial-gradient(circle at 72% 62%,color-mix(in srgb,var(--accent2) 70%,transparent) 0,color-mix(in srgb,var(--accent2) 70%,transparent) 3px,transparent 4px,transparent 9px,color-mix(in srgb,var(--accent2) 50%,transparent) 10px,color-mix(in srgb,var(--accent2) 50%,transparent) 12px,transparent 16px)!important;background-size:56px 56px !important;animation:animTopo 8s ease-in-out infinite}
+/* Topo - smooth flow (white) */
+body.bg-pattern-topo::before{background-image:radial-gradient(circle at 22% 28%,rgba(255,255,255,.65) 0,rgba(255,255,255,.65) 3px,transparent 4px,transparent 9px,rgba(255,255,255,.45) 10px,rgba(255,255,255,.45) 12px,transparent 16px),radial-gradient(circle at 72% 62%,rgba(255,255,255,.6) 0,rgba(255,255,255,.6) 3px,transparent 4px,transparent 8px,rgba(255,255,255,.4) 9px,rgba(255,255,255,.4) 11px,transparent 14px)!important;background-size:52px 52px !important;animation:animTopo 8s ease-in-out infinite}
 
-/* Zigzag - wave */
-body.bg-pattern-zigzag::before{background-image:linear-gradient(135deg,color-mix(in srgb,var(--accent) 90%,transparent) 28%,transparent 28%),linear-gradient(-135deg,color-mix(in srgb,var(--accent) 90%,transparent) 28%,transparent 28%)!important;background-size:36px 36px !important;background-position:0 0,18px 0 !important;animation:animZigzag 8s ease-in-out infinite}
+/* Zigzag - wave (white) */
+body.bg-pattern-zigzag::before{background-image:linear-gradient(135deg,rgba(255,255,255,.8) 28%,transparent 28%),linear-gradient(-135deg,rgba(255,255,255,.8) 28%,transparent 28%)!important;background-size:32px 32px !important;background-position:0 0,16px 0 !important;animation:animZigzag 8s ease-in-out infinite}
 
-/* Waves - flowing */
-body.bg-pattern-waves::before{background-image:repeating-linear-gradient(0deg,color-mix(in srgb,var(--accent2) 80%,transparent) 0,color-mix(in srgb,var(--accent2) 80%,transparent) 4px,transparent 4px,transparent 22px),repeating-linear-gradient(90deg,color-mix(in srgb,var(--accent) 70%,transparent) 0,color-mix(in srgb,var(--accent) 70%,transparent) 3px,transparent 3px,transparent 28px)!important;background-size:100% 30px !important;animation:animWaves 8s ease-in-out infinite}
+/* Waves - flowing (white) */
+body.bg-pattern-waves::before{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.7) 0,rgba(255,255,255,.7) 3px,transparent 3px,transparent 20px),repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0,rgba(255,255,255,.6) 3px,transparent 3px,transparent 26px)!important;background-size:100% 28px !important;animation:animWaves 8s ease-in-out infinite}
 
-/* Hex - honeycomb */
-body.bg-pattern-hex::before{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 3px,color-mix(in srgb,var(--accent) 90%,transparent) 3px,color-mix(in srgb,var(--accent) 90%,transparent) 5px,transparent 5px,transparent 22px),repeating-linear-gradient(-60deg,transparent 0,transparent 3px,color-mix(in srgb,var(--accent) 90%,transparent) 3px,color-mix(in srgb,var(--accent) 90%,transparent) 5px,transparent 5px,transparent 22px)!important;background-size:36px 22px !important;background-position:0 0,18px 11px !important;animation:animHex 10s ease-in-out infinite}
+/* Hex - honeycomb (white) */
+body.bg-pattern-hex::before{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 3px,rgba(255,255,255,.8) 3px,rgba(255,255,255,.8) 5px,transparent 5px,transparent 20px),repeating-linear-gradient(-60deg,transparent 0,transparent 3px,rgba(255,255,255,.8) 3px,rgba(255,255,255,.8) 5px,transparent 5px,transparent 20px)!important;background-size:32px 20px !important;background-position:0 0,16px 10px !important;animation:animHex 10s ease-in-out infinite}
 
-/* Diamond - shimmer */
-body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,color-mix(in srgb,var(--accent2) 85%,transparent) 25%,transparent 25%),linear-gradient(-45deg,color-mix(in srgb,var(--accent2) 85%,transparent) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,color-mix(in srgb,var(--accent2) 85%,transparent) 75%),linear-gradient(-45deg,transparent 75%,color-mix(in srgb,var(--accent2) 85%,transparent) 75%)!important;background-size:28px 28px !important;background-position:0 0,0 14px,14px -14px,-14px 0px !important;animation:animDiamond 8s ease-in-out infinite}
+/* Diamond - shimmer (white) */
+body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,rgba(255,255,255,.75) 25%,transparent 25%),linear-gradient(-45deg,rgba(255,255,255,.75) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(255,255,255,.75) 75%),linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.75) 75%)!important;background-size:26px 26px !important;background-position:0 0,0 13px,13px -13px,-13px 0px !important;animation:animDiamond 8s ease-in-out infinite}
 
 /* Pattern previews (used in settings) */
 .pp-none,.pp-dots,.pp-cross,.pp-diagonal,.pp-circles,.pp-stars,.pp-grid,.pp-aurora,.pp-circuit,.pp-nebula,.pp-matrix,.pp-topo,.pp-zigzag,.pp-waves,.pp-hex,.pp-diamond{width:36px;height:36px;border-radius:6px;border:1px solid var(--border);display:inline-block;vertical-align:middle;background-size:cover;overflow:hidden}
@@ -785,21 +785,21 @@ body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,color-mix
 .pp-diamond{background-image:linear-gradient(45deg,var(--accent2) 25%,transparent 25%),linear-gradient(-45deg,var(--accent2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--accent2) 75%),linear-gradient(-45deg,transparent 75%,var(--accent2) 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0px}
 
 /* Pattern animations */
-@keyframes animDots{0%,100%{background-size:24px 24px}50%{background-size:28px 28px}}
+@keyframes animDots{0%,100%{background-size:22px 22px}50%{background-size:26px 26px}}
 @keyframes animCross{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-@keyframes animDiagonal{0%{background-position:0 0}100%{background-position:44px 44px}}
-@keyframes animCircles{0%,100%{background-size:40px 40px;opacity:.8}50%{background-size:44px 44px;opacity:1}}
-@keyframes animStars{0%,100%{background-size:200px 180px}50%{background-size:220px 200px}}
+@keyframes animDiagonal{0%{background-position:0 0}100%{background-position:40px 40px}}
+@keyframes animCircles{0%,100%{background-size:36px 36px;opacity:.7}50%{background-size:40px 40px;opacity:.9}}
+@keyframes animStars{0%,100%{background-size:180px 160px}50%{background-size:200px 180px}}
 @keyframes animGrid{0%,100%{background-position:0 0,0 0,0 0,0 0}50%{background-position:2px 2px,2px 2px,0 0,0 0}}
 @keyframes auroraDrift{0%{background-position:0% 50%}25%{background-position:50% 40%}50%{background-position:100% 30%}75%{background-position:50% 60%}100%{background-position:0% 50%}}
 @keyframes nebulaShift{0%{background-position:0% 50%}25%{background-position:40% 30%}50%{background-position:80% 20%}75%{background-position:20% 70%}100%{background-position:0% 50%}}
-@keyframes animCircuit{0%,100%{background-size:36px 36px;opacity:.8}50%{background-size:40px 40px;opacity:1}}
-@keyframes animMatrix{0%{background-position:0 0,0 0}100%{background-position:0 48px,0 0}}
-@keyframes animTopo{0%,100%{background-position:0 0}50%{background-position:8px 8px}}
-@keyframes animZigzag{0%,100%{background-position:0 0,18px 0}50%{background-position:9px 0,27px 0}}
-@keyframes animWaves{0%,100%{background-position:0 0,0 0}50%{background-position:4px 8px,0 0}}
-@keyframes animHex{0%,100%{background-size:32px 20px;background-position:0 0,16px 10px}50%{background-size:36px 22px;background-position:2px 2px,18px 12px}}
-@keyframes animDiamond{0%,100%{background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0px}50%{background-size:28px 28px;background-position:2px 2px,2px 14px,14px -14px,-14px 2px}}
+@keyframes animCircuit{0%,100%{background-size:32px 32px;opacity:.7}50%{background-size:36px 36px;opacity:.9}}
+@keyframes animMatrix{0%{background-position:0 0,0 0}100%{background-position:0 44px,0 0}}
+@keyframes animTopo{0%,100%{background-position:0 0}50%{background-position:6px 6px}}
+@keyframes animZigzag{0%,100%{background-position:0 0,16px 0}50%{background-position:8px 0,24px 0}}
+@keyframes animWaves{0%,100%{background-position:0 0,0 0}50%{background-position:3px 6px,0 0}}
+@keyframes animHex{0%,100%{background-size:28px 18px;background-position:0 0,14px 9px}50%{background-size:32px 20px;background-position:2px 2px,16px 10px}}
+@keyframes animDiamond{0%,100%{background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0px}50%{background-size:26px 26px;background-position:2px 2px,2px 13px,13px -13px,-13px 2px}}
 
 /* Icon animations and active glow */
 .nb svg{display:block;transition:all .2s cubic-bezier(.4,0,.2,1)}
