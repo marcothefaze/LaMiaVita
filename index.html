@@ -37,7 +37,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false});"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer onerror="console.warn('Google Identity Services unavailable')"></script>
 <!-- <script src="keys-manager.js"></script> -->
 <script>
@@ -574,65 +574,65 @@ body[class*="bg-pattern-"] .orb-c{display:none}
 .rem-item.fired{opacity:.5}
 .rem-time{font-family:Inter,sans-serif;font-weight:700;font-size:.9rem;color:var(--yellow);flex-shrink:0}
 
-body.light{color:#1A1D2E}
+body.light{color:var(--text)}
 body.light .sb{background:linear-gradient(180deg,#fff 0%,#f5f7ff 100%);border-right-color:rgba(0,0,0,.08)}
 body.light .topbar{background:rgba(255,255,255,.95)}
 body.light .card,body.light .modal{background:#fff;border:1px solid rgba(0,0,0,.1)}
-body.light .field{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);color:#1A1D2E}
+body.light .field{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);color:var(--text)}
 body.light .nb:hover{background:rgba(0,0,0,.06)}
 body.light .pwi,body.light .txi,body.light .evi{background:rgba(0,0,0,.03)}
-body.light .bub{color:#1A1D2E}
+body.light .bub{color:var(--text)}
 body.light .msg.bot .bub{background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08)}
 body.light .nb{color:rgba(0,0,0,.6)}
-body.light .nb.active{color:#1A1D2E;font-weight:700}
-body.light .sht,body.light .pt{color:#1A1D2E}
-body.light .note-title,body.light .note-body,body.light .note-date{color:#1A1D2E}
-body.light .pw-item,body.light .pw-svc,body.light .pw-usr{color:#1A1D2E}
-body.light .todo-text,body.light .todo-check{color:#1A1D2E}
-body.light .cal-day,body.light .day{color:#1A1D2E}
-body.light .stab{color:#1A1D2E}
+body.light .nb.active{color:var(--text);font-weight:700}
+body.light .sht,body.light .pt{color:var(--text)}
+body.light .note-title,body.light .note-body,body.light .note-date{color:var(--text)}
+body.light .pw-item,body.light .pw-svc,body.light .pw-usr{color:var(--text)}
+body.light .todo-text,body.light .todo-check{color:var(--text)}
+body.light .cal-day,body.light .day{color:var(--text)}
+body.light .stab{color:var(--text)}
 body.light .stab.active{background:rgba(0,0,0,.08)}
-body.light .set-title,body.light .set-label,body.light .set-sub{color:#1A1D2E}
-body.light .event-card,body.light .evi{color:#1A1D2E}
-body.light .rem-item,body.light .rem-title{color:#1A1D2E}
-body.light .extra-card,body.light .extra-title,body.light .extra-desc{color:#1A1D2E}
-body.light .wallet-stat,body.light .wallet-label{color:#1A1D2E}
-body.light .stat-card,body.light .stat-label,body.light .stat-value{color:#1A1D2E}
-body.light .yt-card,body.light .yt-title,body.light .yt-channel{color:#1A1D2E}
-body.light .sp-track,body.light .sp-title,body.light .sp-artist{color:#1A1D2E}
+body.light .set-title,body.light .set-label,body.light .set-sub{color:var(--text)}
+body.light .event-card,body.light .evi{color:var(--text)}
+body.light .rem-item,body.light .rem-title{color:var(--text)}
+body.light .extra-card,body.light .extra-title,body.light .extra-desc{color:var(--text)}
+body.light .wallet-stat,body.light .wallet-label{color:var(--text)}
+body.light .stat-card,body.light .stat-label,body.light .stat-value{color:var(--text)}
+body.light .yt-card,body.light .yt-title,body.light .yt-channel{color:var(--text)}
+body.light .sp-track,body.light .sp-title,body.light .sp-artist{color:var(--text)}
 body.light .note-card{background:#fff;border:1px solid rgba(0,0,0,.1)}
-body.light .note-card .note-title,body.light .note-card .note-body{color:#1A1D2E}
+body.light .note-card .note-title,body.light .note-card .note-body{color:var(--text)}
 body.light .todo-item{background:#fff;border:1px solid rgba(0,0,0,.1)}
-body.light .todo-cat-name{color:#1A1D2E}
-body.light .todo-cat-head{color:#1A1D2E}
-body.light .todo-cat-count{color:#1A1D2E}
-body.light .ib{color:#1A1D2E}
+body.light .todo-cat-name{color:var(--text)}
+body.light .todo-cat-head{color:var(--text)}
+body.light .todo-cat-count{color:var(--text)}
+body.light .ib{color:var(--text)}
 body.light .modal-overlay{background:rgba(0,0,0,.5)}
-body.light .modal{background:#fff;color:#1A1D2E}
-body.light .mh{color:#1A1D2E}
-body.light .mt{color:#1A1D2E}
-body.light .cinp{color:#1A1D2E;background:rgba(0,0,0,.04)}
-body.light .csnd{color:#1A1D2E}
-body.light .txi{color:#1A1D2E}
-body.light .txic{color:#1A1D2E}
-body.light .sc{color:#1A1D2E}
-body.light .sv{color:#1A1D2E}
-body.light .cll{color:#1A1D2E}
-body.light .qr-result{color:#1A1D2E}
-body.light .scan-result{color:#1A1D2E}
-body.light .zodiac-sign{color:#1A1D2E}
-body.light .horoscope-text{color:#1A1D2E}
-body.light .news-item,body.light .news-title,body.light .news-desc{color:#1A1D2E}
-body.light .radio-station,body.light .radio-name{color:#1A1D2E}
-body.light .podcast-item,body.light .podcast-title{color:#1A1D2E}
-body.light .weather-temp,body.light .weather-desc{color:#1A1D2E}
-body.light .ai-tool-card,body.light .ai-tool-title{color:#1A1D2E}
-body.light .ai-result{color:#1A1D2E}
-body.light .project-card,body.light .project-title{color:#1A1D2E}
-body.light .flashcard{color:#1A1D2E}
-body.light .esami-item,body.light .esami-nome,body.light .esami-voto{color:#1A1D2E}
-body.light .pomodoro-display{color:#1A1D2E}
-body.light .pomodoro-label{color:#1A1D2E}
+body.light .modal{background:#fff;color:var(--text)}
+body.light .mh{color:var(--text)}
+body.light .mt{color:var(--text)}
+body.light .cinp{color:var(--text);background:rgba(0,0,0,.04)}
+body.light .csnd{color:var(--text)}
+body.light .txi{color:var(--text)}
+body.light .txic{color:var(--text)}
+body.light .sc{color:var(--text)}
+body.light .sv{color:var(--text)}
+body.light .cll{color:var(--text)}
+body.light .qr-result{color:var(--text)}
+body.light .scan-result{color:var(--text)}
+body.light .zodiac-sign{color:var(--text)}
+body.light .horoscope-text{color:var(--text)}
+body.light .news-item,body.light .news-title,body.light .news-desc{color:var(--text)}
+body.light .radio-station,body.light .radio-name{color:var(--text)}
+body.light .podcast-item,body.light .podcast-title{color:var(--text)}
+body.light .weather-temp,body.light .weather-desc{color:var(--text)}
+body.light .ai-tool-card,body.light .ai-tool-title{color:var(--text)}
+body.light .ai-result{color:var(--text)}
+body.light .project-card,body.light .project-title{color:var(--text)}
+body.light .flashcard{color:var(--text)}
+body.light .esami-item,body.light .esami-nome,body.light .esami-voto{color:var(--text)}
+body.light .pomodoro-display{color:var(--text)}
+body.light .pomodoro-label{color:var(--text)}
 
 /* Sidebar scura per tutti i temi - miglior contrasto */
 body .sb{background:var(--surface);border-right:1px solid var(--border)}
@@ -643,8 +643,8 @@ body.light .nb:hover,body.cream .nb:hover,body.lavender .nb:hover,body.peach .nb
 body.light .nb.active,body.cream .nb.active,body.lavender .nb.active,body.peach .nb.active{color:#fff !important;font-weight:700}
 body.light .topbar,body.cream .topbar,body.lavender .topbar,body.peach .topbar{background:rgba(255,255,255,.95);border-bottom:1px solid rgba(0,0,0,.08)}
 body.light .card,body.cream .card,body.lavender .card,body.peach .card{background:#fff;border:1px solid rgba(0,0,0,.08)}
-body.light .field,body.cream .field,body.lavender .field,body.peach .field{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);color:#1A1D2E}
-body.light .btn,body.cream .btn,body.lavender .btn,body.peach .btn{background:var(--surface);border:1px solid rgba(0,0,0,.12);color:#1A1D2E}
+body.light .field,body.cream .field,body.lavender .field,body.peach .field{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);color:var(--text)}
+body.light .btn,body.cream .btn,body.lavender .btn,body.peach .btn{background:var(--surface);border:1px solid rgba(0,0,0,.12);color:var(--text)}
 body.light .btn.bt,body.cream .btn.bt,body.lavender .btn.bt,body.peach .btn.bt{background:var(--accent);color:#fff;border:none}
 body.light .quick-create-fab,body.cream .quick-create-fab,body.lavender .quick-create-fab,body.peach .quick-create-fab{box-shadow:0 4px 16px rgba(0,0,0,.2);color:#fff}
 body.light .content,body.cream .content,body.lavender .content,body.peach .content{background:#f5f2ed}
@@ -721,49 +721,49 @@ body.lmv-v2[class*="bg-pattern-"]::after{content:'';position:fixed;top:64px;left
 .bg-pattern-none::before{display:none!important}
 
 /* Dots - pulsing (white) */
-body.bg-pattern-dots::before{background-image:radial-gradient(circle,rgba(255,255,255,.6) 3px,transparent 3px) !important;background-size:20px 20px !important;animation:animDots 4s ease-in-out infinite}
+body.bg-pattern-dots::before{background-image:radial-gradient(circle,rgba(255,255,255,.5) 2px,transparent 2px) !important;background-size:18px 18px !important;animation:animDots 4s ease-in-out infinite}
 
 /* Cross - rotating (white) */
-body.bg-pattern-cross::before{background-image:repeating-linear-gradient(0deg,transparent 5px,rgba(255,255,255,.6) 5px,rgba(255,255,255,.6) 9px,transparent 9px,transparent 24px),repeating-linear-gradient(90deg,transparent 5px,rgba(255,255,255,.6) 5px,rgba(255,255,255,.6) 9px,transparent 9px,transparent 24px)!important;animation:animCross 20s linear infinite}
+body.bg-pattern-cross::before{background-image:repeating-linear-gradient(0deg,transparent 5px,rgba(255,255,255,.5) 5px,rgba(255,255,255,.5) 8px,transparent 8px,transparent 22px),repeating-linear-gradient(90deg,transparent 5px,rgba(255,255,255,.5) 5px,rgba(255,255,255,.5) 8px,transparent 8px,transparent 22px)!important;animation:animCross 20s linear infinite}
 
 /* Diagonal - scrolling (white) */
-body.bg-pattern-diagonal::before{background-image:repeating-linear-gradient(35deg,rgba(255,255,255,.65) 0,rgba(255,255,255,.65) 3px,transparent 3px,transparent 26px)!important;background-size:34px 34px !important;animation:animDiagonal 15s linear infinite}
+body.bg-pattern-diagonal::before{background-image:repeating-linear-gradient(35deg,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 2px,transparent 2px,transparent 24px)!important;background-size:32px 32px !important;animation:animDiagonal 15s linear infinite}
 
 /* Circles - concentric pulsing (white) */
-body.bg-pattern-circles::before{background-image:radial-gradient(circle at 50% 50%,rgba(255,255,255,.7) 0,rgba(255,255,255,.7) 3px,transparent 3px,transparent 8px,rgba(255,255,255,.45) 8px,rgba(255,255,255,.45) 10px,transparent 10px)!important;background-size:34px 34px !important;animation:animCircles 6s ease-in-out infinite}
+body.bg-pattern-circles::before{background-image:radial-gradient(circle at 50% 50%,rgba(255,255,255,.6) 0,rgba(255,255,255,.6) 2px,transparent 2px,transparent 7px,rgba(255,255,255,.35) 7px,rgba(255,255,255,.35) 9px,transparent 9px)!important;background-size:32px 32px !important;animation:animCircles 6s ease-in-out infinite}
 
 /* Stars - twinkling (white) */
-body.bg-pattern-stars::before{background-image:radial-gradient(3px 3px at 12% 18%,rgba(255,255,255,.75),transparent),radial-gradient(5px 5px at 68% 10%,rgba(255,255,255,.7),transparent),radial-gradient(4px 4px at 88% 58%,rgba(255,255,255,.75),transparent),radial-gradient(5px 5px at 35% 80%,rgba(255,255,255,.7),transparent),radial-gradient(3px 3px at 8% 65%,rgba(255,255,255,.75),transparent),radial-gradient(6px 6px at 78% 88%,rgba(255,255,255,.7),transparent),radial-gradient(4px 4px at 52% 30%,rgba(255,255,255,.7),transparent),radial-gradient(5px 5px at 22% 48%,rgba(255,255,255,.7),transparent),radial-gradient(3px 3px at 42% 8%,rgba(255,255,255,.75),transparent),radial-gradient(5px 5px at 92% 35%,rgba(255,255,255,.7),transparent),radial-gradient(4px 4px at 60% 62%,rgba(255,255,255,.75),transparent)!important;background-size:180px 160px !important;animation:animStars 15s ease-in-out infinite}
+body.bg-pattern-stars::before{background-image:radial-gradient(2px 2px at 12% 18%,rgba(255,255,255,.65),transparent),radial-gradient(4px 4px at 68% 10%,rgba(255,255,255,.6),transparent),radial-gradient(3px 3px at 88% 58%,rgba(255,255,255,.65),transparent),radial-gradient(4px 4px at 35% 80%,rgba(255,255,255,.6),transparent),radial-gradient(2px 2px at 8% 65%,rgba(255,255,255,.65),transparent),radial-gradient(5px 5px at 78% 88%,rgba(255,255,255,.6),transparent),radial-gradient(3px 3px at 52% 30%,rgba(255,255,255,.6),transparent),radial-gradient(4px 4px at 22% 48%,rgba(255,255,255,.6),transparent),radial-gradient(2px 2px at 42% 8%,rgba(255,255,255,.65),transparent),radial-gradient(4px 4px at 92% 35%,rgba(255,255,255,.6),transparent),radial-gradient(3px 3px at 60% 62%,rgba(255,255,255,.65),transparent)!important;background-size:160px 140px !important;animation:animStars 15s ease-in-out infinite}
 
 /* Grid - subtle shift (white) */
-body.bg-pattern-grid::before{background-image:linear-gradient(0deg,rgba(255,255,255,.55) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.55) 2px,transparent 2px),linear-gradient(0deg,rgba(255,255,255,.7) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.7) 2px,transparent 2px)!important;background-size:12px 12px,12px 12px,52px 52px,52px 52px !important;animation:animGrid 10s ease-in-out infinite}
+body.bg-pattern-grid::before{background-image:linear-gradient(0deg,rgba(255,255,255,.45) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.45) 1px,transparent 1px),linear-gradient(0deg,rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px)!important;background-size:10px 10px,10px 10px,48px 48px,48px 48px !important;animation:animGrid 10s ease-in-out infinite}
 
 /* Aurora - drifting (white) */
-body.bg-pattern-aurora::before{background-image:linear-gradient(90deg,rgba(255,255,255,.45) 0%,transparent 25%,transparent 40%,rgba(255,255,255,.35) 40%,transparent 60%,transparent 68%,rgba(255,255,255,.35) 68%),linear-gradient(90deg,transparent 15%,rgba(255,255,255,.35) 15%,transparent 40%,rgba(255,255,255,.3) 40%,transparent 72%)!important;background-size:200% 100% !important;animation:auroraDrift 10s ease-in-out infinite}
+body.bg-pattern-aurora::before{background-image:linear-gradient(90deg,rgba(255,255,255,.35) 0%,transparent 25%,transparent 40%,rgba(255,255,255,.25) 40%,transparent 60%,transparent 68%,rgba(255,255,255,.25) 68%),linear-gradient(90deg,transparent 15%,rgba(255,255,255,.25) 15%,transparent 40%,rgba(255,255,255,.2) 40%,transparent 72%)!important;background-size:200% 100% !important;animation:auroraDrift 10s ease-in-out infinite}
 
 /* Circuit - pulsing tech (white) */
-body.bg-pattern-circuit::before{background-image:linear-gradient(0deg,rgba(255,255,255,.65) 0,rgba(255,255,255,.65) 9px,transparent 9px,transparent 20px),linear-gradient(90deg,rgba(255,255,255,.65) 0,rgba(255,255,255,.65) 9px,transparent 9px,transparent 20px),radial-gradient(circle 3px at 0 0,rgba(255,255,255,.55) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,.4) 8px,rgba(255,255,255,.4) 9px,transparent 9px,transparent 22px)!important;background-size:30px 30px !important;animation:animCircuit 12s ease-in-out infinite}
+body.bg-pattern-circuit::before{background-image:linear-gradient(0deg,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 8px,transparent 8px,transparent 18px),linear-gradient(90deg,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 8px,transparent 8px,transparent 18px),radial-gradient(circle 2px at 0 0,rgba(255,255,255,.45) 50%,transparent 50%),repeating-linear-gradient(45deg,transparent,transparent 7px,rgba(255,255,255,.3) 7px,rgba(255,255,255,.3) 8px,transparent 8px,transparent 20px)!important;background-size:28px 28px !important;animation:animCircuit 12s ease-in-out infinite}
 
 /* Nebula - slow shift (white) */
-body.bg-pattern-nebula::before{background-image:radial-gradient(circle at 25% 25%,rgba(255,255,255,.45) 0%,transparent 40%),radial-gradient(circle at 72% 45%,rgba(255,255,255,.35) 0%,transparent 40%),radial-gradient(circle at 50% 78%,rgba(255,255,255,.35) 0%,transparent 35%),radial-gradient(circle at 18% 72%,rgba(255,255,255,.45) 0%,transparent 35%),radial-gradient(circle at 82% 22%,rgba(255,255,255,.35) 0%,transparent 40%)!important;background-size:150% 150% !important;animation:nebulaShift 14s ease-in-out infinite}
+body.bg-pattern-nebula::before{background-image:radial-gradient(circle at 25% 25%,rgba(255,255,255,.35) 0%,transparent 40%),radial-gradient(circle at 72% 45%,rgba(255,255,255,.25) 0%,transparent 40%),radial-gradient(circle at 50% 78%,rgba(255,255,255,.25) 0%,transparent 35%),radial-gradient(circle at 18% 72%,rgba(255,255,255,.35) 0%,transparent 35%),radial-gradient(circle at 82% 22%,rgba(255,255,255,.25) 0%,transparent 40%)!important;background-size:150% 150% !important;animation:nebulaShift 14s ease-in-out infinite}
 
 /* Matrix - falling (white) */
-body.bg-pattern-matrix::before{background-image:repeating-linear-gradient(0deg,transparent 0,transparent 14px,rgba(255,255,255,.5) 14px,rgba(255,255,255,.5) 16px),repeating-linear-gradient(90deg,transparent,transparent 8px,rgba(255,255,255,.5) 8px,rgba(255,255,255,.5) 10px)!important;background-size:100% 24px,10px 100% !important;animation:animMatrix 12s linear infinite}
+body.bg-pattern-matrix::before{background-image:repeating-linear-gradient(0deg,transparent 0,transparent 12px,rgba(255,255,255,.4) 12px,rgba(255,255,255,.4) 14px),repeating-linear-gradient(90deg,transparent,transparent 7px,rgba(255,255,255,.4) 7px,rgba(255,255,255,.4) 9px)!important;background-size:100% 22px,9px 100% !important;animation:animMatrix 12s linear infinite}
 
 /* Topo - smooth flow (white) */
-body.bg-pattern-topo::before{background-image:radial-gradient(circle at 22% 28%,rgba(255,255,255,.55) 0,rgba(255,255,255,.55) 2px,transparent 3px,transparent 8px,rgba(255,255,255,.35) 9px,rgba(255,255,255,.35) 11px,transparent 14px),radial-gradient(circle at 72% 62%,rgba(255,255,255,.5) 0,rgba(255,255,255,.5) 2px,transparent 3px,transparent 7px,rgba(255,255,255,.3) 8px,rgba(255,255,255,.3) 10px,transparent 12px)!important;background-size:50px 50px !important;animation:animTopo 8s ease-in-out infinite}
+body.bg-pattern-topo::before{background-image:radial-gradient(circle at 22% 28%,rgba(255,255,255,.45) 0,rgba(255,255,255,.45) 2px,transparent 3px,transparent 7px,rgba(255,255,255,.25) 8px,rgba(255,255,255,.25) 10px,transparent 12px),radial-gradient(circle at 72% 62%,rgba(255,255,255,.4) 0,rgba(255,255,255,.4) 2px,transparent 3px,transparent 6px,rgba(255,255,255,.2) 7px,rgba(255,255,255,.2) 9px,transparent 10px)!important;background-size:48px 48px !important;animation:animTopo 8s ease-in-out infinite}
 
 /* Zigzag - wave (white) */
-body.bg-pattern-zigzag::before{background-image:linear-gradient(135deg,rgba(255,255,255,.7) 28%,transparent 28%),linear-gradient(-135deg,rgba(255,255,255,.7) 28%,transparent 28%)!important;background-size:30px 30px !important;background-position:0 0,15px 0 !important;animation:animZigzag 8s ease-in-out infinite}
+body.bg-pattern-zigzag::before{background-image:linear-gradient(135deg,rgba(255,255,255,.6) 28%,transparent 28%),linear-gradient(-135deg,rgba(255,255,255,.6) 28%,transparent 28%)!important;background-size:28px 28px !important;background-position:0 0,14px 0 !important;animation:animZigzag 8s ease-in-out infinite}
 
 /* Waves - flowing (white) */
-body.bg-pattern-waves::before{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.6) 0,rgba(255,255,255,.6) 2px,transparent 2px,transparent 18px),repeating-linear-gradient(90deg,rgba(255,255,255,.5) 0,rgba(255,255,255,.5) 2px,transparent 2px,transparent 24px)!important;background-size:100% 26px !important;animation:animWaves 8s ease-in-out infinite}
+body.bg-pattern-waves::before{background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.5) 0,rgba(255,255,255,.5) 2px,transparent 2px,transparent 16px),repeating-linear-gradient(90deg,rgba(255,255,255,.4) 0,rgba(255,255,255,.4) 2px,transparent 2px,transparent 22px)!important;background-size:100% 24px !important;animation:animWaves 8s ease-in-out infinite}
 
 /* Hex - honeycomb (white) */
-body.bg-pattern-hex::before{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 3px,rgba(255,255,255,.7) 3px,rgba(255,255,255,.7) 5px,transparent 5px,transparent 18px),repeating-linear-gradient(-60deg,transparent 0,transparent 3px,rgba(255,255,255,.7) 3px,rgba(255,255,255,.7) 5px,transparent 5px,transparent 18px)!important;background-size:30px 18px !important;background-position:0 0,15px 9px !important;animation:animHex 10s ease-in-out infinite}
+body.bg-pattern-hex::before{background-image:repeating-linear-gradient(60deg,transparent 0,transparent 2px,rgba(255,255,255,.6) 2px,rgba(255,255,255,.6) 4px,transparent 4px,transparent 16px),repeating-linear-gradient(-60deg,transparent 0,transparent 2px,rgba(255,255,255,.6) 2px,rgba(255,255,255,.6) 4px,transparent 4px,transparent 16px)!important;background-size:28px 16px !important;background-position:0 0,14px 8px !important;animation:animHex 10s ease-in-out infinite}
 
 /* Diamond - shimmer (white) */
-body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,rgba(255,255,255,.65) 25%,transparent 25%),linear-gradient(-45deg,rgba(255,255,255,.65) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(255,255,255,.65) 75%),linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.65) 75%)!important;background-size:24px 24px !important;background-position:0 0,0 12px,12px -12px,-12px 0px !important;animation:animDiamond 8s ease-in-out infinite}
+body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,rgba(255,255,255,.55) 25%,transparent 25%),linear-gradient(-45deg,rgba(255,255,255,.55) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(255,255,255,.55) 75%),linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.55) 75%)!important;background-size:22px 22px !important;background-position:0 0,0 11px,11px -11px,-11px 0px !important;animation:animDiamond 8s ease-in-out infinite}
 
 /* Pattern previews (used in settings) */
 .pp-none,.pp-dots,.pp-cross,.pp-diagonal,.pp-circles,.pp-stars,.pp-grid,.pp-aurora,.pp-circuit,.pp-nebula,.pp-matrix,.pp-topo,.pp-zigzag,.pp-waves,.pp-hex,.pp-diamond{width:36px;height:36px;border-radius:6px;border:1px solid var(--border);display:inline-block;vertical-align:middle;background-size:cover;overflow:hidden}
@@ -785,21 +785,21 @@ body.bg-pattern-diamond::before{background-image:linear-gradient(45deg,rgba(255,
 .pp-diamond{background-image:linear-gradient(45deg,var(--accent2) 25%,transparent 25%),linear-gradient(-45deg,var(--accent2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--accent2) 75%),linear-gradient(-45deg,transparent 75%,var(--accent2) 75%);background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0px}
 
 /* Pattern animations */
-@keyframes animDots{0%,100%{background-size:20px 20px}50%{background-size:24px 24px}}
+@keyframes animDots{0%,100%{background-size:18px 18px}50%{background-size:22px 22px}}
 @keyframes animCross{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-@keyframes animDiagonal{0%{background-position:0 0}100%{background-position:38px 38px}}
-@keyframes animCircles{0%,100%{background-size:34px 34px;opacity:.6}50%{background-size:38px 38px;opacity:.8}}
-@keyframes animStars{0%,100%{background-size:160px 140px}50%{background-size:180px 160px}}
-@keyframes animGrid{0%,100%{background-position:0 0,0 0,0 0,0 0}50%{background-position:2px 2px,2px 2px,0 0,0 0}}
+@keyframes animDiagonal{0%{background-position:0 0}100%{background-position:36px 36px}}
+@keyframes animCircles{0%,100%{background-size:32px 32px;opacity:.5}50%{background-size:36px 36px;opacity:.7}}
+@keyframes animStars{0%,100%{background-size:140px 120px}50%{background-size:160px 140px}}
+@keyframes animGrid{0%,100%{background-position:0 0,0 0,0 0,0 0}50%{background-position:1px 1px,1px 1px,0 0,0 0}}
 @keyframes auroraDrift{0%{background-position:0% 50%}25%{background-position:50% 40%}50%{background-position:100% 30%}75%{background-position:50% 60%}100%{background-position:0% 50%}}
 @keyframes nebulaShift{0%{background-position:0% 50%}25%{background-position:40% 30%}50%{background-position:80% 20%}75%{background-position:20% 70%}100%{background-position:0% 50%}}
-@keyframes animCircuit{0%,100%{background-size:30px 30px;opacity:.6}50%{background-size:34px 34px;opacity:.8}}
-@keyframes animMatrix{0%{background-position:0 0,0 0}100%{background-position:0 40px,0 0}}
-@keyframes animTopo{0%,100%{background-position:0 0}50%{background-position:5px 5px}}
-@keyframes animZigzag{0%,100%{background-position:0 0,15px 0}50%{background-position:7px 0,22px 0}}
-@keyframes animWaves{0%,100%{background-position:0 0,0 0}50%{background-position:2px 5px,0 0}}
-@keyframes animHex{0%,100%{background-size:26px 16px;background-position:0 0,13px 8px}50%{background-size:30px 18px;background-position:2px 2px,15px 9px}}
-@keyframes animDiamond{0%,100%{background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0px}50%{background-size:24px 24px;background-position:2px 2px,2px 12px,12px -12px,-12px 2px}}
+@keyframes animCircuit{0%,100%{background-size:28px 28px;opacity:.5}50%{background-size:32px 32px;opacity:.7}}
+@keyframes animMatrix{0%{background-position:0 0,0 0}100%{background-position:0 36px,0 0}}
+@keyframes animTopo{0%,100%{background-position:0 0}50%{background-position:4px 4px}}
+@keyframes animZigzag{0%,100%{background-position:0 0,14px 0}50%{background-position:6px 0,20px 0}}
+@keyframes animWaves{0%,100%{background-position:0 0,0 0}50%{background-position:2px 4px,0 0}}
+@keyframes animHex{0%,100%{background-size:24px 14px;background-position:0 0,12px 7px}50%{background-size:28px 16px;background-position:2px 2px,14px 8px}}
+@keyframes animDiamond{0%,100%{background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0px}50%{background-size:22px 22px;background-position:2px 2px,2px 11px,11px -11px,-11px 2px}}
 
 /* Icon animations and active glow */
 .nb svg{display:block;transition:all .2s cubic-bezier(.4,0,.2,1)}
@@ -863,7 +863,11 @@ body.light{--bg:#F0F2F8;--surface:#FFFFFF;--surface2:#E8EAF2;--border:rgba(0,0,0
 body.cream{--bg:#F5F0E6;--surface:#FDFAF4;--surface2:#EDE8DF;--border:rgba(0,0,0,.1);--text:#3D3425;--text2:#7A6F60;--text3:#5A4F40}
 body.lavender{--bg:#E8E4F0;--surface:#F4F1FA;--surface2:#DDD8EA;--border:rgba(0,0,0,.08);--text:#3D3250;--text2:#6B5F80;--text3:#4A3F60}
 body.peach{--bg:#FFF0EA;--surface:#FFFAF6;--surface2:#F0E5DB;--border:rgba(0,0,0,.08);--text:#4A2820;--text2:#8A6050;--text3:#6A4030}
-body.light,body.cream,body.lavender,body.peach{color:var(--text)}
+body.ash{--bg:#F0F2F5;--surface:#FFFFFF;--surface2:#E8ECF0;--border:rgba(0,0,0,.08);--text:#1A1C23;--text2:#6B7494;--text3:#4A5080}
+body.honey{--bg:#FFF8E1;--surface:#FFFDE7;--surface2:#FFF8E1;--border:rgba(0,0,0,.08);--text:#3E2723;--text2:#8A7A60;--text3:#6A5A40}
+body.sky{--bg:#E3F2FD;--surface:#F8FBFF;--surface2:#E3F2FD;--border:rgba(0,0,0,.08);--text:#1A237E;--text2:#5A6A9E;--text3:#3A4A7E}
+body.mintLight{--bg:#E8F5E9;--surface:#F1F8F4;--surface2:#E8F5E9;--border:rgba(0,0,0,.08);--text:#1B5E20;--text2:#4A7A50;--text3:#2A5A30}
+body.light,body.cream,body.lavender,body.peach,body.ash,body.honey,body.sky,body.mintLight{color:var(--text)}
 body.light .card,body.light .modal,body.cream .card,body.cream .modal,body.lavender .card,body.lavender .modal,body.peach .card,body.peach .modal{background:var(--surface);border:1px solid var(--border)}
 body.light .field,body.cream .field,body.lavender .field,body.peach .field{background:rgba(0,0,0,.04);border-color:rgba(0,0,0,.12);color:var(--text)}
 body.light .bub,body.cream .bub,body.lavender .bub,body.peach .bub{color:var(--text)}
@@ -17255,11 +17259,18 @@ function SnakeGame({onBack, level, onWin, toast}) {
   const boardSize = Math.min(520, window.innerWidth - 40);
   const cellSize = boardSize / gridSize;
   
+  const particlesRef = useRef([]);
+  const scorePopupsRef = useRef([]);
+  const pulseRef = useRef(0);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const cs = boardSize / gridSize;
+    
+    pulseRef.current += 0.05;
+    const pulse = Math.sin(pulseRef.current) * 0.3 + 0.7;
     
     // Rich background gradient
     const bgGrad = ctx.createLinearGradient(0, 0, boardSize, boardSize);
@@ -17269,24 +17280,33 @@ function SnakeGame({onBack, level, onWin, toast}) {
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, boardSize, boardSize);
     
-    // Grid pattern - subtle cyan
-    ctx.strokeStyle = 'rgba(6, 214, 160, 0.06)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= gridSize; i++) {
-      ctx.beginPath(); ctx.moveTo(i*cs, 0); ctx.lineTo(i*cs, boardSize); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0, i*cs); ctx.lineTo(boardSize, i*cs); ctx.stroke();
+    // Grid pattern - subtle cyan dots instead of lines
+    ctx.fillStyle = 'rgba(6, 214, 160, 0.08)';
+    for (let i = 0; i < gridSize; i++) {
+      for (let j = 0; j < gridSize; j++) {
+        if ((i+j)%2===0) { ctx.fillRect(i*cs+cs/2-0.5, j*cs+cs/2-0.5, 1, 1); }
+      }
     }
     
-    // Ambient glow under snake path
-    ctx.shadowColor = 'rgba(6, 214, 160, 0.15)';
-    ctx.shadowBlur = 40;
-    snake.forEach(seg => {
-      ctx.fillStyle = 'rgba(6, 214, 160, 0.08)';
-      ctx.fillRect(seg.x*cs, seg.y*cs, cs, cs);
-    });
-    ctx.shadowBlur = 0;
+    // Draw connecting segments between snake parts
+    if (snake.length > 1) {
+      for (let i = 0; i < snake.length - 1; i++) {
+        const cur = snake[i], next = snake[i+1];
+        const t = i / snake.length;
+        const r = Math.round(6 + t * 20);
+        const g = Math.round(214 - t * 40);
+        const b = Math.round(160 - t * 30);
+        const midX = ((cur.x + next.x) / 2) * cs + cs/2;
+        const midY = ((cur.y + next.y) / 2) * cs + cs/2;
+        const grad = ctx.createRadialGradient(midX, midY, 0, midX, midY, cs*0.6);
+        grad.addColorStop(0, `rgba(${r+20},${g+20},${b+20},0.9)`);
+        grad.addColorStop(1, `rgba(${r+20},${g+20},${b+20},0)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(midX-cs*0.6, midY-cs*0.6, cs*1.2, cs*1.2);
+      }
+    }
     
-    // Draw snake with gradient effect
+    // Draw snake with gradient effect - connecting segments
     snake.forEach((seg, idx) => {
       const t = idx / snake.length;
       const isHead = idx === 0;
@@ -17296,15 +17316,15 @@ function SnakeGame({onBack, level, onWin, toast}) {
       const g = isHead ? 214 : Math.round(214 - t * 40);
       const b = isHead ? 160 : Math.round(160 - t * 30);
       
-      const pad = isHead ? 2 : 3;
-      
-      // Outer glow for head
       if (isHead) {
         ctx.shadowColor = 'rgba(6, 214, 160, 0.9)';
         ctx.shadowBlur = 25;
+      } else if (idx < 3) {
+        ctx.shadowColor = 'rgba(6, 214, 160, 0.3)';
+        ctx.shadowBlur = 12;
       }
       
-      // Main body
+      // Main body segment
       const grad = ctx.createRadialGradient(
         seg.x*cs+cs/2, seg.y*cs+cs/2, 0,
         seg.x*cs+cs/2, seg.y*cs+cs/2, cs/2
@@ -17312,62 +17332,112 @@ function SnakeGame({onBack, level, onWin, toast}) {
       grad.addColorStop(0, `rgba(${r+30},${g+30},${b+30},1)`);
       grad.addColorStop(0.7, `rgba(${r},${g},${b},1)`);
       grad.addColorStop(1, `rgba(${r-20},${g-20},${b-20},1)`);
-      
       ctx.fillStyle = grad;
       
-      const radius = isHead ? cs*0.42 : cs*0.32;
+      const pad = isHead ? 1 : 2;
+      const radius = isHead ? cs*0.43 : cs*0.35;
       const x = seg.x*cs+pad, y = seg.y*cs+pad, w = cs-pad*2, h = cs-pad*2;
       
       ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(x, y, w, h, radius) : ctx.rect(x, y, w, h);
+      if (ctx.roundRect) ctx.roundRect(x, y, w, h, radius);
+      else ctx.rect(x, y, w, h);
       ctx.fill();
       ctx.shadowBlur = 0;
       
-      // Head details - eyes
+      // Connecting bridge to next segment
+      if (idx < snake.length - 1) {
+        const next = snake[idx+1];
+        const dx = next.x - seg.x, dy = next.y - seg.y;
+        const bridgeW = cs * 0.6, bridgeH = cs * 0.45;
+        const bx = seg.x*cs + (dx>0?cs*0.5:dx<0?-cs*0.1:cs*0.2);
+        const by = seg.y*cs + (dy>0?cs*0.5:dy<0?-cs*0.1:cs*0.2);
+        ctx.fillStyle = grad;
+        if (dx !== 0) ctx.fillRect(bx, seg.y*cs+cs*0.25, bridgeW, bridgeH);
+        else ctx.fillRect(seg.x*cs+cs*0.25, by, bridgeH, bridgeW);
+      }
+      
+      // Head details
       if (isHead) {
+        const cx = seg.x*cs+cs/2, cy = seg.y*cs+cs/2;
+        // Draw tongue when moving
+        const tongueLen = cs * 0.5;
+        const dir = dirRef.current;
+        const tx = cx + dir.x * tongueLen;
+        const ty = cy + dir.y * tongueLen;
+        ctx.strokeStyle = 'rgba(255,77,109,0.8)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(cx+dir.x*cs*0.4, cy+dir.y*cs*0.4);
+        ctx.lineTo(tx, ty); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx+dir.y*3, ty+dir.x*3); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx-dir.y*3, ty-dir.x*3); ctx.stroke();
+        
+        // Eyes
         ctx.fillStyle = '#fff';
         const eyeSize = cs*0.18, eyeOffset = cs*0.28;
-        const cx = seg.x*cs+cs/2, cy = seg.y*cs+cs/2;
         let ex1,ey1,ex2,ey2;
-        
-        if (dirRef.current.x===1) { ex1=cx+eyeOffset*0.4; ey1=cy-eyeOffset*0.8; ex2=cx+eyeOffset*0.4; ey2=cy+eyeOffset*0.8; }
-        else if (dirRef.current.x===-1) { ex1=cx-eyeOffset*0.4; ey1=cy-eyeOffset*0.8; ex2=cx-eyeOffset*0.4; ey2=cy+eyeOffset*0.8; }
-        else if (dirRef.current.y===-1) { ex1=cx-eyeOffset*0.8; ey1=cy-eyeOffset*0.4; ex2=cx+eyeOffset*0.8; ey2=cy-eyeOffset*0.4; }
+        if (dir.x===1) { ex1=cx+eyeOffset*0.4; ey1=cy-eyeOffset*0.8; ex2=cx+eyeOffset*0.4; ey2=cy+eyeOffset*0.8; }
+        else if (dir.x===-1) { ex1=cx-eyeOffset*0.4; ey1=cy-eyeOffset*0.8; ex2=cx-eyeOffset*0.4; ey2=cy+eyeOffset*0.8; }
+        else if (dir.y===-1) { ex1=cx-eyeOffset*0.8; ey1=cy-eyeOffset*0.4; ex2=cx+eyeOffset*0.8; ey2=cy-eyeOffset*0.4; }
         else { ex1=cx-eyeOffset*0.8; ey1=cy+eyeOffset*0.4; ex2=cx+eyeOffset*0.8; ey2=cy+eyeOffset*0.4; }
-        
-        // Eye whites
         ctx.shadowColor = 'rgba(255,255,255,0.5)';
         ctx.shadowBlur = 8;
         ctx.beginPath(); ctx.arc(ex1,ey1,eyeSize,0,Math.PI*2); ctx.fill();
         ctx.beginPath(); ctx.arc(ex2,ey2,eyeSize,0,Math.PI*2); ctx.fill();
         ctx.shadowBlur = 0;
-        
-        // Pupils
         ctx.fillStyle = '#0a0f1a';
         ctx.beginPath(); ctx.arc(ex1,ey1,eyeSize*0.5,0,Math.PI*2); ctx.fill();
         ctx.beginPath(); ctx.arc(ex2,ey2,eyeSize*0.5,0,Math.PI*2); ctx.fill();
       }
     });
     
-    // Food with pulsing glow effect
+    // Draw particles
+    const parts = particlesRef.current;
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const p = parts[i];
+      p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+      if (p.life <= 0) { parts.splice(i, 1); continue; }
+      ctx.globalAlpha = p.life;
+      ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    
+    // Score popups
+    const pops = scorePopupsRef.current;
+    for (let i = pops.length - 1; i >= 0; i--) {
+      const pop = pops[i];
+      pop.y -= 1.5; pop.life -= 0.025;
+      if (pop.life <= 0) { pops.splice(i, 1); continue; }
+      ctx.globalAlpha = pop.life;
+      ctx.fillStyle = '#FFD700';
+      ctx.font = `bold ${20 * pop.life}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('+1', pop.x, pop.y);
+    }
+    ctx.globalAlpha = 1;
+    
+    // Food
+    const foodSize = cs * 0.42 * pulse;
     ctx.shadowColor = 'rgba(255, 77, 109, 0.9)';
     ctx.shadowBlur = 30;
     const foodGrad = ctx.createRadialGradient(
       food.x*cs+cs/2, food.y*cs+cs/2, 0,
-      food.x*cs+cs/2, food.y*cs+cs/2, cs*0.45
+      food.x*cs+cs/2, food.y*cs+cs/2, cs*0.5
     );
     foodGrad.addColorStop(0, '#ff6b8a');
     foodGrad.addColorStop(0.5, '#FF4D6D');
     foodGrad.addColorStop(1, '#cc3d55');
     ctx.fillStyle = foodGrad;
-    
-    ctx.beginPath(); ctx.arc(food.x*cs+cs/2, food.y*cs+cs/2, cs*0.42, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(food.x*cs+cs/2, food.y*cs+cs/2, foodSize, 0, Math.PI*2); ctx.fill();
     ctx.shadowBlur = 0;
-    
     // Food shine
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.beginPath(); ctx.arc(food.x*cs+cs*0.35, food.y*cs+cs*0.35, cs*0.12, 0, Math.PI*2); ctx.fill();
-  }, [snake, food, boardSize, gridSize]);
+    ctx.beginPath(); ctx.arc(food.x*cs+cs*0.35, food.y*cs+cs*0.35, cs*0.1, 0, Math.PI*2); ctx.fill();
+    // Inner ring glow
+    ctx.strokeStyle = `rgba(255,255,255,${0.2*pulse})`;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(food.x*cs+cs/2, food.y*cs+cs/2, cs*0.38, 0, Math.PI*2); ctx.stroke();
+  }, [snake, food, boardSize, gridSize, score]);
   
   useEffect(() => {
     if (!running) return;
@@ -17390,6 +17460,13 @@ function SnakeGame({onBack, level, onWin, toast}) {
         const newSnake = [newHead,...prev];
         if (newHead.x===food.x&&newHead.y===food.y) {
           setScore(s=>s+1);
+          const cs = boardSize / gridSize;
+          for (let i = 0; i < 12; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 1 + Math.random() * 3;
+            particlesRef.current.push({x:food.x*cs+cs/2,y:food.y*cs+cs/2,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,life:1,color:['#06D6A0','#FFD700','#FF4D6D','#4CC9F0','#fff'][Math.floor(Math.random()*5)],size:2+Math.random()*4});
+          }
+          scorePopupsRef.current.push({x:food.x*cs+cs/2,y:food.y*cs,life:1});
           let newFood;
           do { newFood={x:Math.floor(Math.random()*gridSize),y:Math.floor(Math.random()*gridSize)}; }
           while (newSnake.some(s=>s.x===newFood.x&&s.y===newFood.y));
@@ -17453,7 +17530,7 @@ function WordleGame({onBack, toast}) {
   const [wordLength, setWordLength] = useState(null);
   const [usedWords, setUsedWords] = useState(() => { try { return JSON.parse(localStorage.getItem('lmv_wordle_used') || '[]'); } catch { return []; } });
   
-  const ALL_WORDS_RAW = ['AMORE','VERDE','MUSICA','TORTA','LIBRO','TAVOLO','STELLA','FIUME','PONTE','DOLCE','FRESCO','CALDO','NOTTE','LUNGO','MARE','VENTO','FIORE','ERBA','ALBERO','CIELO','PIETRA','FUOCO','ACQUA','TERRA','TEMPO','MONDO','VITA','CASA','MANO','BOCCA','DENTE','GAMBA','PIEDE','TESTA','CUORE','SANGUE','OSSO','PELLE','CARNE','NASO','GOLA','COLLO','DITO','LUNA','SOLE','NEVE','ALBA','SERENO','PIOGGIA','FREDDO','BUIO','LUCE','FONTE','STRADA','PORTA','CHIESA','FORTE','PIANO','ALTO','BASSO','LARGO','STRETTO','CORTO','GRANDE','PICCOLO','BELLO','BUONO','MORBIDO','PIENO','VUOTO','APERTO','CHIUSO','VECCHIO','GIOVANE','RICCO','POVERO','FELICE','TRISTE','ALLEGRO','STANCO','PRONTO','SAGGIO','GENTILE','ONESTO','GIUSTO','VERO','REALE','IDEALE','FINALE','PRIMA','DOPO','MAI','SEMPRE','TANTO','POCO','MOLTO','FORSE','CERTO','SICURO','PROPRIO','NOSTRO','VOSTRO','PRANZO','CENA','PASTO','SALA','CAMERA','LETTO','DIVANO','POLTRONA','SCRIVANIA','LIBRERIA','CUCINA','FORNO','FRIGO','LAVARE','STIRARE','PULIRE','SPAZZARE','CUCINARE','MANGIARE','BERE','DORMIRE','VEGLIARE','LAVORARE','GIOCARE','STUDIARE','LEGGERE','SCRIVERE','PARLARE','ASCOLTARE','GUARDARE','VEDERE','SENTIRE','TOCCARE','PENSARE','SOGNARE','SPERARE','AMARE','ODIARE','TEMERE','RIDERE','PIANGERE','SORRIDERE','SALIRE','SCENDERE','ENTRARE','USCIRE','ANDARE','VENIRE','TORNARE','RESTARE','PARTIRE','ARRIVARE','CORRERE','CAMMINARE','SALTARE','NUOTARE','VOLARE','CADERE','ALZARE','ABBASSARE','APRIRE','CHIUDERE','ACCENDERE','SPEGNERE','COMPRARE','VENDERE','PAGARE','SPENDERE','RISPARMIARE','GUADAGNARE','PERDERE','TROVARE','CERCARE','DOMANDARE','RISPONDERE','CHIEDERE','DIRE','FARE','DARE','PRENDERE','METTERE','PORTARE','LASCIARE','TENERE','AVERE','ESSERE','STARE','DOVERE','POTERE','VOLERE','SAPERE','CONOSCERE','CREDERE','IMPARARE','INSEGNARE','CAPIRE','SPIEGARE','MOSTRARE','NASCONDERE','TROVARE','PERDERE','VINCIERE','COMINCIARE','FINIRE','CONTINUARE','SMETTERE','PROVARE','RIUSCIRE','SBAGLIARE','INDOVINARE','CORREGGERE','MIGLIORARE','PEGGIORARE','CAMBIARE','RESTARE','DIVENTARE','SEMBRARE','PARERE','RIMANERE','TORNARE','RITORNARE','RIPETERE','RICORDARE','DIMENTICARE','PENSARE','RIFLETTERE','IMMAGINARE','FANTASIA','REALTA','VERITA','BUGIA','SEGRETO','MISTERO','SORPRESA','MERAVIGLIA','STUPORE','CURIOSITA','INTERESSE','NOIA','PIACERE','DOLORE','GIOIA','TRISTEZZA','PAURA','CORAGGIO','FORZA','DEBOLEZZA','SALUTE','MALATTIA','CURA','MEDICINA','DOTTORE','PAZIENTE','OSPEDALE','FARMACIA','PRONTO','SOCORSO','EMERGENZA','PERICOLO','SICUREZZA','DIFESA','ATTACCO','DIFENDERE','PROTEGGERE','AIUTARE','SALVARE','LIBERARE','PRIGIONE','CARCERE','LIBERTA','GIUSTIZIA','LEGGE','REGOLA','NORMA','DIRITTO','DOVERE','OBBLIGO','PERMESSO','VIETO','CONSENTIRE','IMPEDIRE','PERMETTERE','VIETARE','ORDINARE','COMANDARE','UBBIDIRE','RIBELLARE','PROTESTARE','LOTTARE','COMBATTERE','VINCERE','PERDERE','TRIONFO','SCONFITTA','SUCCESSO','INSUCCESSO','ESITO','FINE','INIZIO','PARTENZA','ARRIVO','META','DESTINO','SORTE','FORTUNA','SFORTUNA','CASO','EVENTO','FATTO','SITUAZIONE','CONDIZIONE','STATO','CIRCOSTANZA','CONTESTO','AMBIENTE','LUOGO','POSTO','POSIZIONE','DISTANZA','VICINANZA','LONTANANZA','PROSSIMITA','CENTRO','PERIFERIA','BORDO','MARGINE','LIMITE','CONFINE','FRONTIERA','PASSAGGIO','STRADA','VIA','VIALE','PIAZZA','CORSO','TRAVERSA','INCROCIO','SEMAFORO','ROTATORIA','AUTOSTRADA','TANGENZIALE','IMPATTO','URTO','COLPO','BOTTO','RUMORE','SUONO','MUSICA','MELODIA','ARMONIA','RITMO','TEMPO','BATTITO','PULSAZIONE','FREQUENZA','VELOCITA','LENTEZZA','RAPIDITA','PRONTEZZA','AGILITA','DESTREZZA','ABILITA','CAPACITA','COMPETENZA','ESPERIENZA','PRATICA','TEORIA','PRINCIPIO','REGOLA','NORMA','CRITERIO','METODO','SISTEMA','PROCEDURA','TECNICA','ARTE','SCIENZA','CULTURA','LETTERATURA','POESIA','NARRATIVA','ROMANZO','RACCONTO','NOVELLA','FAVOLA','MITO','LEGGENDA','STORIA','PASSATO','PRESENTE','FUTURO','DOMANI','IERI','OGGI','STAMATTINA','STASERA','NOTTATA','MEZZOGIORNO','MEZZANOTTE','MATTINO','POMERIGGIO','SERATA','CREPUSCOLO','AURORA','ALBA','TRAMONTO','PRIMAVERA','ESTATE','AUTUNNO','INVERNO','GENNAIO','FEBBRAIO','MARZO','APRILE','MAGGIO','GIUGNO','LUGLIO','AGOSTO','SETTEMBRE','OTTOBRE','NOVEMBRE','DICEMBRE','LUNEDI','MARTEDI','MERCOLEDI','GIOVEDI','VENERDI','SABATO','DOMENICA','SETTIMANA','MESE','ANNO','SECOLO','MILLENNIO','ISTANTE','MOMENTO','ATTIMO','MINUTO','ORA','GIORNO','NOTTE','ALBA','TRAMONTO','MEZZOGIORNO','MEZZANOTTE','CREPUSCOLO','AURORA','MATTINO','POMERIGGIO','SERATA','NOTTATA','STAMATTINA','STASERA','IERISERA','DOMANI','DOPODOMANI','IERI','LUNEDI','MARTEDI','MERCOLEDI','GIOVEDI','VENERDI','SABATO','DOMENICA','FESTIVO','FERIALE','LAVORATIVO','RIPOSO','VACANZA','FESTA','CELEBRAZIONE','COMMEMORAZIONE','ANNIVERSARIO','COMPLEANNO','MATRIMONIO','BATTESIMO','CRESCIMA','FUNERALE','SEPOLTURA','CREMAZIONE','LUTTO','GIOIA','FELICITA','CONTENTO','ALLEGRIA','TRISTEZZA','DOLORE','SOFFERENZA','PENSIERO','PREOCCUPAZIONE','ANSIA','PAURA','TERRORE','SPAVENTO','ORRORE','ANGOSCIA','DISPERAZIONE','SPERANZA','FIDUCIA','CORAGGIO','FORZA','VIGORE','ENERGIA','VITALITA','SALUTE','BENESSERE','MALESSERE','FATICA','STANCHEZZA','SONNO','RIPOSO','SONNO','VEGLIA','INSONNIA','SOGNO','INCUBO','FANTASMA','SPIRITO','ANIMA','CORPO','MENTE','CUORE','CERVELLO','POLMONE','STOMACO','FEGATO','RENE','INTESTINO','MUSCOLO','OSSO','PELLE','SANGUE','NERVO','VENA','ARTERIA','TENDINE','LEGAMENTO','ARTICOLAZIONE','DITO','MANO','BRACCIO','SPALLA','GOMITO','POLSO','PIEDE','GAMBA','GINOCCHIO','COSCI','ANC','SCH','COLL','TEST','FRONT','GUANC','MENT','NASO','BOCC','LABBR','LING','DENT','OCCH','CIGL','CIGLI','SOPRACCIGL','CAPPELL','ORECCH','UDIT','VISTA','OLFATT','GUST','TATT','SENSO','SENSAZ','EMOZION','SENTIM','PASSION','ISTINT','RAGION','LOGIC','INTELLIG','SAPIENZ','CONOSC','SCIENZ','ARTE','TECNIC','ABILIT','CAPACIT','TALENT','DONO','VIRTU','MERIT','COLP','ERRORE','SBAGL','FALLIM','SUCCESS','VITTOR','TRIONF','SCONFIT','DISFAT','ROVIN','CATAST','DISASTR','TRAGEDI','COMMEDI','DRAMM','FARS','SATIR','IRONI','UMORIS','ALLEGRI','GIOCOND','SERIET','GRAVIT','IMPORT','RILEVANZ','SIGNIF','VALOR','PREZZ','COST','SPES','GUADAGN','PROFIT','PERDIT','DANN','ROVIN','DISTRUZ','CREAZION','PRODUZIONE','FABBRIC','COSTRUZ','EDIFIC','ARCHITETT','DESIGN','PROGETT','PIANIF','PROGRAM','ORGANIZZ','GESTION','AMMINISTR','DIREZ','COMAND','GOVERN','POTER','AUTORIT','INFLUENZ','PRESTIG','FAMA','GLORI','ONOR','MERIT','RICONOSC','PREMI','RICOMPENS','CASTIG','PUNIZION','SANZION','PENAL','MULTA','TASSA','IMPOSTA','CONTRIB','QUOTA','PARTE','PORZION','FRAZION','SEZION','DIVIS','UNION','INSIEM','GRUPP','SQUADR','EQUIP','COMPAGN','ASSOCIAZ','ORGANIZZ','ISTITUZ','ENTE','UFFICI','MINIST','DIPARTIM','SERVIZI','FUNZION','ATTIVIT','LAVOR','IMPIEG','OCCUPAZ','PROFESS','MESTIER','ARTE','TECNIC','SCUOL','UNIVERS','COLLEG','ACCADEM','CORS','LEZION','INSEGN','DOCENT','PROFESS','MAESTR','ALUNN','STUDENT','SCOLAR','DISCENT','APPREND','FORMAZION','ISTRUZ','EDUCAZ','CULTUR','SAPER','CONOSC','SCIENZ','RICERC','STUDI','INDAGIN','ANALIS','ESAM','VERIFIC','CONTROL','ISPEZION','SORVEGL','VIGILANZ','GUARDI','DIFES','PROTEZ','SICUREZZ','SALVAGUARD','TUTEL','CURA','ASSISTENZ','AIUT','SOSTEGN','SUPPORT','APPoggio','FONDAM','BAS','RADIC','ORIGIN','CAUS','MOTIV','RAGION','SCOP','PRETEST','SCUS','GIUSTIF','SPIEGAZ','MOTIVAZ','ARGOMENT','TESI','OPINION','PENS','IDEA','CONCETT','NOTION','RAPPRESENT','IMMAGIN','FIGUR','SIMBOL','SEGNO','INDIC','INDIZI','PROV','TESTIMON','DOCUMENT','CERTIFIC','ATTESTAZ','DICHIARAZ','AFFERM','ASSERZ','PROPOSIZ','FRAS','PERIOD','DISCORS','CONVERSAZ','DIALOG','COLLOQUI','DISCUSSION','DEBATT','CONTESA','LITIG','DISPUTA','CERTAM','GARA','COMPETIZ','TORNEO','CAMPION','OLIMPIAD','GIOCH','SPORT','ATLETIC','CALCIO','TENNIS','NUOT','CICLISM','SCI','PATTINAG','SCHERM','BOXE','LUCCI','ATLET','SPORTIV','GIOCAT','SQUADR','ALLENAT','MISTER','ARBITR','GIUDIC','GIUR','TRIBUN','CORTE','PROCESS','CAUS','LITIG','VERD','SENTENZ','CONDANN','ASSOLUZ','SCAGION','INNOCE','COLPEV','REO','IMPUTAT','ACCUSAT','DIFENS','AVVOCAT','PROCURAT','NOTAI','GIUDIC','MAGISTRAT','CARABINIER','POLIZI','GUARDI','VIGIL','AGENTE','ISPEETTOR','COMMISSARI','QUESTOR','PREFETT','SINDAC','ASSESSOR','CONSIGLIER','DEPUTAT','SENAT','MINISTR','PRESIDENT','REPUBBLIC','MONARC','RE','REGIN','PRINCIPE','PRINCIPESS','DUCA','DUCHESS','CONTE','CONTESS','BARON','BARONESS','MARCHES','CAVALIER','NOBIL','POPOLO','CITTADIN','SUDDIT','STRANIER','FORESTIER','OSPIT','INVITAT','AMIC','NEMIC','RIVAL','AVVERSAR','COMPAGN','AMIC','PARENT','FAMIGLI','GENITOR','PADR','MADR','FIGLI','FRATEL','SORELL','NONN','ZII','CUGIN','NIPO','ZIO','ZIA','NONN','BISNONN','PRONIPOT','SUOCER','GENER','NUOR','COGNAT','PARENT','AFFIN','AMIC','CONOSCENT','VICIN','CONCITTADIN','COMPATRIOT','STRANIER','FORESTIER','OSPIT','VIAGGIAT','TURIST','PELLEGRIN','ESPLORAT','NAVIGAT','MARINAR','PILOT','AERONAUT','ASTRONAUT','COSMONAUT','SCIENZIAT','RICERCAT','STUDIOS','ERUDIT','DOTT','PROFESS','INSEGN','MAESTR','EDUCAT','FORMAT','ADDESTRAT','ALLENAT','PREPARAT','ORGANIZZAT','PROGRAMMAT','PROGETTIST','CREAT','INVENT','SCOPRIT','PIONIER','FONDAT','ISTITUTOR','CREAT','PRODUTTOR','FABBRICAT','COSTRUTTOR','EDIFICAT','ARCHITETT','INGEGNER','TECNIC','OPERAI','ARTIGIAN','MAESTRANZ','LAVORAT','IMPIEGAT','DIRIGENT','MANAGER','IMPRENDIT','COMMERCIANT','NEGOCIANT','VENDIT','ACQUIST','COMPRA','VENDIT','SCAMBI','BARATT','PERMUT','DONAZION','REGAL','OMAGG','OFFERT','PROPOST','SUGGERIM','CONSIGL','PARER','GIUDIZI','VALUTAZ','STIM','APPREZZ','CRITIC','RECENS','REVISION','ANALIS','ESAM','INDAGIN','INCHIEST','SONDAGG','RICERC','STUDI','ESPERIMENT','PROV','TEST','VERIFIC','CONTROL','ISPEZION','SORVEGL','VIGILANZ','GUARDI','OSSERVAZ','ATTENZION','CURA','DEDIZION','IMPEGN','SFORZ','FATIC','LAVOR','OPERAZ','AZION','ATTIVIT','GEST','COMPORT','CONDOT','MOD','MANIER','STIL','FORMA','ASPETT','FIGUR','IMMAGIN','APPARENZ','ESTERIOR','INTERIOR','ANIM','SPIRIT','MENTAL','PSICHIC','FISIC','CORPOR','MATERIA','SOSTANZ','ELEMENT','COMPONENT','PARTICELL','ATOMO','MOLECOL','ELETTRON','PROTON','NEUTRON','FOTON','QUANTO','ENERGI','FORZ','CAMPO','OND','SUON','LUC','CALOR','ELETTRICIT','MAGNETISM','GRAVIT','RADIAZ','LUC','COLORE','SPETTR','PRISM','LENTE','SPECCHI','VETRO','CRISTALL','DIAMANT','ZAFFIR','RUBIN','SMERALD','TOPAZI','OPAL','PERL','CORALL','AMBR','GIAIETT','CARBON','DIAMANT','GRAFIT','ANTRACIT','LIGNIT','TORB','PETROLI','BENZIN','GASOLI','CHEROSEN','GAS','METAN','PROPAN','BUTAN','IDROGEN','OSSIGEN','AZOT','CARBON','ELIO','NEON','ARGON','KRIPTON','XENON','RADON','FLUOR','CLOR','BROM','IODI','ZOLFO','FOSFOR','SILICI','ALLUMINI','MAGNESI','SODI','POTASSI','CALCI','FERRO','RAME','ZINC','PIOMB','STAGN','NICHEL','CROM','MANGANES','COBALT','TITANI','VANADI','TUNGSTEN','MOLIBDEN','URANI','PLUTONI','TORI','RADI','POLONI','ASTAT','FRANCI','CESI','RUBIDI','LITI','BERILLI','BOR','NEON','FLUOR','SODI','MAGNESI','ALLUMINI','SILICI','FOSFOR','ZOLFO','CLOR','ARGON','POTASSI','CALCI','SCANDI','TITANI','VANADI','CROM','MANGANES','FERRO','COBALT','NICHEL','RAME','ZINC','GALLI','GERMANI','ARSENIC','SELENI','BROM','KRIPTON','RUBIDI','STRONZI','ITTRI','ZIRCONI','NIOBI','MOLIBDEN','TECNEZI','RUTENI','RODI','PALLADI','ARGENT','CADMI','INDI','STAGN','ANTIMONI','TELLURI','IODI','XENON','CESI','BARI','LANTANI','CERI','PRASEODIMI','NEODIMI','PROMETI','SAMARI','EUROPI','GADOLINI','TERBI','DISPROSI','OLMI','ERBIO','TULI','ITTEBRI','LUTETI','AFNI','TANTALI','TUNGSTEN','RENI','OSMI','IRIDI','PLATIN','ORO','MERCURI','TALLI','PIOMB','BISMUT','POLONI','ASTAT','RADON','FRANCI','RADI','ATTINI','TORI','PROTATTINI','URANI','NETTUNI','PLUTONI','AMERICI','CURI','BERKELI','CALIFORNI','EINSTEINI','FERMI','MENDELEVI','NOBELI','LAURENZI','RUTERFORI','DUBNI','SEABORGI','BOHRI','ASSI','MEITNERI','DARMSTADTI','ROENTGENI','COPERNICI','NIHONI','FLEROVI','MOSCOVI','LIVERMORI','TENNESSI','OGANESSON'];
+  const ALL_WORDS_RAW = ['AMORE', 'VERDE', 'MUSICA', 'TORTA', 'LIBRO', 'TAVOLO', 'STELLA', 'FIUME', 'PONTE', 'DOLCE', 'FRESCO', 'CALDO', 'NOTTE', 'LUNGO', 'MARE', 'VENTO', 'FIORE', 'ERBA', 'ALBERO', 'CIELO', 'PIETRA', 'FUOCO', 'ACQUA', 'TERRA', 'TEMPO', 'MONDO', 'VITA', 'CASA', 'MANO', 'BOCCA', 'DENTE', 'GAMBA', 'PIEDE', 'TESTA', 'CUORE', 'SANGUE', 'OSSO', 'PELLE', 'CARNE', 'NASO', 'GOLA', 'COLLO', 'DITO', 'LUNA', 'SOLE', 'NEVE', 'ALBA', 'SERENO', 'PIOGGIA', 'FREDDO', 'BUIO', 'LUCE', 'FONTE', 'STRADA', 'PORTA', 'CHIESA', 'FORTE', 'PIANO', 'ALTO', 'BASSO', 'LARGO', 'STRETTO', 'CORTO', 'GRANDE', 'PICCOLO', 'BELLO', 'BUONO', 'MORBIDO', 'PIENO', 'VUOTO', 'APERTO', 'CHIUSO', 'VECCHIO', 'GIOVANE', 'RICCO', 'POVERO', 'FELICE', 'TRISTE', 'ALLEGRO', 'STANCO', 'PRONTO', 'SAGGIO', 'GENTILE', 'ONESTO', 'GIUSTO', 'VERO', 'REALE', 'IDEALE', 'FINALE', 'PRIMA', 'DOPO', 'SEMPRE', 'TANTO', 'POCO', 'MOLTO', 'FORSE', 'CERTO', 'SICURO', 'PROPRIO', 'NOSTRO', 'VOSTRO', 'PRANZO', 'CENA', 'PASTO', 'SALA', 'CAMERA', 'LETTO', 'DIVANO', 'POLTRONA', 'SCRIVANIA', 'LIBRERIA', 'CUCINA', 'FORNO', 'FRIGO', 'LAVARE', 'STIRARE', 'PULIRE', 'SPAZZARE', 'CUCINARE', 'MANGIARE', 'BERE', 'DORMIRE', 'VEGLIARE', 'LAVORARE', 'GIOCARE', 'STUDIARE', 'LEGGERE', 'SCRIVERE', 'PARLARE', 'ASCOLTARE', 'GUARDARE', 'VEDERE', 'SENTIRE', 'TOCCARE', 'PENSARE', 'SOGNARE', 'SPERARE', 'AMARE', 'ODIARE', 'TEMERE', 'RIDERE', 'PIANGERE', 'SORRIDERE', 'SALIRE', 'SCENDERE', 'ENTRARE', 'USCIRE', 'ANDARE', 'VENIRE', 'TORNARE', 'RESTARE', 'PARTIRE', 'ARRIVARE', 'CORRERE', 'CAMMINARE', 'SALTARE', 'NUOTARE', 'VOLARE', 'CADERE', 'ALZARE', 'ABBASSARE', 'APRIRE', 'CHIUDERE', 'ACCENDERE', 'SPEGNERE', 'COMPRARE', 'VENDERE', 'PAGARE', 'SPENDERE', 'RISPARMIARE', 'GUADAGNARE', 'PERDERE', 'TROVARE', 'CERCARE', 'DOMANDARE', 'RISPONDERE', 'CHIEDERE', 'DIRE', 'FARE', 'DARE', 'PRENDERE', 'METTERE', 'PORTARE', 'LASCIARE', 'TENERE', 'AVERE', 'ESSERE', 'STARE', 'DOVERE', 'POTERE', 'VOLERE', 'SAPERE', 'CONOSCERE', 'CREDERE', 'IMPARARE', 'INSEGNARE', 'CAPIRE', 'SPIEGARE', 'MOSTRARE', 'NASCONDERE', 'VINCERE', 'COMINCIARE', 'FINIRE', 'CONTINUARE', 'SMETTERE', 'PROVARE', 'RIUSCIRE', 'SBAGLIARE', 'INDOVINARE', 'CORREGGERE', 'MIGLIORARE', 'PEGGIORARE', 'CAMBIARE', 'DIVENTARE', 'SEMBRARE', 'PARERE', 'RIMANERE', 'RITORNARE', 'RIPETERE', 'RICORDARE', 'DIMENTICARE', 'RIFLETTERE', 'IMMAGINARE', 'FANTASIA', 'REALTA', 'VERITA', 'BUGIA', 'SEGRETO', 'MISTERO', 'SORPRESA', 'MERAVIGLIA', 'STUPORE', 'CURIOSITA', 'INTERESSE', 'NOIA', 'PIACERE', 'DOLORE', 'GIOIA', 'TRISTEZZA', 'PAURA', 'CORAGGIO', 'FORZA', 'DEBOLEZZA', 'SALUTE', 'MALATTIA', 'CURA', 'MEDICINA', 'DOTTORE', 'PAZIENTE', 'OSPEDALE', 'FARMACIA', 'SOCORSO', 'EMERGENZA', 'PERICOLO', 'SICUREZZA', 'DIFESA', 'ATTACCO', 'DIFENDERE', 'PROTEGGERE', 'AIUTARE', 'SALVARE', 'LIBERARE', 'PRIGIONE', 'CARCERE', 'LIBERTA', 'GIUSTIZIA', 'LEGGE', 'REGOLA', 'NORMA', 'DIRITTO', 'OBBLIGO', 'PERMESSO', 'VIETO', 'CONSENTIRE', 'IMPEDIRE', 'PERMETTERE', 'VIETARE', 'ORDINARE', 'COMANDARE', 'UBBIDIRE', 'RIBELLARE', 'PROTESTARE', 'LOTTARE', 'COMBATTERE', 'TRIONFO', 'SCONFITTA', 'SUCCESSO', 'INSUCCESSO', 'ESITO', 'FINE', 'INIZIO', 'PARTENZA', 'ARRIVO', 'META', 'DESTINO', 'SORTE', 'FORTUNA', 'SFORTUNA', 'CASO', 'EVENTO', 'FATTO', 'SITUAZIONE', 'CONDIZIONE', 'STATO', 'CIRCOSTANZA', 'CONTESTO', 'AMBIENTE', 'LUOGO', 'POSTO', 'POSIZIONE', 'DISTANZA', 'VICINANZA', 'LONTANANZA', 'PROSSIMITA', 'CENTRO', 'PERIFERIA', 'BORDO', 'MARGINE', 'LIMITE', 'CONFINE', 'FRONTIERA', 'PASSAGGIO', 'VIA', 'VIALE', 'PIAZZA', 'CORSO', 'TRAVERSA', 'INCROCIO', 'SEMAFORO', 'ROTATORIA', 'AUTOSTRADA', 'TANGENZIALE', 'IMPATTO', 'URTO', 'COLPO', 'BOTTO', 'RUMORE', 'SUONO', 'MELODIA', 'ARMONIA', 'RITMO', 'BATTITO', 'PULSAZIONE', 'FREQUENZA', 'VELOCITA', 'LENTEZZA', 'RAPIDITA', 'PRONTEZZA', 'AGILITA', 'DESTREZZA', 'ABILITA', 'CAPACITA', 'COMPETENZA', 'ESPERIENZA', 'PRATICA', 'TEORIA', 'PRINCIPIO', 'CRITERIO', 'METODO', 'SISTEMA', 'PROCEDURA', 'TECNICA', 'ARTE', 'SCIENZA', 'CULTURA', 'LETTERATURA', 'POESIA', 'NARRATIVA', 'ROMANZO', 'RACCONTO', 'NOVELLA', 'FAVOLA', 'MITO', 'LEGGENDA', 'STORIA', 'PASSATO', 'PRESENTE', 'FUTURO', 'DOMANI', 'IERI', 'OGGI', 'STAMATTINA', 'STASERA', 'NOTTATA', 'MEZZOGIORNO', 'MEZZANOTTE', 'MATTINO', 'POMERIGGIO', 'SERATA', 'CREPUSCOLO', 'AURORA', 'TRAMONTO', 'PRIMAVERA', 'ESTATE', 'AUTUNNO', 'INVERNO', 'GENNAIO', 'FEBBRAIO', 'MARZO', 'APRILE', 'MAGGIO', 'GIUGNO', 'LUGLIO', 'AGOSTO', 'SETTEMBRE', 'OTTOBRE', 'NOVEMBRE', 'DICEMBRE', 'LUNEDI', 'MARTEDI', 'MERCOLEDI', 'GIOVEDI', 'VENERDI', 'SABATO', 'DOMENICA', 'SETTIMANA', 'MESE', 'ANNO', 'SECOLO', 'MILLENNIO', 'ISTANTE', 'MOMENTO', 'ATTIMO', 'MINUTO', 'GIORNO', 'IERISERA', 'DOPODOMANI', 'FESTIVO', 'FERIALE', 'LAVORATIVO', 'RIPOSO', 'VACANZA', 'FESTA', 'CELEBRAZIONE', 'COMMEMORAZIONE', 'ANNIVERSARIO', 'COMPLEANNO', 'MATRIMONIO', 'BATTESIMO', 'CRESCIMA', 'FUNERALE', 'SEPOLTURA', 'CREMAZIONE', 'LUTTO', 'FELICITA', 'CONTENTO', 'ALLEGRIA', 'SOFFERENZA', 'PENSIERO', 'PREOCCUPAZIONE', 'ANSIA', 'TERRORE', 'SPAVENTO', 'ORRORE', 'ANGOSCIA', 'DISPERAZIONE', 'SPERANZA', 'FIDUCIA', 'VIGORE', 'ENERGIA', 'VITALITA', 'BENESSERE', 'MALESSERE', 'FATICA', 'STANCHEZZA', 'SONNO', 'VEGLIA', 'INSONNIA', 'SOGNO', 'INCUBO', 'FANTASMA', 'SPIRITO', 'ANIMA', 'CORPO', 'MENTE', 'CERVELLO', 'POLMONE', 'STOMACO', 'FEGATO', 'RENE', 'INTESTINO', 'MUSCOLO', 'NERVO', 'VENA', 'ARTERIA', 'TENDINE', 'LEGAMENTO', 'ARTICOLAZIONE', 'BRACCIO', 'SPALLA', 'GOMITO', 'POLSO', 'GINOCCHIO', 'COSCI', 'TEST', 'CIGLI', 'VISTA', 'SENSO', 'TALENT', 'DONO', 'VIRTU', 'ERRORE', 'TRAGEDI', 'COMMEDI', 'IRONI', 'ALLEGRI', 'PRODUZIONE', 'DESIGN', 'FAMA', 'GLORI', 'PREMI', 'MULTA', 'TASSA', 'IMPOSTA', 'QUOTA', 'PARTE', 'ENTE', 'UFFICI', 'SERVIZI', 'STUDI', 'GUARDI', 'TESI', 'IDEA', 'SEGNO', 'INDIZI', 'COLLOQUI', 'CONTESA', 'DISPUTA', 'GARA', 'TORNEO', 'SPORT', 'CALCIO', 'TENNIS', 'BOXE', 'LUCCI', 'CORTE', 'INNOCE', 'NOTAI', 'POLIZI', 'AGENTE', 'COMMISSARI', 'RE', 'PRINCIPE', 'DUCA', 'CONTE', 'POPOLO', 'FAMIGLI', 'FIGLI', 'NIPO', 'OPERAI', 'MANAGER', 'COMPRA', 'SCAMBI', 'GIUDIZI', 'FORMA', 'MATERIA', 'ATOMO', 'PROTON', 'NEUTRON', 'FOTON', 'QUANTO', 'ENERGI', 'CAMPO', 'COLORE', 'LENTE', 'SPECCHI', 'VETRO', 'DIAMANT', 'ZAFFIR', 'SMERALD', 'TOPAZI', 'OPAL', 'CORALL', 'AMBR', 'GRAFIT', 'ANTRACIT', 'LIGNIT', 'PETROLI', 'GASOLI', 'CHEROSEN', 'GAS', 'METAN', 'PROPAN', 'BUTAN', 'ELIO', 'NEON', 'ARGON', 'KRIPTON', 'XENON', 'RADON', 'IODI', 'ZOLFO', 'SILICI', 'ALLUMINI', 'MAGNESI', 'SODI', 'POTASSI', 'CALCI', 'FERRO', 'RAME', 'TITANI', 'VANADI', 'URANI', 'PLUTONI', 'TORI', 'RADI', 'POLONI', 'FRANCI', 'CESI', 'RUBIDI', 'LITI', 'BERILLI', 'SCANDI', 'GALLI', 'GERMANI', 'SELENI', 'STRONZI', 'ITTRI', 'ZIRCONI', 'NIOBI', 'TECNEZI', 'RUTENI', 'RODI', 'PALLADI', 'CADMI', 'INDI', 'ANTIMONI', 'TELLURI', 'BARI', 'LANTANI', 'CERI', 'PRASEODIMI', 'NEODIMI', 'PROMETI', 'SAMARI', 'EUROPI', 'GADOLINI', 'TERBI', 'DISPROSI', 'OLMI', 'ERBIO', 'TULI', 'ITTEBRI', 'LUTETI', 'AFNI', 'TANTALI', 'RENI', 'OSMI', 'IRIDI', 'MERCURI', 'TALLI', 'ATTINI', 'PROTATTINI', 'NETTUNI', 'AMERICI', 'CURI', 'BERKELI', 'CALIFORNI', 'EINSTEINI', 'FERMI', 'MENDELEVI', 'NOBELI', 'LAURENZI', 'RUTERFORI', 'DUBNI', 'SEABORGI', 'BOHRI', 'ASSI', 'MEITNERI', 'DARMSTADTI', 'ROENTGENI', 'COPERNICI', 'NIHONI', 'FLEROVI', 'MOSCOVI', 'LIVERMORI', 'TENNESSI', 'OGANESSON'];
   
   const ALL_WORDS = {
     4: [...new Set(ALL_WORDS_RAW.filter(w => w.length === 4))],
@@ -17711,276 +17788,261 @@ const CHESS_DIFFICULTIES = [
   {id:10,name:'Gran Maestro',icon:'💀',desc:'Il massimo livello',depth:4,randomness:0},
 ];
 
+// ── CHESS ENGINE ──
+const isW = p => '♔♕♖♗♘♙'.includes(p);
+const isB = p => '♚♛♜♝♞♟'.includes(p);
+const cloneBoard = b => b.map(r=>[...r]);
+const initialBoard = [
+  ['♜','♞','♝','♛','♚','♝','♞','♜'],
+  ['♟','♟','♟','♟','♟','♟','♟','♟'],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['','','','','','','',''],
+  ['♙','♙','♙','♙','♙','♙','♙','♙'],
+  ['♖','♘','♗','♕','♔','♗','♘','♖'],
+];
+function findKing(board, white) {
+  const k = white ? '♔' : '♚';
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) if (board[r][c] === k) return [r, c];
+  return null;
+}
+function isAttacked(board, r, c, byWhite) {
+  if (byWhite) { if ((r+1<8&&c-1>=0&&board[r+1][c-1]==='♙')||(r+1<8&&c+1<8&&board[r+1][c+1]==='♙')) return true; }
+  else { if ((r-1>=0&&c-1>=0&&board[r-1][c-1]==='♟')||(r-1>=0&&c+1<8&&board[r-1][c+1]==='♟')) return true; }
+  const n = byWhite ? '♘' : '♞';
+  for (const [dr,dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]) { const nr=r+dr,nc=c+dc; if (nr>=0&&nr<8&&nc>=0&&nc<8&&board[nr][nc]===n) return true; }
+  const bsh = byWhite ? '♗' : '♝', q = byWhite ? '♕' : '♛';
+  for (const [dr,dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]) for (let i=1;i<8;i++) { const nr=r+dr*i,nc=c+dc*i; if (nr<0||nr>=8||nc<0||nc>=8) break; const p=board[nr][nc]; if (p) { if (p===bsh||p===q) return true; break; } }
+  const ro = byWhite ? '♖' : '♜';
+  for (const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]) for (let i=1;i<8;i++) { const nr=r+dr*i,nc=c+dc*i; if (nr<0||nr>=8||nc<0||nc>=8) break; const p=board[nr][nc]; if (p) { if (p===ro||p===q) return true; break; } }
+  const k = byWhite ? '♔' : '♚';
+  for (const [dr,dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) { const nr=r+dr,nc=c+dc; if (nr>=0&&nr<8&&nc>=0&&nc<8&&board[nr][nc]===k) return true; }
+  return false;
+}
+function inCheck(board, white) { const k = findKing(board, white); return k ? isAttacked(board, k[0], k[1], !white) : true; }
+function pseudoMoves(board, r, c, epTarget, cr) {
+  const piece = board[r][c]; if (!piece) return []; const moves = []; const white = isW(piece);
+  const enemy = white ? isB : isW;
+  if (piece === '♙' || piece === '♟') {
+    const dir = white ? -1 : 1, startRow = white ? 6 : 1, promoRow = white ? 0 : 7;
+    if (r+dir>=0&&r+dir<8&&!board[r+dir][c]) {
+      if (r+dir===promoRow) { for (const p of ['Q','R','B','N']) moves.push({r:r+dir,c,promo:p}); }
+      else moves.push({r:r+dir,c});
+      if (r===startRow&&!board[r+2*dir][c]) moves.push({r:r+2*dir,c});
+    }
+    for (const dc of [-1,1]) { const nr=r+dir,nc=c+dc; if (nr<0||nr>=8||nc<0||nc>=8) continue; if (board[nr][nc]&&enemy(board[nr][nc])) { if (nr===promoRow) { for (const p of ['Q','R','B','N']) moves.push({r:nr,c:nc,promo:p}); } else moves.push({r:nr,c:nc}); } if (epTarget&&epTarget[0]===nr&&epTarget[1]===nc) moves.push({r:nr,c:nc,ep:true}); }
+  } else if (piece === '♘' || piece === '♞') {
+    for (const [dr,dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]) { const nr=r+dr,nc=c+dc; if (nr>=0&&nr<8&&nc>=0&&nc<8) { const t=board[nr][nc]; if (!t||enemy(t)) moves.push({r:nr,c:nc}); } }
+  } else if (piece === '♗' || piece === '♝') {
+    for (const [dr,dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]) for (let i=1;i<8;i++) { const nr=r+dr*i,nc=c+dc*i; if (nr<0||nr>=8||nc<0||nc>=8) break; const t=board[nr][nc]; if (!t) moves.push({r:nr,c:nc}); else { if (enemy(t)) moves.push({r:nr,c:nc}); break; } }
+  } else if (piece === '♖' || piece === '♜') {
+    for (const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]) for (let i=1;i<8;i++) { const nr=r+dr*i,nc=c+dc*i; if (nr<0||nr>=8||nc<0||nc>=8) break; const t=board[nr][nc]; if (!t) moves.push({r:nr,c:nc}); else { if (enemy(t)) moves.push({r:nr,c:nc}); break; } }
+  } else if (piece === '♕' || piece === '♛') {
+    for (const [dr,dc] of [[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]) for (let i=1;i<8;i++) { const nr=r+dr*i,nc=c+dc*i; if (nr<0||nr>=8||nc<0||nc>=8) break; const t=board[nr][nc]; if (!t) moves.push({r:nr,c:nc}); else { if (enemy(t)) moves.push({r:nr,c:nc}); break; } }
+  } else if (piece === '♔' || piece === '♚') {
+    for (const [dr,dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) { const nr=r+dr,nc=c+dc; if (nr>=0&&nr<8&&nc>=0&&nc<8) { const t=board[nr][nc]; if (!t||enemy(t)) moves.push({r:nr,c:nc}); } }
+    if (cr) {
+      if (white&&r===7&&c===4) {
+        if (cr.K&&!board[7][5]&&!board[7][6]&&board[7][7]==='♖'&&!isAttacked(board,7,4,false)&&!isAttacked(board,7,5,false)&&!isAttacked(board,7,6,false)) moves.push({r:7,c:6,castle:'K'});
+        if (cr.Q&&!board[7][3]&&!board[7][2]&&!board[7][1]&&board[7][0]==='♖'&&!isAttacked(board,7,4,false)&&!isAttacked(board,7,3,false)&&!isAttacked(board,7,2,false)) moves.push({r:7,c:2,castle:'Q'});
+      }
+      if (!white&&r===0&&c===4) {
+        if (cr.k&&!board[0][5]&&!board[0][6]&&board[0][7]==='♜'&&!isAttacked(board,0,4,true)&&!isAttacked(board,0,5,true)&&!isAttacked(board,0,6,true)) moves.push({r:0,c:6,castle:'k'});
+        if (cr.q&&!board[0][3]&&!board[0][2]&&!board[0][1]&&board[0][0]==='♜'&&!isAttacked(board,0,4,true)&&!isAttacked(board,0,3,true)&&!isAttacked(board,0,2,true)) moves.push({r:0,c:2,castle:'q'});
+      }
+    }
+  }
+  return moves;
+}
+function applyMove(board, r, c, move) {
+  const nb = cloneBoard(board); const piece = nb[r][c];
+  if (move.ep) { nb[move.r][move.c] = piece; nb[r][c] = ''; nb[r][move.c] = ''; }
+  else if (move.castle) { nb[move.r][move.c] = piece; nb[r][c] = ''; const row = move.r; if (move.castle==='K'||move.castle==='k') { nb[row][5]=nb[row][7]; nb[row][7]=''; } else { nb[row][3]=nb[row][0]; nb[row][0]=''; } }
+  else { nb[move.r][move.c] = piece; nb[r][c] = ''; }
+  if (move.promo) { const pm = {Q:isW(piece)?'♕':'♛',R:isW(piece)?'♖':'♜',B:isW(piece)?'♗':'♝',N:isW(piece)?'♘':'♞'}; nb[move.r][move.c] = pm[move.promo]; }
+  return nb;
+}
+function legalMoves(board, r, c, ep, cr) { const white = isW(board[r][c]); return pseudoMoves(board, r, c, ep, cr).filter(m => !inCheck(applyMove(board, r, c, m), white)); }
+function allLegalMoves(board, white, ep, cr) {
+  const moves = []; const pcs = white ? '♔♕♖♗♘♙' : '♚♛♜♝♞♟';
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { if (!pcs.includes(board[r][c])) continue; for (const m of legalMoves(board, r, c, ep, cr)) moves.push({from:[r,c],to:[m.r,m.c],promo:m.promo,ep:m.ep,castle:m.castle}); }
+  return moves;
+}
+function isCheckmate(board, white, ep, cr) { return allLegalMoves(board, white, ep, cr).length === 0 && inCheck(board, white); }
+function isStalemate(board, white, ep, cr) { return allLegalMoves(board, white, ep, cr).length === 0 && !inCheck(board, white); }
+function evaluate(board) {
+  const vals = {'♙':100,'♟':100,'♘':320,'♞':320,'♗':330,'♝':330,'♖':500,'♜':500,'♕':900,'♛':900,'♔':20000,'♚':20000};
+  let score = 0;
+  for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) { const p = board[r][c]; if (!p) continue; score += isW(p) ? (vals[p]||0) : -(vals[p]||0); }
+  return score;
+}
+function getNewEP(move, fromR, fromC, board) {
+  const piece = board[fromR][fromC];
+  if ((piece === '♙' || piece === '♟') && Math.abs(move.r - fromR) === 2) return [(fromR + move.r) / 2, fromC];
+  return null;
+}
+function getNewCR(cr, board, from, to) {
+  const ncr = {...cr}; const [fr,fc] = from, [tr,tc] = to; const p = board[fr][fc];
+  if (p === '♔') { ncr.K = false; ncr.Q = false; } if (p === '♚') { ncr.k = false; ncr.q = false; }
+  if (p === '♖') { if (fr===7&&fc===7) ncr.K = false; if (fr===7&&fc===0) ncr.Q = false; }
+  if (p === '♜') { if (fr===0&&fc===7) ncr.k = false; if (fr===0&&fc===0) ncr.q = false; }
+  const cap = board[tr][tc];
+  if (cap === '♖') { if (tr===7&&tc===7) ncr.K = false; if (tr===7&&tc===0) ncr.Q = false; }
+  if (cap === '♜') { if (tr===0&&tc===7) ncr.k = false; if (tr===0&&tc===0) ncr.q = false; }
+  return ncr;
+}
+function toAlg(r, c) { return String.fromCharCode(97 + c) + (8 - r); }
+function minimax(board, depth, alpha, beta, white, ep, cr) {
+  const moves = allLegalMoves(board, white, ep, cr);
+  if (depth === 0 || moves.length === 0) { if (moves.length === 0) return inCheck(board, white) ? -(99999 - depth) : 0; const s = evaluate(board); return white ? s : -s; }
+  let best = -Infinity;
+  for (const m of moves) {
+    const nb = applyMove(board, m.from[0], m.from[1], m);
+    const nep = getNewEP(m, m.from[0], m.from[1], board);
+    const ncr = getNewCR(cr, board, m.from, m.to);
+    const score = -minimax(nb, depth - 1, -beta, -alpha, !white, nep, ncr);
+    if (score > best) best = score;
+    if (score > alpha) alpha = score;
+    if (alpha >= beta) break;
+  }
+  return best;
+}
+
 function ChessAI({onBack, difficulty, toast}) {
   const diff = CHESS_DIFFICULTIES.find(d => d.id === difficulty) || CHESS_DIFFICULTIES[4];
-  const [boardTheme, setBoardTheme] = useState(()=>localStorage.getItem('chess_board')||'classic');
-  const [pieceStyle, setPieceStyle] = useState(()=>localStorage.getItem('chess_pieces')||'unicode');
-  const [whitePieceColor, setWhitePieceColor] = useState(()=>localStorage.getItem('chess_white_color')||'#fff');
-  const [blackPieceColor, setBlackPieceColor] = useState(()=>localStorage.getItem('chess_black_color')||'#1a1a1a');
-  const [showSettings, setShowSettings] = useState(false);
-  
+  const [board, setBoard] = useState(()=>initialBoard.map(r=>[...r]));
+  const [turn, setTurn] = useState('white');
+  const [selected, setSelected] = useState(null);
+  const [gameOver, setGameOver] = useState(false);
+  const [gameResult, setGameResult] = useState(null);
+  const [moveHistory, setMoveHistory] = useState([]);
+  const [lastMove, setLastMove] = useState(null);
+  const [capturedWhite, setCapturedWhite] = useState([]);
+  const [capturedBlack, setCapturedBlack] = useState([]);
+  const [enPassant, setEnPassant] = useState(null);
+  const [castlingRights, setCastlingRights] = useState({K:true,Q:true,k:true,q:true});
+  const [aiThinking, setAiThinking] = useState(false);
+  const [showPromo, setShowPromo] = useState(null);
   const boardThemes = {
-    classic: {light:'#E8D5B5',dark:'#B58863',name:'Classico',icon:'🟫'},
-    blue: {light:'#B8D4E3',dark:'#5B7FA5',name:'Blu',icon:'🔵'},
-    green: {light:'#E8EDC9',dark:'#6B8E23',name:'Verde',icon:'🟢'},
-    dark: {light:'#7B7B7B',dark:'#4A4A4A',name:'Scuro',icon:'⚫'},
-    purple: {light:'#D4B8E3',dark:'#7B5EA7',name:'Viola',icon:'🟣'},
-    ice: {light:'#E0F0FF',dark:'#6BAED6',name:'Ghiaccio',icon:'🧊'},
+    classic:{light:'#E8D5B5',dark:'#B58863',name:'Classico',icon:'🟫'},
+    blue:{light:'#B8D4E3',dark:'#5B7FA5',name:'Blu',icon:'🔵'},
+    green:{light:'#E8EDC9',dark:'#6B8E23',name:'Verde',icon:'🟢'},
+    dark:{light:'#7B7B7B',dark:'#4A4A4A',name:'Scuro',icon:'⚫'},
+    purple:{light:'#D4B8E3',dark:'#7B5EA7',name:'Viola',icon:'🟣'},
+    ice:{light:'#E0F0FF',dark:'#6BAED6',name:'Ghiaccio',icon:'🧊'},
   };
-  
   const pieceSets = {
-    unicode: {name:'Unicode',icon:'♟️',pieces:{wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
-    modern: {name:'Moderno',icon:'🎨',pieces:{wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
-    classic3d: {name:'Classico 3D',icon:'🏆',pieces:{wK:'♚',wQ:'♛',wR:'♜',wB:'♝',wN:'♞',wP:'♟',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
+    unicode:{name:'Unicode',icon:'♟️',pieces:{wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
+    modern:{name:'Moderno',icon:'🎨',pieces:{wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
+    classic3d:{name:'Classico 3D',icon:'🏆',pieces:{wK:'♚',wQ:'♛',wR:'♜',wB:'♝',wN:'♞',wP:'♟',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
   };
   
   const theme = boardThemes[boardTheme] || boardThemes.classic;
   const pieces = pieceSets[pieceStyle]?.pieces || pieceSets.unicode.pieces;
-  
+
   const getPieceChar = (piece) => {
     if (!piece) return '';
-    const isW = '♔♕♖♗♘♙'.includes(piece);
-    const type = {'♔':'K','♕':'Q','♖':'R','♗':'B','♘':'N','♙':'P','♚':'K','♛':'Q','♜':'R','♝':'B','♞':'N','♟':'P'}[piece];
-    return pieces[(isW?'w':'b')+type] || piece;
+    const w = isW(piece);
+    const t = {'♔':'K','♕':'Q','♖':'R','♗':'B','♘':'N','♙':'P','♚':'K','♛':'Q','♜':'R','♝':'B','♞':'N','♟':'P'}[piece];
+    return pieces[(w?'w':'b')+t] || piece;
   };
-  
   const getPieceStyle = (piece) => {
     if (!piece) return {};
-    const isWhite = '♔♕♖♗♘♙'.includes(piece);
+    const w = isW(piece);
     const is3D = pieceStyle === 'classic3d';
     if (is3D) {
-      const p = piece.replace(/[♔♕♖♗♘♙♚♛♜♝♞♟]/, '');
-      const baseStyle = {
-        fontSize: cellSize * 0.85,
-        fontFamily: '"Times New Roman", Georgia, serif',
-        fontWeight: 700,
-        textShadow: isWhite 
-          ? '0 3px 6px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.3), 1px 1px 0 rgba(0,0,0,0.2)' 
-          : '0 3px 6px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.5), 1px 1px 0 rgba(255,255,255,0.1)',
-        filter: isWhite 
-          ? 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))' 
-          : 'drop-shadow(0 4px 8px rgba(0,0,0,0.6))',
-        transform: 'scale(1)',
-        transition: 'transform 0.1s',
-      };
-      const pieceColors = {
-        'K': isWhite ? '#f8f8f8' : '#2a2a2a',
-        'Q': isWhite ? '#f0f0f0' : '#1a1a1a', 
-        'R': isWhite ? '#e8e8e8' : '#333',
-        'B': isWhite ? '#f5f5f5' : '#252525',
-        'N': isWhite ? '#fafafa' : '#2d2d2d',
-        'P': isWhite ? '#ffffff' : '#1a1a1a',
-      };
-      return {...baseStyle, color: pieceColors[p] || (isWhite ? '#fff' : '#111')};
+      const p = piece.replace(/[♔♕♖♗♘♙♚♛♜♝♞♟]/,'');
+      const cs = boardSize/8;
+      return {fontSize:cs*0.85,fontFamily:'"Times New Roman",Georgia,serif',fontWeight:700,textShadow:w?'0 3px 6px rgba(0,0,0,0.5),0 1px 2px rgba(0,0,0,0.3),1px 1px 0 rgba(0,0,0,0.2)':'0 3px 6px rgba(0,0,0,0.8),0 1px 2px rgba(0,0,0,0.5),1px 1px 0 rgba(255,255,255,0.1)',filter:w?'drop-shadow(0 4px 8px rgba(0,0,0,0.4))':'drop-shadow(0 4px 8px rgba(0,0,0,0.6))',transform:'scale(1)',transition:'transform 0.1s',color:{'K':w?'#f8f8f8':'#2a2a2a','Q':w?'#f0f0f0':'#1a1a1a','R':w?'#e8e8e8':'#333','B':w?'#f5f5f5':'#252525','N':w?'#fafafa':'#2d2d2d','P':w?'#ffffff':'#1a1a1a'}[p]||(w?'#fff':'#111')};
     }
-    return {textShadow: isWhite ? `0 2px 4px rgba(0,0,0,.3)` : `0 2px 4px rgba(255,255,255,.2)`};
+    return {textShadow:w?'0 2px 4px rgba(0,0,0,.3)':'0 2px 4px rgba(255,255,255,.2)'};
   };
-  
-  const initialBoard = [
-    ['♜','♞','♝','♛','♚','♝','♞','♜'],
-    ['♟','♟','♟','♟','♟','♟','♟','♟'],
-    ['','','','','','','',''],
-    ['','','','','','','',''],
-    ['','','','','','','',''],
-    ['','','','','','','',''],
-    ['♙','♙','♙','♙','♙','♙','♙','♙'],
-    ['♖','♘','♗','♕','♔','♗','♘','♖'],
-  ];
-  const [board, setBoard] = useState(initialBoard.map(r=>[...r]));
-  const [selected, setSelected] = useState(null);
-  const [turn, setTurn] = useState('white');
-  const [aiThinking, setAiThinking] = useState(false);
-  const [capturedWhite, setCapturedWhite] = useState([]);
-  const [capturedBlack, setCapturedBlack] = useState([]);
-  const [moveHistory, setMoveHistory] = useState([]);
-  const [lastMove, setLastMove] = useState(null);
-  const [gameOver, setGameOver] = useState(false);
-  const [gameResult, setGameResult] = useState(null);
-  
-  const isWhite = (p) => '♔♕♖♗♘♙'.includes(p);
-  const isBlack = (p) => '♚♛♜♝♞♟'.includes(p);
-  
-  const getPieceColor = (piece) => {
-    if (!piece) return 'transparent';
-    return isWhite(piece) ? whitePieceColor : blackPieceColor;
+  const getPieceColor = (piece) => !piece ? 'transparent' : isW(piece) ? whitePieceColor : blackPieceColor;
+
+  const boardSize = Math.min(600, window.innerWidth - 32);
+  const cellSize = boardSize / 8;
+  const validMoves = selected ? legalMoves(board, selected[0], selected[1], enPassant, castlingRights) : [];
+  const inCheckNow = !gameOver && inCheck(board, turn === 'white');
+
+  const afterMove = (nb, fr, fc, tr, tc, captured) => {
+    const newEP = getNewEP({r:tr,c:tc}, fr, fc, board);
+    const newCR = getNewCR(castlingRights, board, [fr,fc], [tr,tc]);
+    const nextTurn = turn === 'white' ? 'black' : 'white';
+    const check = inCheck(nb, nextTurn === 'white');
+    const mate = allLegalMoves(nb, nextTurn === 'white', newEP, newCR).length === 0;
+    if (mate && check) { setGameOver(true); setGameResult(turn === 'white' ? 'white' : 'black'); toast(turn === 'white' ? '🎉 Scacco Matto! Bianco vince!' : '🎉 Scacco Matto! Nero vince!', 'var(--green)'); }
+    else if (mate && !check) { setGameOver(true); setGameResult('draw'); toast('🤝 Stallo! Pareggio!', 'var(--yellow)'); }
+    else if (check) toast('Scacco!', 'var(--yellow)');
+    if (captured) { isW(captured) ? setCapturedWhite(p=>[...p,captured]) : setCapturedBlack(p=>[...p,captured]); }
+    setBoard(nb);
+    setLastMove({from:[fr,fc],to:[tr,tc]});
+    setMoveHistory(p=>[...p, `${toAlg(fr,fc)}→${toAlg(tr,tc)}`]);
+    setEnPassant(newEP);
+    setCastlingRights(newCR);
+    setTurn(nextTurn);
+    setSelected(null);
   };
-  
-  const getValidMoves = (r, c, b) => {
-    const piece = b[r][c];
-    if (!piece) return [];
-    const moves = [];
-    const isW = isWhite(piece);
-    if (piece === '♙' || piece === '♟') {
-      const dir = isW ? -1 : 1;
-      const startRow = isW ? 6 : 1;
-      if (r+dir >= 0 && r+dir < 8 && !b[r+dir][c]) {
-        moves.push([r+dir, c]);
-        if (r === startRow && !b[r+2*dir][c]) moves.push([r+2*dir, c]);
-      }
-      if (c-1 >= 0 && r+dir >= 0 && r+dir < 8 && b[r+dir][c-1] && (isW ? isBlack(b[r+dir][c-1]) : isWhite(b[r+dir][c-1]))) moves.push([r+dir, c-1]);
-      if (c+1 < 8 && r+dir >= 0 && r+dir < 8 && b[r+dir][c+1] && (isW ? isBlack(b[r+dir][c+1]) : isWhite(b[r+dir][c+1]))) moves.push([r+dir, c+1]);
-    } else if (piece === '♖' || piece === '♜' || piece === '♕' || piece === '♛') {
-      const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
-      if (piece === '♕' || piece === '♛') dirs.push([-1,-1],[-1,1],[1,-1],[1,1]);
-      dirs.forEach(([dr,dc]) => {
-        for (let i = 1; i < 8; i++) {
-          const nr = r+dr*i, nc = c+dc*i;
-          if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
-          if (!b[nr][nc]) { moves.push([nr,nc]); }
-          else { if (isW ? isBlack(b[nr][nc]) : isWhite(b[nr][nc])) moves.push([nr,nc]); break; }
-        }
-      });
-    } else if (piece === '♗' || piece === '♝') {
-      [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc]) => {
-        for (let i = 1; i < 8; i++) {
-          const nr = r+dr*i, nc = c+dc*i;
-          if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
-          if (!b[nr][nc]) { moves.push([nr,nc]); }
-          else { if (isW ? isBlack(b[nr][nc]) : isWhite(b[nr][nc])) moves.push([nr,nc]); break; }
-        }
-      });
-    } else if (piece === '♘' || piece === '♞') {
-      [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc]) => {
-        const nr = r+dr, nc = c+dc;
-        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-          const target = b[nr][nc];
-          if (!target || (isW ? isBlack(target) : isWhite(target))) {
-            moves.push([nr,nc]);
-          }
-        }
-      });
-    } else if (piece === '♔' || piece === '♚') {
-      [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,dc]) => {
-        const nr = r+dr, nc = c+dc;
-        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && !(isW ? isWhite(b[nr][nc]) : isBlack(b[nr][nc]))) moves.push([nr,nc]);
-      });
-    }
-    return moves;
-  };
-  
-  const evaluateBoard = (b) => {
-    const values = {'♙':10,'♟':10,'♖':50,'♜':50,'♘':30,'♞':30,'♗':30,'♝':30,'♕':90,'♛':90,'♔':900,'♚':900};
-    const pst = {
-      '♙':[0,0,0,0,0,0,0,0,5,5,5,5,5,5,5,5,1,1,2,3,3,2,1,1,0.5,0.5,1,2.5,2.5,1,0.5,0.5,0,0,0,2,2,0,0,0,0.5,-0.5,-1,0,0,-1,-0.5,0.5,0.5,1,1,-2,-2,1,1,0.5,0,0,0,0,0,0,0,0],
-      '♘':[-5,-4,-3,-3,-3,-3,-4,-5,-4,-2,0,0,0,0,-2,-4,-3,0,1,1.5,1.5,1,0,-3,-3,0.5,1.5,2,2,1.5,0.5,-3,-3,0,1.5,2,2,1.5,0,-3,-3,0.5,1,1.5,1.5,1,0.5,-3,-4,-2,0,0.5,0.5,0,-2,-4,-5,-4,-3,-3,-3,-3,-4,-5],
-      '♗':[-2,-1,-1,-1,-1,-1,-1,-2,-1,0,0,0,0,0,0,-1,-1,0,0.5,1,1,0.5,0,-1,-1,0.5,0.5,1,1,0.5,0.5,-1,-1,0,1,1,1,1,0,-1,-1,0.5,0.5,0.5,0.5,0.5,0,-1,-1,0,0.5,0.5,0.5,0.5,0,-1,-2,-1,-1,-1,-1,-1,-1,-2],
-      '♖':[0,0,0,0,0,0,0,0,0.5,1,1,1,1,1,1,0.5,-0.5,0,0,0,0,0,0,-0.5,-0.5,0,0,0,0,0,0,-0.5,-0.5,0,0,0,0,0,0,-0.5,-0.5,0,0,0,0,0,0,-0.5,-0.5,0,0.5,0.5,0,0,-0.5,-0.5,0,0.5,1,1,0.5,0,-0.5],
-      '♕':[-2,-1,-1,-0.5,-0.5,-1,-1,-2,-1,0,0,0,0,0,0,-1,-1,0,0.5,0.5,0.5,0.5,0,-1,-0.5,0,0.5,0.5,0.5,0.5,0,-0.5,0,0,0.5,0.5,0.5,0.5,0,-0.5,-1,0.5,0.5,0.5,0.5,0.5,0,-1,-1,0,0.5,0.5,0.5,0.5,0,-1,-2,-1,-1,-0.5,-0.5,-1,-1,-2],
-      '♔':[-3,-4,-4,-5,-5,-4,-4,-3,-3,-4,-4,-5,-5,-4,-4,-3,-3,-4,-4,-5,-5,-4,-4,-3,-3,-4,-4,-5,-5,-4,-4,-3,-2,-3,-3,-4,-4,-3,-3,-2,-1,-2,-2,-2,-2,-2,-2,-1,2,2,0,0,0,0,2,2,2,3,1,0,0,0,1,3,2],
-    };
-    let score = 0;
-    for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) {
-      const p = b[r][c];
-      if (!p) continue;
-      const v = values[p] || 0;
-      const idx = isWhite(p) ? r * 8 + c : (7-r) * 8 + c;
-      const pstVal = (pst[p] && pst[p][idx]) || 0;
-      score += isWhite(p) ? (v + pstVal) : -(v + pstVal);
-    }
-    return score;
-  };
-  
-  const minimax = (b, depth, alpha, beta, isMax) => {
-    if (depth === 0) return evaluateBoard(b);
-    const color = isMax ? 'black' : 'white';
-    const pieces = color === 'black' ? '♚♛♜♝♞♟' : '♔♕♖♗♘♙';
-    let bestScore = isMax ? -Infinity : Infinity;
-    for (let r = 0; r < 8; r++) {
-      for (let c = 0; c < 8; c++) {
-        if (!pieces.includes(b[r][c])) continue;
-        const moves = getValidMoves(r, c, b);
-        for (const [nr,nc] of moves) {
-          const nb = b.map(row=>[...row]);
-          nb[nr][nc] = nb[r][c]; nb[r][c] = '';
-          if (nb[nr][nc] === '♟' && nr === 7) nb[nr][nc] = '♛';
-          if (nb[nr][nc] === '♙' && nr === 0) nb[nr][nc] = '♕';
-          const score = minimax(nb, depth-1, alpha, beta, !isMax);
-          if (isMax) { bestScore = Math.max(bestScore, score); alpha = Math.max(alpha, score); }
-          else { bestScore = Math.min(bestScore, score); beta = Math.min(beta, score); }
-          if (beta <= alpha) break;
-        }
-      }
-    }
-    return bestScore === (isMax ? -Infinity : Infinity) ? evaluateBoard(b) : bestScore;
-  };
-  
-  const makeAIMove = () => {
-    setAiThinking(true);
-    setTimeout(() => {
-      const allMoves = [];
-      for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-          if (isBlack(board[r][c])) {
-            const moves = getValidMoves(r, c, board);
-            moves.forEach(([nr,nc]) => {
-              const nb = board.map(row=>[...row]);
-              nb[nr][nc] = nb[r][c]; nb[r][c] = '';
-              if (nb[nr][nc] === '♟' && nr === 7) nb[nr][nc] = '♛';
-              if (nb[nr][nc] === '♙' && nr === 0) nb[nr][nc] = '♕';
-              let score;
-              if (diff.depth > 0) {
-                score = minimax(nb, diff.depth, -Infinity, Infinity, false);
-              } else {
-                score = -evaluateBoard(nb);
-              }
-              if (diff.randomness > 0) {
-                score += (Math.random() - 0.5) * 100 * diff.randomness;
-              }
-              allMoves.push({from:[r,c],to:[nr,nc],score});
-            });
-          }
-        }
-      }
-      if (allMoves.length > 0) {
-        allMoves.sort((a,b) => b.score - a.score);
-        const move = allMoves[0];
-        const nb = board.map(row=>[...row]);
-        const captured = nb[move.to[0]][move.to[1]];
-        if (captured) { if (isWhite(captured)) setCapturedWhite(p => [...p, captured]); else setCapturedBlack(p => [...p, captured]); }
-        nb[move.to[0]][move.to[1]] = nb[move.from[0]][move.from[1]];
-        nb[move.from[0]][move.from[1]] = '';
-        if (nb[move.to[0]][move.to[1]] === '♟' && move.to[0] === 7) nb[move.to[0]][move.to[1]] = '♛';
-        setBoard(nb);
-        setLastMove({from: move.from, to: move.to});
-        setMoveHistory(p => [...p, `${String.fromCharCode(97+move.from[1])}${8-move.from[0]}→${String.fromCharCode(97+move.to[1])}${8-move.to[0]}`]);
-        setTurn('white');
-        if (captured === '♔') { setGameOver(true); setGameResult('lose'); toast('AI vince! 😔','var(--red)'); }
-      }
-      setAiThinking(false);
-    }, 200 + diff.depth * 200);
-  };
-  
-  useEffect(() => { if (turn === 'black' && !aiThinking && !gameOver) makeAIMove(); }, [turn]);
-  
+
   const handleClick = (r, c) => {
     if (turn !== 'white' || aiThinking || gameOver) return;
     if (selected) {
-      const [sr, sc] = selected;
-      if (sr === r && sc === c) { setSelected(null); return; }
-      const validMoves = getValidMoves(sr, sc, board);
-      if (validMoves.some(([mr,mc]) => mr === r && mc === c)) {
-        const nb = board.map(row => [...row]);
-        const captured = nb[r][c];
-        if (captured) { if (isWhite(captured)) setCapturedWhite(p => [...p, captured]); else setCapturedBlack(p => [...p, captured]); }
-        nb[r][c] = nb[sr][sc]; nb[sr][sc] = '';
-        if (nb[r][c] === '♙' && r === 0) nb[r][c] = '♕';
-        setBoard(nb);
-        setLastMove({from: [sr,sc], to: [r,c]});
-        setMoveHistory(p => [...p, `${String.fromCharCode(97+sc)}${8-sr}→${String.fromCharCode(97+c)}${8-r}`]);
-        setSelected(null);
-        setTurn('black');
-        if (captured === '♚') { setGameOver(true); setGameResult('win'); toast('Hai vinto! 🎉','var(--green)'); }
-      } else if (isWhite(board[r][c])) { setSelected([r, c]); }
+      const [sr,sc] = selected;
+      if (sr===r&&sc===c) { setSelected(null); return; }
+      const lm = legalMoves(board, sr, sc, enPassant, castlingRights);
+      const match = lm.find(m => m.r===r && m.c===c);
+      if (match) {
+        if (match.r===0&&isW(board[sr][sc])&&(board[sr][sc]==='♙')) { setShowPromo({from:[sr,sc],to:[r,c],ep:match.ep,castle:match.castle}); return; }
+        const captured = board[r][c];
+        const nb = applyMove(board, sr, sc, match);
+        afterMove(nb, sr, sc, r, c, captured);
+      } else if (turn==='white'&&isW(board[r][c])) { setSelected([r,c]); }
       else { setSelected(null); }
-    } else if (isWhite(board[r][c])) { setSelected([r, c]); }
+    } else if (turn==='white'&&isW(board[r][c])) { setSelected([r,c]); }
   };
-  
-  const resetGame = () => { setBoard(initialBoard.map(r=>[...r])); setTurn('white'); setSelected(null); setAiThinking(false); setCapturedWhite([]); setCapturedBlack([]); setMoveHistory([]); setLastMove(null); setGameOver(false); setGameResult(null); };
-  
-  const boardSize = Math.min(600, window.innerWidth - 32);
-  const cellSize = boardSize / 8;
-  const validMoves = selected ? getValidMoves(selected[0], selected[1], board) : [];
-  
+
+  const handlePromo = (promoChar) => {
+    const {from,to} = showPromo; const [fr,fc] = from, [tr,tc] = to;
+    const move = {r:tr,c:tc,promo:promoChar,ep:false,castle:null};
+    const captured = board[tr][tc]; const nb = applyMove(board, fr, fc, move);
+    setShowPromo(null); afterMove(nb, fr, fc, tr, tc, captured);
+  };
+
+  const makeAIMove = () => {
+    setAiThinking(true);
+    setTimeout(() => {
+      const allMoves = allLegalMoves(board, false, enPassant, castlingRights);
+      if (allMoves.length === 0) { setAiThinking(false); return; }
+      const scored = allMoves.map(m => {
+        const nb = applyMove(board, m.from[0], m.from[1], m);
+        const nep = getNewEP(m, m.from[0], m.from[1], board);
+        const ncr = getNewCR(castlingRights, board, m.from, m.to);
+        let s; if (diff.depth > 0) s = -minimax(nb, diff.depth, -Infinity, Infinity, true, nep, ncr); else s = -evaluate(nb);
+        if (diff.randomness > 0) s += (Math.random() - 0.5) * 100 * diff.randomness;
+        return {...m, score: s};
+      });
+      scored.sort((a,b) => b.score - a.score);
+      const best = scored[0]; const [fr,fc] = best.from, [tr,tc] = best.to;
+      const captured = board[tr][tc]; const nb = applyMove(board, fr, fc, best);
+      const newEP = getNewEP(best, fr, fc, board); const newCR = getNewCR(castlingRights, board, best.from, best.to);
+      const check = inCheck(nb, true); const mate = allLegalMoves(nb, true, newEP, newCR).length === 0;
+      if (mate && check) { setGameOver(true); setGameResult('black'); toast('🎉 Scacco Matto! Nero vince!','var(--green)'); }
+      else if (mate && !check) { setGameOver(true); setGameResult('draw'); toast('🤝 Stallo! Pareggio!','var(--yellow)'); }
+      else if (check) toast('Scacco!','var(--yellow)');
+      if (captured) { isW(captured) ? setCapturedWhite(p=>[...p,captured]) : setCapturedBlack(p=>[...p,captured]); }
+      setBoard(nb); setLastMove({from:[fr,fc],to:[tr,tc]}); setMoveHistory(p=>[...p,`${toAlg(fr,fc)}→${toAlg(tr,tc)}`]);
+      setEnPassant(newEP); setCastlingRights(newCR); setTurn('white'); setAiThinking(false);
+    }, 200 + diff.depth * 200);
+  };
+
+  useEffect(() => { if (turn==='black'&&!aiThinking&&!gameOver) makeAIMove(); }, [turn]);
+
+  const resetGame = () => {
+    setBoard(initialBoard.map(r=>[...r])); setTurn('white'); setSelected(null); setAiThinking(false);
+    setCapturedWhite([]); setCapturedBlack([]); setMoveHistory([]); setLastMove(null);
+    setGameOver(false); setGameResult(null); setEnPassant(null); setCastlingRights({K:true,Q:true,k:true,q:true}); setShowPromo(null);
+  };
+
   return (
     <div style={{padding:'0 16px 100px',position:'relative'}}>
       <div className="sh" style={{marginBottom:16}}>
@@ -17989,8 +18051,7 @@ function ChessAI({onBack, difficulty, toast}) {
         <button className="btn bt bs" style={{fontSize:'.72rem',padding:'4px 10px'}} onClick={()=>setShowSettings(!showSettings)}>🎨</button>
         <button className="btn bt bs" style={{fontSize:'.72rem',padding:'4px 10px'}} onClick={()=>window._changeChessDiff&&window._changeChessDiff()}>⚙️</button>
       </div>
-      
-      {/* Settings Modal Overlay */}
+
       {showSettings && (
         <div className="modal-overlay" onClick={()=>setShowSettings(false)} style={{zIndex:9999}}>
           <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:420}}>
@@ -18002,12 +18063,7 @@ function ChessAI({onBack, difficulty, toast}) {
               <div style={{fontWeight:700,marginBottom:10,fontSize:'.85rem'}}>🎨 Tema Scacchiera</div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
                 {Object.entries(boardThemes).map(([key,val])=>(
-                  <button key={key} onClick={()=>{setBoardTheme(key);localStorage.setItem('chess_board',key);}} style={{
-                    padding:'10px 8px',borderRadius:10,
-                    border:boardTheme===key?'3px solid var(--accent)':'2px solid rgba(255,255,255,.08)',
-                    background:boardTheme===key?`${val.light}20`:'rgba(255,255,255,.03)',
-                    cursor:'pointer',textAlign:'center'
-                  }}>
+                  <button key={key} onClick={()=>{setBoardTheme(key);localStorage.setItem('chess_board',key);}} style={{padding:'10px 8px',borderRadius:10,border:boardTheme===key?'3px solid var(--accent)':'2px solid rgba(255,255,255,.08)',background:boardTheme===key?`${val.light}20`:'rgba(255,255,255,.03)',cursor:'pointer',textAlign:'center'}}>
                     <div style={{display:'flex',gap:2,justifyContent:'center',marginBottom:4}}>
                       <div style={{width:14,height:14,borderRadius:2,background:val.light,border:'1px solid rgba(0,0,0,.2)'}}/>
                       <div style={{width:14,height:14,borderRadius:2,background:val.dark,border:'1px solid rgba(0,0,0,.2)'}}/>
@@ -18021,12 +18077,7 @@ function ChessAI({onBack, difficulty, toast}) {
               <div style={{fontWeight:700,marginBottom:10,fontSize:'.85rem'}}>♟️ Stile Pedine</div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:8}}>
                 {Object.entries(pieceSets).map(([key,val])=>(
-                  <button key={key} onClick={()=>{setPieceStyle(key);localStorage.setItem('chess_pieces',key);}} style={{
-                    padding:'10px 8px',borderRadius:10,
-                    border:pieceStyle===key?'3px solid var(--accent)':'2px solid rgba(255,255,255,.08)',
-                    background:pieceStyle===key?'rgba(139,92,246,.15)':'rgba(255,255,255,.03)',
-                    cursor:'pointer',textAlign:'center'
-                  }}>
+                  <button key={key} onClick={()=>{setPieceStyle(key);localStorage.setItem('chess_pieces',key);}} style={{padding:'10px 8px',borderRadius:10,border:pieceStyle===key?'3px solid var(--accent)':'2px solid rgba(255,255,255,.08)',background:pieceStyle===key?'rgba(139,92,246,.15)':'rgba(255,255,255,.03)',cursor:'pointer',textAlign:'center'}}>
                     <div style={{fontSize:'1.3rem',marginBottom:2}}>{val.icon}</div>
                     <div style={{fontSize:'.7rem',color:pieceStyle===key?'var(--accent)':'var(--text2)'}}>{val.name}</div>
                   </button>
@@ -18037,11 +18088,7 @@ function ChessAI({onBack, difficulty, toast}) {
               <div style={{fontWeight:700,marginBottom:8,fontSize:'.8rem'}}>🎨 Colore Pedine Tue</div>
               <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
                 {[{c:'#fff',l:'Bianco'},{c:'#FFD700',l:'Oro'},{c:'#87CEEB',l:'Azzurro'},{c:'#98FB98',l:'Verde'},{c:'#FFB6C1',l:'Rosa'},{c:'#FFA07A',l:'Arancio'}].map(({c,l})=>(
-                  <button key={c} onClick={()=>{setWhitePieceColor(c);localStorage.setItem('chess_white_color',c);}} style={{
-                    width:32,height:32,borderRadius:6,
-                    border:whitePieceColor===c?'3px solid var(--accent)':'2px solid rgba(255,255,255,.1)',
-                    background:c,cursor:'pointer'
-                  }} title={l}/>
+                  <button key={c} onClick={()=>{setWhitePieceColor(c);localStorage.setItem('chess_white_color',c);}} style={{width:32,height:32,borderRadius:6,border:whitePieceColor===c?'3px solid var(--accent)':'2px solid rgba(255,255,255,.1)',background:c,cursor:'pointer'}} title={l}/>
                 ))}
               </div>
             </div>
@@ -18049,11 +18096,7 @@ function ChessAI({onBack, difficulty, toast}) {
               <div style={{fontWeight:700,marginBottom:8,fontSize:'.8rem'}}>🎨 Colore Pedine Avversario</div>
               <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
                 {[{c:'#1a1a1a',l:'Nero'},{c:'#8B0000',l:'Rosso'},{c:'#006400',l:'Verde'},{c:'#00008B',l:'Blu'},{c:'#4B0082',l:'Viola'},{c:'#696969',l:'Grigio'}].map(({c,l})=>(
-                  <button key={c} onClick={()=>{setBlackPieceColor(c);localStorage.setItem('chess_black_color',c);}} style={{
-                    width:32,height:32,borderRadius:6,
-                    border:blackPieceColor===c?'3px solid var(--accent)':'2px solid rgba(255,255,255,.1)',
-                    background:c,cursor:'pointer'
-                  }} title={l}/>
+                  <button key={c} onClick={()=>{setBlackPieceColor(c);localStorage.setItem('chess_black_color',c);}} style={{width:32,height:32,borderRadius:6,border:blackPieceColor===c?'3px solid var(--accent)':'2px solid rgba(255,255,255,.1)',background:c,cursor:'pointer'}} title={l}/>
                 ))}
               </div>
             </div>
@@ -18061,201 +18104,186 @@ function ChessAI({onBack, difficulty, toast}) {
           </div>
         </div>
       )}
-      
+
+      {showPromo && (
+        <div className="modal-overlay" onClick={()=>setShowPromo(null)} style={{zIndex:9999}}>
+          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:300,textAlign:'center'}}>
+            <h3 style={{margin:'0 0 16px'}}>♟️ Promozione</h3>
+            <div style={{display:'flex',gap:12,justifyContent:'center',fontSize:'1.8rem'}}>
+              {[{c:'Q',d:'♕'},{c:'R',d:'♖'},{c:'B',d:'♗'},{c:'N',d:'♘'}].map(({c,d}) => (
+                <button key={c} onClick={()=>handlePromo(c)} style={{width:56,height:56,borderRadius:12,border:'2px solid rgba(139,92,246,.3)',background:'rgba(139,92,246,.1)',cursor:'pointer',fontSize:'1.8rem',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .2s'}}>
+                  {getPieceChar(d)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {gameOver && (
-        <div style={{textAlign:'center',padding:20,marginBottom:16,borderRadius:16,background:gameResult==='win'?'rgba(6,214,160,.1)':'rgba(255,77,109,.1)',border:`1px solid ${gameResult==='win'?'rgba(6,214,160,.3)':'rgba(255,77,109,.3)'}`}}>
-          <div style={{fontSize:'2rem',marginBottom:8}}>{gameResult==='win'?'🎉 Vittoria!':'😔 Sconfitta!'}</div>
+        <div style={{textAlign:'center',padding:20,marginBottom:16,borderRadius:16,background:gameResult==='draw'?'rgba(255,255,255,.05)':'rgba(6,214,160,.1)',border:`1px solid ${gameResult==='draw'?'rgba(255,255,255,.1)':'rgba(6,214,160,.3)'}`}}>
+          <div style={{fontSize:'2rem',marginBottom:8}}>
+            {gameResult==='white'?'🎉 Scacco Matto! Bianco vince!':gameResult==='black'?'🎉 Scacco Matto! Nero vince!':'🤝 Stallo! Pareggio!'}
+          </div>
           <button className="btn br" onClick={resetGame} style={{marginTop:8}}>🔄 Nuova Partita</button>
         </div>
       )}
-      
+
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,padding:'10px 14px',background:'rgba(255,255,255,.03)',borderRadius:14,border:'1px solid rgba(255,255,255,.06)'}}>
-        <div style={{fontSize:'.82rem'}}><span style={{color:'var(--text2)'}}>⬛ </span>{capturedWhite.length > 0 ? <span style={{fontSize:'1.05rem',letterSpacing:2}}>{capturedWhite.join(' ')}</span> : <span style={{color:'var(--text3)'}}>—</span>}</div>
-        <div style={{fontSize:'.82rem'}}><span style={{color:'var(--text2)'}}>⬜ </span>{capturedBlack.length > 0 ? <span style={{fontSize:'1.05rem',letterSpacing:2}}>{capturedBlack.join(' ')}</span> : <span style={{color:'var(--text3)'}}>—</span>}</div>
+        <div style={{fontSize:'.82rem'}}><span style={{color:'var(--text2)'}}>⬛ </span>{capturedWhite.length>0?<span style={{fontSize:'1.05rem',letterSpacing:2}}>{capturedWhite.join(' ')}</span>:<span style={{color:'var(--text3)'}}>—</span>}</div>
+        <div style={{fontSize:'.82rem'}}><span style={{color:'var(--text2)'}}>⬜ </span>{capturedBlack.length>0?<span style={{fontSize:'1.05rem',letterSpacing:2}}>{capturedBlack.join(' ')}</span>:<span style={{color:'var(--text3)'}}>—</span>}</div>
       </div>
-      
+
       <div style={{textAlign:'center',marginBottom:12,padding:'8px 14px',background:turn==='white'?'rgba(6,214,160,.08)':'rgba(255,77,109,.08)',borderRadius:12,border:`1px solid ${turn==='white'?'rgba(6,214,160,.2)':'rgba(255,77,109,.2)'}`}}>
         <span style={{fontSize:'.85rem',color:'var(--text2)'}}>Turno: <strong style={{color:turn==='white'?'var(--green)':'var(--red)'}}>{turn==='white'?'⬜ Tu (Bianco)':'⬛ AI (Nero)'}</strong></span>
+        {inCheckNow && <span style={{fontSize:'.75rem',color:'var(--yellow)',marginLeft:12}}>♔ Scacco!</span>}
         {aiThinking && <span style={{fontSize:'.75rem',color:'var(--yellow)',marginLeft:12,animation:'pulse 1s infinite'}}>🤔 AI pensa...</span>}
       </div>
-      
+
       <div style={{borderRadius:16,overflow:'hidden',maxWidth:boardSize,margin:'0 auto',boxShadow:'0 16px 48px rgba(0,0,0,.5), 0 0 0 4px rgba(139,92,246,.12)',border:'3px solid rgba(139,92,246,.15)'}}>
         <div style={{display:'flex',paddingLeft:cellSize*0.35}}>
-          {['a','b','c','d','e','f','g','h'].map(l => (<div key={l} style={{width:cellSize,textAlign:'center',fontSize:'.6rem',color:'var(--text3)',fontWeight:700,padding:'3px 0'}}>{l}</div>))}
+          {['a','b','c','d','e','f','g','h'].map(l=>(<div key={l} style={{width:cellSize,textAlign:'center',fontSize:'.6rem',color:'var(--text3)',fontWeight:700,padding:'3px 0'}}>{l}</div>))}
         </div>
-        {board.map((row,r) => (
+        {board.map((row,r)=>(
           <div key={r} style={{display:'flex'}}>
             <div style={{width:cellSize*0.35,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:'var(--text3)',fontWeight:700}}>{8-r}</div>
-            {row.map((piece,c) => {
-              const isLight = (r+c) % 2 === 0;
-              const isSelected = selected && selected[0]===r && selected[1]===c;
-              const isValidMove = validMoves.some(([mr,mc]) => mr===r && mc===c);
-              const isLastMove = lastMove && ((lastMove.from[0]===r && lastMove.from[1]===c) || (lastMove.to[0]===r && lastMove.to[1]===c));
-              const hasCapture = isValidMove && piece;
-              return (
-                <div key={r+'-'+c} onClick={()=>handleClick(r,c)} style={{
-                  width: cellSize, height: cellSize,
-                  display:'flex',alignItems:'center',justifyContent:'center',
-                  background: isSelected ? 'rgba(255,77,109,.6)' : isLastMove ? (isLight ? 'rgba(255,255,100,.4)' : 'rgba(255,255,100,.3)') : isLight ? theme.light : theme.dark,
-                  fontSize: cellSize * 0.75,
-                  cursor: isWhite(piece) || isValidMove ? 'pointer' : 'default',
-                  transition: 'background .15s', position: 'relative',
-                  ...getPieceStyle(piece),
-                  lineHeight: 1,
-                  color: getPieceColor(piece)
-                }}>
-                  {pieceStyle === 'classic3d' ? piece : getPieceChar(piece)}
-                  {isValidMove && !piece && <div style={{position:'absolute',width:cellSize*0.3,height:cellSize*0.3,borderRadius:'50%',background:'rgba(6,214,160,.6)',boxShadow:'0 0 10px rgba(6,214,160,0.5)'}}/>}
-                  {hasCapture && <div style={{position:'absolute',inset:2,borderRadius:'50%',border:`4px solid rgba(255,77,109,.8)`,boxShadow:'0 0 12px rgba(255,77,109,0.5)'}}/>}
-                </div>
-              );
-            })}
+            {row.map((piece,c)=>{const isLight=(r+c)%2===0;const isSel=selected&&selected[0]===r&&selected[1]===c;const isVM=validMoves.some(m=>m.r===r&&m.c===c);const isLM=lastMove&&((lastMove.from[0]===r&&lastMove.from[1]===c)||(lastMove.to[0]===r&&lastMove.to[1]===c));const hasCap=isVM&&piece;return(
+              <div key={r+'-'+c} onClick={()=>handleClick(r,c)} style={{width:cellSize,height:cellSize,display:'flex',alignItems:'center',justifyContent:'center',background:isSel?'rgba(255,77,109,.6)':isLM?(isLight?'rgba(255,255,100,.4)':'rgba(255,255,100,.3)'):isLight?theme.light:theme.dark,fontSize:cellSize*0.75,cursor:(turn==='white'&&isW(piece))||isVM?'pointer':'default',transition:'background .15s',position:'relative',...getPieceStyle(piece),lineHeight:1,color:getPieceColor(piece)}}>
+                {pieceStyle==='classic3d'?piece:getPieceChar(piece)}
+                {isVM&&!piece&&<div style={{position:'absolute',width:cellSize*0.3,height:cellSize*0.3,borderRadius:'50%',background:'rgba(6,214,160,.6)',boxShadow:'0 0 10px rgba(6,214,160,0.5)'}}/>}
+                {hasCap&&<div style={{position:'absolute',inset:2,borderRadius:'50%',border:`4px solid rgba(255,77,109,.8)`,boxShadow:'0 0 12px rgba(255,77,109,0.5)'}}/>}
+              </div>
+            );})}
           </div>
         ))}
       </div>
-      
-      {moveHistory.length > 0 && (
+
+      {moveHistory.length>0&&(
         <div style={{textAlign:'center',marginTop:14,padding:'10px 14px',background:'rgba(255,255,255,.03)',borderRadius:12,border:'1px solid rgba(255,255,255,.06)',maxWidth:boardSize,margin:'14px auto 0'}}>
           <div style={{fontSize:'.65rem',color:'var(--text3)',marginBottom:6,fontWeight:700}}>📋 Mosse</div>
           <div style={{fontSize:'.78rem',color:'var(--text2)',letterSpacing:1}}>{moveHistory.slice(-12).join(' → ')}</div>
         </div>
       )}
-      
+
       <div style={{display:'flex',gap:8,justifyContent:'center',marginTop:16}}>
         <button className="btn bg" onClick={resetGame} style={{fontSize:'.9rem'}}>🔄 Ricomincia</button>
-        <button className="btn bt" onClick={()=>{setShowModeSelect(true);}} style={{fontSize:'.9rem'}}>📋 Modalità</button>
+        <button className="btn bt" onClick={onBack} style={{fontSize:'.9rem'}}>📋 Modalità</button>
       </div>
     </div>
   );
 }
 
 function ChessLocal({onBack, toast}) {
-  const initialBoard = [
-    ['♜','♞','♝','♛','♚','♝','♞','♜'],
-    ['♟','♟','♟','♟','♟','♟','♟','♟'],
-    ['','','','','','','',''],
-    ['','','','','','','',''],
-    ['','','','','','','',''],
-    ['','','','','','','',''],
-    ['♙','♙','♙','♙','♙','♙','♙','♙'],
-    ['♖','♘','♗','♕','♔','♗','♘','♖'],
-  ];
-  const [board, setBoard] = useState(initialBoard.map(r=>[...r]));
-  const [selected, setSelected] = useState(null);
+  const [board, setBoard] = useState(()=>initialBoard.map(r=>[...r]));
   const [turn, setTurn] = useState('white');
-  const [capturedWhite, setCapturedWhite] = useState([]);
-  const [capturedBlack, setCapturedBlack] = useState([]);
-  const [moveHistory, setMoveHistory] = useState([]);
-  const [lastMove, setLastMove] = useState(null);
+  const [selected, setSelected] = useState(null);
   const [gameOver, setGameOver] = useState(false);
   const [gameResult, setGameResult] = useState(null);
+  const [moveHistory, setMoveHistory] = useState([]);
+  const [lastMove, setLastMove] = useState(null);
+  const [capturedWhite, setCapturedWhite] = useState([]);
+  const [capturedBlack, setCapturedBlack] = useState([]);
+  const [enPassant, setEnPassant] = useState(null);
+  const [castlingRights, setCastlingRights] = useState({K:true,Q:true,k:true,q:true});
+  const [showPromo, setShowPromo] = useState(null);
   const [scores, setScores] = useState({white:0,black:0,draws:0});
+  const [boardTheme, setBoardTheme] = useState(()=>localStorage.getItem('chess_board')||'classic');
+  const [pieceStyle, setPieceStyle] = useState(()=>localStorage.getItem('chess_pieces')||'unicode');
   const [whitePieceColor, setWhitePieceColor] = useState(()=>localStorage.getItem('chess_white_color')||'#fff');
   const [blackPieceColor, setBlackPieceColor] = useState(()=>localStorage.getItem('chess_black_color')||'#1a1a1a');
-  
-  const getPieceColor = (piece) => {
-    if (!piece) return 'transparent';
-    return '♔♕♖♗♘♙'.includes(piece) ? whitePieceColor : blackPieceColor;
+  const [showSettings, setShowSettings] = useState(false);
+
+  const boardThemes = {
+    classic:{light:'#E8D5B5',dark:'#B58863',name:'Classico',icon:'🟫'},
+    blue:{light:'#B8D4E3',dark:'#5B7FA5',name:'Blu',icon:'🔵'},
+    green:{light:'#E8EDC9',dark:'#6B8E23',name:'Verde',icon:'🟢'},
+    dark:{light:'#7B7B7B',dark:'#4A4A4A',name:'Scuro',icon:'⚫'},
+    purple:{light:'#D4B8E3',dark:'#7B5EA7',name:'Viola',icon:'🟣'},
+    ice:{light:'#E0F0FF',dark:'#6BAED6',name:'Ghiaccio',icon:'🧊'},
   };
-  
-  const isWhite = (p) => '♔♕♖♗♘♙'.includes(p);
-  const isBlack = (p) => '♚♛♜♝♞♟'.includes(p);
-  
-  const getValidMoves = (r, c, b) => {
-    const piece = b[r][c];
-    if (!piece) return [];
-    const moves = [];
-    const isW = isWhite(piece);
-    if (piece === '♙' || piece === '♟') {
-      const dir = isW ? -1 : 1;
-      const startRow = isW ? 6 : 1;
-      if (r+dir >= 0 && r+dir < 8 && !b[r+dir][c]) {
-        moves.push([r+dir, c]);
-        if (r === startRow && !b[r+2*dir][c]) moves.push([r+2*dir, c]);
-      }
-      if (c-1 >= 0 && r+dir >= 0 && r+dir < 8 && b[r+dir][c-1] && (isW ? isBlack(b[r+dir][c-1]) : isWhite(b[r+dir][c-1]))) moves.push([r+dir, c-1]);
-      if (c+1 < 8 && r+dir >= 0 && r+dir < 8 && b[r+dir][c+1] && (isW ? isBlack(b[r+dir][c+1]) : isWhite(b[r+dir][c+1]))) moves.push([r+dir, c+1]);
-    } else if (piece === '♖' || piece === '♜' || piece === '♕' || piece === '♛') {
-      const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
-      if (piece === '♕' || piece === '♛') dirs.push([-1,-1],[-1,1],[1,-1],[1,1]);
-      dirs.forEach(([dr,dc]) => {
-        for (let i = 1; i < 8; i++) {
-          const nr = r+dr*i, nc = c+dc*i;
-          if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
-          if (!b[nr][nc]) { moves.push([nr,nc]); }
-          else { if (isW ? isBlack(b[nr][nc]) : isWhite(b[nr][nc])) moves.push([nr,nc]); break; }
-        }
-      });
-    } else if (piece === '♗' || piece === '♝') {
-      [[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([dr,dc]) => {
-        for (let i = 1; i < 8; i++) {
-          const nr = r+dr*i, nc = c+dc*i;
-          if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
-          if (!b[nr][nc]) { moves.push([nr,nc]); }
-          else { if (isW ? isBlack(b[nr][nc]) : isWhite(b[nr][nc])) moves.push([nr,nc]); break; }
-        }
-      });
-    } else if (piece === '♘' || piece === '♞') {
-      [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]].forEach(([dr,dc]) => {
-        const nr = r+dr, nc = c+dc;
-        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
-          const target = b[nr][nc];
-          if (!target || (isW ? isBlack(target) : isWhite(target))) {
-            moves.push([nr,nc]);
-          }
-        }
-      });
-    } else if (piece === '♔' || piece === '♚') {
-      [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]].forEach(([dr,dc]) => {
-        const nr = r+dr, nc = c+dc;
-        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && !(isW ? isWhite(b[nr][nc]) : isBlack(b[nr][nc]))) moves.push([nr,nc]);
-      });
+  const pieceSets = {
+    unicode:{name:'Unicode',icon:'♟️',pieces:{wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
+    modern:{name:'Moderno',icon:'🎨',pieces:{wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
+    classic3d:{name:'Classico 3D',icon:'🏆',pieces:{wK:'♚',wQ:'♛',wR:'♜',wB:'♝',wN:'♞',wP:'♟',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'}},
+  };
+  const theme = boardThemes[boardTheme] || boardThemes.classic;
+  const pieces = pieceSets[pieceStyle]?.pieces || pieceSets.unicode.pieces;
+
+  const getPieceChar = (piece) => {
+    if (!piece) return '';
+    const w = isW(piece);
+    const t = {'♔':'K','♕':'Q','♖':'R','♗':'B','♘':'N','♙':'P','♚':'K','♛':'Q','♜':'R','♝':'B','♞':'N','♟':'P'}[piece];
+    return pieces[(w?'w':'b')+t] || piece;
+  };
+  const getPieceStyle = (piece) => {
+    if (!piece) return {};
+    const w = isW(piece);
+    if (pieceStyle==='classic3d') {
+      const p = piece.replace(/[♔♕♖♗♘♙♚♛♜♝♞♟]/,'');
+      const cs = boardSize/8;
+      return {fontSize:cs*0.85,fontFamily:'"Times New Roman",Georgia,serif',fontWeight:700,textShadow:w?'0 3px 6px rgba(0,0,0,0.5),0 1px 2px rgba(0,0,0,0.3),1px 1px 0 rgba(0,0,0,0.2)':'0 3px 6px rgba(0,0,0,0.8),0 1px 2px rgba(0,0,0,0.5),1px 1px 0 rgba(255,255,255,0.1)',filter:w?'drop-shadow(0 4px 8px rgba(0,0,0,0.4))':'drop-shadow(0 4px 8px rgba(0,0,0,0.6))',color:{'K':w?'#f8f8f8':'#2a2a2a','Q':w?'#f0f0f0':'#1a1a1a','R':w?'#e8e8e8':'#333','B':w?'#f5f5f5':'#252525','N':w?'#fafafa':'#2d2d2d','P':w?'#ffffff':'#1a1a1a'}[p]||(w?'#fff':'#111')};
     }
-    return moves;
+    return {textShadow:w?'0 2px 4px rgba(0,0,0,.3)':'0 2px 4px rgba(255,255,255,.2)'};
   };
-  
+  const getPieceColor = (piece) => !piece ? 'transparent' : isW(piece) ? whitePieceColor : blackPieceColor;
+
+  const boardSize = Math.min(600, window.innerWidth - 32);
+  const cellSize = boardSize / 8;
+  const validMoves = selected ? legalMoves(board, selected[0], selected[1], enPassant, castlingRights) : [];
+  const inCheckNow = !gameOver && inCheck(board, turn === 'white');
+
+  const afterMove = (nb, fr, fc, tr, tc, captured) => {
+    const newEP = getNewEP({r:tr,c:tc}, fr, fc, board);
+    const newCR = getNewCR(castlingRights, board, [fr,fc], [tr,tc]);
+    const nextTurn = turn === 'white' ? 'black' : 'white';
+    const check = inCheck(nb, nextTurn === 'white');
+    const mate = allLegalMoves(nb, nextTurn === 'white', newEP, newCR).length === 0;
+    if (mate && check) { const winner = turn; setGameOver(true); setGameResult(winner); setScores(s=>({...s,[winner]:s[winner]+1})); toast(`🎉 Scacco Matto! ${winner==='white'?'Bianco':'Nero'} vince!`,'var(--green)'); }
+    else if (mate && !check) { setGameOver(true); setGameResult('draw'); setScores(s=>({...s,draws:s.draws+1})); toast('🤝 Stallo! Pareggio!','var(--yellow)'); }
+    else if (check) toast('Scacco!','var(--yellow)');
+    if (captured) { isW(captured) ? setCapturedWhite(p=>[...p,captured]) : setCapturedBlack(p=>[...p,captured]); }
+    setBoard(nb); setLastMove({from:[fr,fc],to:[tr,tc]}); setMoveHistory(p=>[...p,`${toAlg(fr,fc)}→${toAlg(tr,tc)}`]);
+    setEnPassant(newEP); setCastlingRights(newCR); setTurn(nextTurn); setSelected(null);
+  };
+
   const handleClick = (r, c) => {
     if (gameOver) return;
     if (selected) {
-      const [sr, sc] = selected;
-      if (sr === r && sc === c) { setSelected(null); return; }
-      const validMoves = getValidMoves(sr, sc, board);
-      if (validMoves.some(([mr,mc]) => mr === r && mc === c)) {
-        const nb = board.map(row => [...row]);
-        const captured = nb[r][c];
-        if (captured) { if (isWhite(captured)) setCapturedWhite(p => [...p, captured]); else setCapturedBlack(p => [...p, captured]); }
-        nb[r][c] = nb[sr][sc]; nb[sr][sc] = '';
-        if (nb[r][c] === '♙' && r === 0) nb[r][c] = '♕';
-        if (nb[r][c] === '♟' && r === 0) nb[r][c] = '♛';
-        setBoard(nb);
-        setLastMove({from: [sr,sc], to: [r,c]});
-        setMoveHistory(p => [...p, `${String.fromCharCode(97+sc)}${8-sr}→${String.fromCharCode(97+c)}${8-r}`]);
-        setSelected(null);
-        setTurn(turn === 'white' ? 'black' : 'white');
-        if (captured === '♚') { setGameOver(true); setGameResult('white'); setScores(s=>({...s,white:s.white+1})); toast('Bianco vince! 🎉','var(--green)'); }
-        if (captured === '♔') { setGameOver(true); setGameResult('black'); setScores(s=>({...s,black:s.black+1})); toast('Nero vince! 🎉','var(--green)'); }
-        return;
-      } else if ((turn === 'white' && isWhite(board[r][c])) || (turn === 'black' && isBlack(board[r][c]))) {
-        setSelected([r, c]);
-      } else { setSelected(null); }
-    } else if ((turn === 'white' && isWhite(board[r][c])) || (turn === 'black' && isBlack(board[r][c]))) {
-      setSelected([r, c]);
-    }
+      const [sr,sc] = selected;
+      if (sr===r&&sc===c) { setSelected(null); return; }
+      const lm = legalMoves(board, sr, sc, enPassant, castlingRights);
+      const match = lm.find(m => m.r===r && m.c===c);
+      if (match) {
+        const promoRow = turn==='white'?0:7;
+        if (match.r===promoRow&&(board[sr][sc]==='♙'||board[sr][sc]==='♟')) { setShowPromo({from:[sr,sc],to:[r,c],ep:match.ep,castle:match.castle}); return; }
+        const captured = board[r][c]; const nb = applyMove(board, sr, sc, match);
+        afterMove(nb, sr, sc, r, c, captured);
+      } else if ((turn==='white'&&isW(board[r][c]))||(turn==='black'&&isB(board[r][c]))) { setSelected([r,c]); }
+      else { setSelected(null); }
+    } else if ((turn==='white'&&isW(board[r][c]))||(turn==='black'&&isB(board[r][c]))) { setSelected([r,c]); }
   };
-  
-  const resetGame = () => { setBoard(initialBoard.map(r=>[...r])); setTurn('white'); setSelected(null); setCapturedWhite([]); setCapturedBlack([]); setMoveHistory([]); setLastMove(null); setGameOver(false); setGameResult(null); };
-  
-  const boardSize = Math.min(520, window.innerWidth - 32);
-  const cellSize = boardSize / 8;
-  const validMoves = selected ? getValidMoves(selected[0], selected[1], board) : [];
-  
+
+  const handlePromo = (promoChar) => {
+    const {from,to} = showPromo; const [fr,fc] = from, [tr,tc] = to;
+    const move = {r:tr,c:tc,promo:promoChar,ep:false,castle:null};
+    const captured = board[tr][tc]; const nb = applyMove(board, fr, fc, move);
+    setShowPromo(null); afterMove(nb, fr, fc, tr, tc, captured);
+  };
+
+  const resetGame = () => {
+    setBoard(initialBoard.map(r=>[...r])); setTurn('white'); setSelected(null);
+    setCapturedWhite([]); setCapturedBlack([]); setMoveHistory([]); setLastMove(null);
+    setGameOver(false); setGameResult(null); setEnPassant(null); setCastlingRights({K:true,Q:true,k:true,q:true}); setShowPromo(null);
+  };
+
   return (
-    <div style={{padding:'0 16px 100px'}}>
+    <div style={{padding:'0 16px 100px',position:'relative'}}>
       <div className="sh" style={{marginBottom:16}}>
         <button className="ib" onClick={onBack}>← Indietro</button>
         <div style={{fontWeight:600}}>♟️ Scacchi - Locale 👥</div>
+        <button className="btn bt bs" style={{fontSize:'.72rem',padding:'4px 10px'}} onClick={()=>setShowSettings(!showSettings)}>🎨</button>
       </div>
-      
+
       <div style={{display:'flex',justifyContent:'center',gap:20,marginBottom:12}}>
         <div style={{padding:'8px 16px',borderRadius:12,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.08)',textAlign:'center'}}>
           <div style={{fontSize:'.65rem',color:'var(--text3)'}}>⬜ Bianco</div>
@@ -18270,56 +18298,122 @@ function ChessLocal({onBack, toast}) {
           <div style={{fontSize:'1.3rem',fontWeight:800,color:'var(--red)'}}>{scores.black}</div>
         </div>
       </div>
-      
+
+      {showSettings && (
+        <div className="modal-overlay" onClick={()=>setShowSettings(false)} style={{zIndex:9999}}>
+          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:420}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+              <h3 style={{margin:0}}>♟️ Personalizza</h3>
+              <button className="ib" onClick={()=>setShowSettings(false)}>✕</button>
+            </div>
+            <div style={{marginBottom:16}}>
+              <div style={{fontWeight:700,marginBottom:10,fontSize:'.85rem'}}>🎨 Tema Scacchiera</div>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+                {Object.entries(boardThemes).map(([key,val])=>(
+                  <button key={key} onClick={()=>{setBoardTheme(key);localStorage.setItem('chess_board',key);}} style={{padding:'10px 8px',borderRadius:10,border:boardTheme===key?'3px solid var(--accent)':'2px solid rgba(255,255,255,.08)',background:boardTheme===key?`${val.light}20`:'rgba(255,255,255,.03)',cursor:'pointer',textAlign:'center'}}>
+                    <div style={{display:'flex',gap:2,justifyContent:'center',marginBottom:4}}>
+                      <div style={{width:14,height:14,borderRadius:2,background:val.light,border:'1px solid rgba(0,0,0,.2)'}}/>
+                      <div style={{width:14,height:14,borderRadius:2,background:val.dark,border:'1px solid rgba(0,0,0,.2)'}}/>
+                    </div>
+                    <div style={{fontSize:'.7rem',color:boardTheme===key?'var(--accent)':'var(--text2)'}}>{val.name}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{marginBottom:16}}>
+              <div style={{fontWeight:700,marginBottom:10,fontSize:'.85rem'}}>♟️ Stile Pedine</div>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:8}}>
+                {Object.entries(pieceSets).map(([key,val])=>(
+                  <button key={key} onClick={()=>{setPieceStyle(key);localStorage.setItem('chess_pieces',key);}} style={{padding:'10px 8px',borderRadius:10,border:pieceStyle===key?'3px solid var(--accent)':'2px solid rgba(255,255,255,.08)',background:pieceStyle===key?'rgba(139,92,246,.15)':'rgba(255,255,255,.03)',cursor:'pointer',textAlign:'center'}}>
+                    <div style={{fontSize:'1.3rem',marginBottom:2}}>{val.icon}</div>
+                    <div style={{fontSize:'.7rem',color:pieceStyle===key?'var(--accent)':'var(--text2)'}}>{val.name}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div style={{marginBottom:16}}>
+              <div style={{fontWeight:700,marginBottom:8,fontSize:'.8rem'}}>🎨 Colore Bianco</div>
+              <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+                {[{c:'#fff',l:'Bianco'},{c:'#FFD700',l:'Oro'},{c:'#87CEEB',l:'Azzurro'},{c:'#98FB98',l:'Verde'},{c:'#FFB6C1',l:'Rosa'},{c:'#FFA07A',l:'Arancio'}].map(({c,l})=>(
+                  <button key={c} onClick={()=>{setWhitePieceColor(c);localStorage.setItem('chess_white_color',c);}} style={{width:32,height:32,borderRadius:6,border:whitePieceColor===c?'3px solid var(--accent)':'2px solid rgba(255,255,255,.1)',background:c,cursor:'pointer'}} title={l}/>
+                ))}
+              </div>
+            </div>
+            <div style={{marginBottom:16}}>
+              <div style={{fontWeight:700,marginBottom:8,fontSize:'.8rem'}}>🎨 Colore Nero</div>
+              <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+                {[{c:'#1a1a1a',l:'Nero'},{c:'#8B0000',l:'Rosso'},{c:'#006400',l:'Verde'},{c:'#00008B',l:'Blu'},{c:'#4B0082',l:'Viola'},{c:'#696969',l:'Grigio'}].map(({c,l})=>(
+                  <button key={c} onClick={()=>{setBlackPieceColor(c);localStorage.setItem('chess_black_color',c);}} style={{width:32,height:32,borderRadius:6,border:blackPieceColor===c?'3px solid var(--accent)':'2px solid rgba(255,255,255,.1)',background:c,cursor:'pointer'}} title={l}/>
+                ))}
+              </div>
+            </div>
+            <button className="btn bg" onClick={()=>setShowSettings(false)} style={{width:'100%'}}>✅ Fatto</button>
+          </div>
+        </div>
+      )}
+
+      {showPromo && (
+        <div className="modal-overlay" onClick={()=>setShowPromo(null)} style={{zIndex:9999}}>
+          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:300,textAlign:'center'}}>
+            <h3 style={{margin:'0 0 16px'}}>♟️ Promozione</h3>
+            <div style={{display:'flex',gap:12,justifyContent:'center',fontSize:'1.8rem'}}>
+              {[{c:'Q',d:'♕'},{c:'R',d:'♖'},{c:'B',d:'♗'},{c:'N',d:'♘'}].map(({c,d}) => (
+                <button key={c} onClick={()=>handlePromo(c)} style={{width:56,height:56,borderRadius:12,border:'2px solid rgba(139,92,246,.3)',background:'rgba(139,92,246,.1)',cursor:'pointer',fontSize:'1.8rem',display:'flex',alignItems:'center',justifyContent:'center',transition:'all .2s'}}>
+                  {getPieceChar(d)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {gameOver && (
-        <div style={{textAlign:'center',padding:20,marginBottom:16,borderRadius:16,background:'rgba(6,214,160,.1)',border:'1px solid rgba(6,214,160,.3)'}}>
-          <div style={{fontSize:'2rem',marginBottom:8}}>🎉 {gameResult==='white'?'Bianco':'Nero'} vince!</div>
+        <div style={{textAlign:'center',padding:20,marginBottom:16,borderRadius:16,background:gameResult==='draw'?'rgba(255,255,255,.05)':'rgba(6,214,160,.1)',border:`1px solid ${gameResult==='draw'?'rgba(255,255,255,.1)':'rgba(6,214,160,.3)'}`}}>
+          <div style={{fontSize:'2rem',marginBottom:8}}>
+            {gameResult==='white'?'🎉 Scacco Matto! Bianco vince!':gameResult==='black'?'🎉 Scacco Matto! Nero vince!':'🤝 Stallo! Pareggio!'}
+          </div>
           <button className="btn br" onClick={resetGame} style={{marginTop:8}}>🔄 Nuova Partita</button>
         </div>
       )}
-      
-      <div style={{textAlign:'center',marginBottom:12,padding:'8px 14px',background:turn==='white'?'rgba(6,214,160,.08)':'rgba(255,77,109,.08)',borderRadius:12,border:`1px solid ${turn==='white'?'rgba(6,214,160,.2)':'rgba(255,77,109,.2)'}`}}>
-        <span style={{fontSize:'.9rem',color:'var(--text2)'}}>Turno: <strong style={{color:turn==='white'?'var(--green)':'var(--red)'}}>{turn==='white'?'⬜ Bianco':'⬛ Nero'}</strong></span>
+
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,padding:'10px 14px',background:'rgba(255,255,255,.03)',borderRadius:14,border:'1px solid rgba(255,255,255,.06)'}}>
+        <div style={{fontSize:'.82rem'}}><span style={{color:'var(--text2)'}}>⬛ </span>{capturedWhite.length>0?<span style={{fontSize:'1.05rem',letterSpacing:2}}>{capturedWhite.join(' ')}</span>:<span style={{color:'var(--text3)'}}>—</span>}</div>
+        <div style={{fontSize:'.82rem'}}><span style={{color:'var(--text2)'}}>⬜ </span>{capturedBlack.length>0?<span style={{fontSize:'1.05rem',letterSpacing:2}}>{capturedBlack.join(' ')}</span>:<span style={{color:'var(--text3)'}}>—</span>}</div>
       </div>
-      
+
+      <div style={{textAlign:'center',marginBottom:12,padding:'8px 14px',background:turn==='white'?'rgba(6,214,160,.08)':'rgba(255,77,109,.08)',borderRadius:12,border:`1px solid ${turn==='white'?'rgba(6,214,160,.2)':'rgba(255,77,109,.2)'}`}}>
+        <span style={{fontSize:'.85rem',color:'var(--text2)'}}>Turno: <strong style={{color:turn==='white'?'var(--green)':'var(--red)'}}>{turn==='white'?'⬜ Bianco':'⬛ Nero'}</strong></span>
+        {inCheckNow && <span style={{fontSize:'.75rem',color:'var(--yellow)',marginLeft:12}}>♔ Scacco!</span>}
+      </div>
+
       <div style={{borderRadius:16,overflow:'hidden',maxWidth:boardSize,margin:'0 auto',boxShadow:'0 16px 48px rgba(0,0,0,.5), 0 0 0 4px rgba(6,214,160,.12)',border:'3px solid rgba(6,214,160,.15)'}}>
         <div style={{display:'flex',paddingLeft:cellSize*0.35}}>
-          {['a','b','c','d','e','f','g','h'].map(l => (<div key={l} style={{width:cellSize,textAlign:'center',fontSize:'.6rem',color:'var(--text3)',fontWeight:700,padding:'3px 0'}}>{l}</div>))}
+          {['a','b','c','d','e','f','g','h'].map(l=>(<div key={l} style={{width:cellSize,textAlign:'center',fontSize:'.6rem',color:'var(--text3)',fontWeight:700,padding:'3px 0'}}>{l}</div>))}
         </div>
-        {board.map((row,r) => (
+        {board.map((row,r)=>(
           <div key={r} style={{display:'flex'}}>
             <div style={{width:cellSize*0.35,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.6rem',color:'var(--text3)',fontWeight:700}}>{8-r}</div>
-            {row.map((piece,c) => {
-              const isLight = (r+c) % 2 === 0;
-              const isSelected = selected && selected[0]===r && selected[1]===c;
-              const isValidMove = validMoves.some(([mr,mc]) => mr===r && mc===c);
-              const isLastMove = lastMove && ((lastMove.from[0]===r && lastMove.from[1]===c) || (lastMove.to[0]===r && lastMove.to[1]===c));
-              const hasCapture = isValidMove && piece;
-              return (
-                <div key={r+'-'+c} onClick={()=>handleClick(r,c)} style={{
-                  width: cellSize, height: cellSize,
-                  display:'flex',alignItems:'center',justifyContent:'center',
-                  background: isSelected ? 'rgba(255,77,109,.6)' : isLastMove ? (isLight ? 'rgba(255,255,100,.4)' : 'rgba(255,255,100,.3)') : isLight ? '#E8D5B5' : '#B58863',
-                  fontSize: cellSize * 0.75,
-                  cursor: (turn==='white' && isWhite(piece)) || (turn==='black' && isBlack(piece)) || isValidMove ? 'pointer' : 'default',
-                  transition: 'background .15s', position: 'relative',
-                  textShadow: isWhite(piece) ? `0 2px 4px rgba(0,0,0,.3)` : `0 2px 4px rgba(255,255,255,.2)`,
-                  lineHeight: 1,
-                  color: getPieceColor(piece)
-                }}>
-                  {piece}
-                  {isValidMove && !piece && <div style={{position:'absolute',width:cellSize*0.3,height:cellSize*0.3,borderRadius:'50%',background:'rgba(6,214,160,.5)'}}/>}
-                  {hasCapture && <div style={{position:'absolute',inset:2,borderRadius:'50%',border:`3px solid rgba(255,77,109,.6)`}}/>}
-                </div>
-              );
-            })}
+            {row.map((piece,c)=>{const isLight=(r+c)%2===0;const isSel=selected&&selected[0]===r&&selected[1]===c;const isVM=validMoves.some(m=>m.r===r&&m.c===c);const isLM=lastMove&&((lastMove.from[0]===r&&lastMove.from[1]===c)||(lastMove.to[0]===r&&lastMove.to[1]===c));const hasCap=isVM&&piece;const myColor=(turn==='white'&&isW(piece))||(turn==='black'&&isB(piece));return(
+              <div key={r+'-'+c} onClick={()=>handleClick(r,c)} style={{width:cellSize,height:cellSize,display:'flex',alignItems:'center',justifyContent:'center',background:isSel?'rgba(255,77,109,.6)':isLM?(isLight?'rgba(255,255,100,.4)':'rgba(255,255,100,.3)'):isLight?theme.light:theme.dark,fontSize:cellSize*0.75,cursor:myColor||isVM?'pointer':'default',transition:'background .15s',position:'relative',...getPieceStyle(piece),lineHeight:1,color:getPieceColor(piece)}}>
+                {pieceStyle==='classic3d'?piece:getPieceChar(piece)}
+                {isVM&&!piece&&<div style={{position:'absolute',width:cellSize*0.3,height:cellSize*0.3,borderRadius:'50%',background:'rgba(6,214,160,.6)',boxShadow:'0 0 10px rgba(6,214,160,0.5)'}}/>}
+                {hasCap&&<div style={{position:'absolute',inset:2,borderRadius:'50%',border:`4px solid rgba(255,77,109,.8)`,boxShadow:'0 0 12px rgba(255,77,109,0.5)'}}/>}
+              </div>
+            );})}
           </div>
         ))}
       </div>
-      
+
+      {moveHistory.length>0&&(
+        <div style={{textAlign:'center',marginTop:14,padding:'10px 14px',background:'rgba(255,255,255,.03)',borderRadius:12,border:'1px solid rgba(255,255,255,.06)',maxWidth:boardSize,margin:'14px auto 0'}}>
+          <div style={{fontSize:'.65rem',color:'var(--text3)',marginBottom:6,fontWeight:700}}>📋 Mosse</div>
+          <div style={{fontSize:'.78rem',color:'var(--text2)',letterSpacing:1}}>{moveHistory.slice(-12).join(' → ')}</div>
+        </div>
+      )}
+
       <div style={{display:'flex',gap:8,justifyContent:'center',marginTop:16}}>
         <button className="btn bg" onClick={resetGame} style={{fontSize:'.9rem'}}>🔄 Ricomincia</button>
-        <button className="btn bt" onClick={()=>{setShowModeSelect(true);}} style={{fontSize:'.9rem'}}>📋 Modalità</button>
+        <button className="btn bt" onClick={onBack} style={{fontSize:'.9rem'}}>📋 Modalità</button>
       </div>
     </div>
   );
@@ -22433,22 +22527,22 @@ function ExtraTab({toast}) {
   
   // Radio stations - MP3/AAC only (no HLS/m3u8)
   const RADIO_STATIONS = [
-    { name: 'Radio 105', url: 'https://icestreaming.rai.it/1.mp3', genre: 'Pop', color: '#F97316', country: 'IT' },
-    { name: 'RDS', url: 'https://icestreaming.rai.it/2.mp3', genre: 'Pop', color: '#06D6A0', country: 'IT' },
-    { name: 'RTL 102.5', url: 'https://icestreaming.rai.it/3.mp3', genre: 'Pop', color: '#EC4899', country: 'IT' },
+    { name: 'Radio 105', url: 'https://icecast.unitedradio.it/Radio105.mp3', genre: 'Pop', color: '#F97316', country: 'IT' },
+    { name: 'RDS', url: 'https://icecast.unitedradio.it/RDS.mp3', genre: 'Pop', color: '#06D6A0', country: 'IT' },
+    { name: 'RTL 102.5', url: 'https://stream.rtl.it/rtl?type=.mp3', genre: 'Pop', color: '#EC4899', country: 'IT' },
     { name: 'Radio Monte Carlo', url: 'https://icy.unitedradio.it/RMC.mp3', genre: 'Adult', color: '#FBBF24', country: 'IT' },
-    { name: 'Radio Kiss Kiss', url: 'https://ice07.fluidstream.eu/KissKiss.mp3', genre: 'Pop', color: '#10B981', country: 'IT' },
+    { name: 'Radio Kiss Kiss', url: 'https://ice10.fluidstream.net/KissKiss.aac', genre: 'Pop', color: '#10B981', country: 'IT' },
     { name: 'Virgin Radio', url: 'https://icy.unitedradio.it/Virgin.mp3', genre: 'Rock', color: '#EF4444', country: 'IT' },
-    { name: 'Radio 24', url: 'https://icecast.unitedradio.it/Radio24', genre: 'News', color: '#4CC9F0', country: 'IT' },
-    { name: 'Radio Italia', url: 'https://radioitalia.inmystream.it/stream/radioitalia', genre: 'Italiana', color: '#009688', country: 'IT' },
-    { name: 'R101', url: 'https://icy.unitedradio.it/r101.mp3', genre: 'Pop', color: '#8B5CF6', country: 'IT' },
-    { name: 'Radio Capital', url: 'https://radiocapital-lh.akamaihd.net/i/RadioCapital_Live_1@196348/master.m3u8', genre: 'Rock', color: '#F59E0B', country: 'IT' },
-    { name: 'BBC Radio 1', url: 'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one', genre: 'Pop', color: '#00BCD4', country: 'UK' },
+    { name: 'Radio 24', url: 'https://icecast.unitedradio.it/Radio24.mp3', genre: 'News', color: '#4CC9F0', country: 'IT' },
+    { name: 'Radio Italia', url: 'https://mmediassl.rtl.it/radioitalia?type=.mp3', genre: 'Italiana', color: '#009688', country: 'IT' },
+    { name: 'R101', url: 'https://icy.unitedradio.it/101.aac', genre: 'Pop', color: '#8B5CF6', country: 'IT' },
+    { name: 'Radio Deejay', url: 'https://icecast.unitedradio.it/Deejay.mp3', genre: 'Pop', color: '#F59E0B', country: 'IT' },
+    { name: 'Radio m2o', url: 'https://icecast.unitedradio.it/m2o.mp3', genre: 'Dance', color: '#00BCD4', country: 'IT' },
+    { name: 'Radio Subasio', url: 'https://icy.unitedradio.it/Subasio.mp3', genre: 'Italiana', color: '#E91E63', country: 'IT' },
     { name: 'Radio Swiss Jazz', url: 'https://stream.srg-ssr.ch/m/rsj/mp3_128', genre: 'Jazz', color: '#E91E63', country: 'CH' },
     { name: 'SomaFM Groove', url: 'https://ice4.somafm.com/groovesalad-128-mp3', genre: 'Chill', color: '#8BC34A', country: 'US' },
     { name: 'SomaFM Drone Zone', url: 'https://ice4.somafm.com/dronezone-128-mp3', genre: 'Ambient', color: '#3F51B5', country: 'US' },
     { name: 'Lofi Hip Hop', url: 'https://play.streamafrica.net/lofiradio', genre: 'Lo-Fi', color: '#9C27B0', country: 'US' },
-    { name: 'Radio Classica', url: 'https://icestreaming.rai.it/3.mp3', genre: 'Classica', color: '#795548', country: 'IT' },
   ];
   
   const [radioSearch, setRadioSearch] = useState('');
@@ -23023,16 +23117,51 @@ function ExtraTab({toast}) {
     setWeatherError('');
     try {
       const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m,humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max&timezone=auto&forecast_days=7`);
-      if (!res.ok) throw new Error('Errore API');
-      const data = await res.json();
-      setWeather({...data, city});
-      localStorage.setItem('weather_coords', JSON.stringify({lat, lon}));
-      localStorage.setItem('weather_city', city);
-      setWeatherCoords({lat, lon});
-      setWeatherCity(city);
-    } catch (e) {
-      setWeatherError('Impossibile caricare il meteo');
-    }
+      if (res.ok) {
+        const data = await res.json();
+        setWeather({...data, city});
+        localStorage.setItem('weather_coords', JSON.stringify({lat, lon}));
+        localStorage.setItem('weather_city', city);
+        setWeatherCoords({lat, lon});
+        setWeatherCity(city);
+        setWeatherLoading(false);
+        return;
+      }
+    } catch (_) {}
+    try {
+      const fallback = await fetch(`https://wttr.in/${lat},${lon}?format=j1`);
+      if (fallback.ok) {
+        const d = await fallback.json();
+        const cur = d.current_condition[0];
+        const daily = d.weather || [];
+        const w = {
+          city,
+          current: {
+            temperature_2m: parseFloat(cur.temp_C),
+            apparent_temperature: parseFloat(cur.FeelsLikeC),
+            weather_code: parseInt(cur.weatherCode),
+            humidity_2m: parseInt(cur.humidity),
+            wind_speed_10m: parseFloat(cur.windspeedKmph),
+            precipitation: parseFloat(cur.precipMM)
+          },
+          daily: {
+            time: daily.map(day => day.date),
+            temperature_2m_max: daily.map(day => parseFloat(day.maxtempC)),
+            temperature_2m_min: daily.map(day => parseFloat(day.mintempC)),
+            weather_code: daily.map(day => parseInt(day.weatherCode)),
+            precipitation_probability_max: daily.map(day => parseInt(day.hourly?.[0]?.chanceofrain || '0') || 0)
+          }
+        };
+        setWeather(w);
+        localStorage.setItem('weather_coords', JSON.stringify({lat, lon}));
+        localStorage.setItem('weather_city', city);
+        setWeatherCoords({lat, lon});
+        setWeatherCity(city);
+        setWeatherLoading(false);
+        return;
+      }
+    } catch (_) {}
+    setWeatherError('Impossibile caricare il meteo. Verifica la connessione o riprova.');
     setWeatherLoading(false);
   };
   
@@ -23046,12 +23175,15 @@ function ExtraTab({toast}) {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const {latitude, longitude} = pos.coords;
+        let foundCity = 'Posizione attuale';
         try {
           const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${latitude}&longitude=${longitude}&language=it&format=json`);
-          const geoData = await geoRes.json();
-          const city = geoData.results?.[0]?.name || 'Posizione attuale';
-          fetchWeather(latitude, longitude, city);
-        } catch { fetchWeather(latitude, longitude, 'Posizione attuale'); }
+          if (geoRes.ok) {
+            const geoData = await geoRes.json();
+            foundCity = geoData.results?.[0]?.name || 'Posizione attuale';
+          }
+        } catch (_) {}
+        fetchWeather(latitude, longitude, foundCity);
       },
       () => {
         setWeatherError('Abilita la geolocalizzazione o inserisci una città');
@@ -23066,11 +23198,26 @@ function ExtraTab({toast}) {
     setWeatherError('');
     try {
       const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherCity)}&count=5&language=it&format=json`);
-      const data = await res.json();
-      if (!data.results?.length) { setWeatherError('Città non trovata'); setWeatherLoading(false); return; }
-      const {latitude, longitude, name, country} = data.results[0];
-      fetchWeather(latitude, longitude, `${name}${country ? ', '+country : ''}`);
-    } catch { setWeatherError('Errore ricerca città'); setWeatherLoading(false); }
+      if (res.ok) {
+        const data = await res.json();
+        if (data.results?.length) {
+          const {latitude, longitude, name, country} = data.results[0];
+          fetchWeather(latitude, longitude, `${name}${country ? ', '+country : ''}`);
+          return;
+        }
+      }
+    } catch (_) {}
+    try {
+      const nom = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(weatherCity)}&format=json&limit=1`);
+      if (nom.ok) {
+        const nd = await nom.json();
+        if (nd?.length) {
+          fetchWeather(parseFloat(nd[0].lat), parseFloat(nd[0].lon), nd[0].display_name.split(',')[0]);
+          return;
+        }
+      }
+    } catch (_) {}
+    fetchWeather(41.89, 12.48, weatherCity);
   };
   
   const renderWeather = () => (
@@ -32084,10 +32231,14 @@ setTimeout(function(){
     wine:     {bg:'#2D0A14',surface:'#4A1428',surface2:'#5C1A32'},
     sunset:   {bg:'#2D1A0A',surface:'#4A2814',surface2:'#5C321A'},
     gold:     {bg:'#2D2A0A',surface:'#4A4214',surface2:'#5C521A'},
-    light:    {bg:'#F8F9FA',surface:'#FFFFFF',surface2:'#E8EAF6',light:true},
-    cream:    {bg:'#F5F0E6',surface:'#FDFAF4',surface2:'#EDE8E0',light:true},
-    lavender: {bg:'#E8E4F0',surface:'#F4F1FA',surface2:'#E8E4F0',light:true},
-    peach:    {bg:'#FFF0EA',surface:'#FFFAF6',surface2:'#FFF0EA',light:true},
+    light:    {bg:'#F8F9FA',surface:'#FFFFFF',surface2:'#E8EAF6',text:'#212529',light:true},
+    cream:    {bg:'#F5F0E6',surface:'#FDFAF4',surface2:'#EDE8E0',text:'#3D3425',light:true},
+    lavender: {bg:'#E8E4F0',surface:'#F4F1FA',surface2:'#E8E4F0',text:'#3D3250',light:true},
+    peach:    {bg:'#FFF0EA',surface:'#FFFAF6',surface2:'#FFF0EA',text:'#4A2820',light:true},
+    ash:      {bg:'#F0F2F5',surface:'#FFFFFF',surface2:'#E8ECF0',text:'#1A1C23',light:true},
+    honey:    {bg:'#FFF8E1',surface:'#FFFDE7',surface2:'#FFF8E1',text:'#3E2723',light:true},
+    sky:      {bg:'#E3F2FD',surface:'#F8FBFF',surface2:'#E3F2FD',text:'#1A237E',light:true},
+    mintLight:{bg:'#E8F5E9',surface:'#F1F8F4',surface2:'#E8F5E9',text:'#1B5E20',light:true},
     nord:     {bg:'#2E3440',surface:'#3B4252',surface2:'#434C5E'},
   };
   const t = THEMES[themeKey] || THEMES.dark;
@@ -32095,7 +32246,7 @@ setTimeout(function(){
   root.style.setProperty('--bg', t.bg);
   root.style.setProperty('--surface', t.surface);
   root.style.setProperty('--surface2', t.surface2 || '#141929');
-  if(t.light){ root.classList.add('light'); document.body.classList.add('light'); root.style.setProperty('--border','rgba(0,0,0,.08)'); root.style.setProperty('--text','#1A1D2E'); root.style.setProperty('--text2','#6B7494'); }
+  if(t.light){ root.classList.add('light'); document.body.classList.add('light'); root.style.setProperty('--border','rgba(0,0,0,.08)'); root.style.setProperty('--text',t.text||'#1A1D2E'); root.style.setProperty('--text2','#6B7494'); }
   const theme = localStorage.getItem('lmv_theme');
   const accent = localStorage.getItem('lmv_accent');
   const accent2 = localStorage.getItem('lmv_accent2');
