@@ -24769,45 +24769,24 @@ function StudySessionsModal({onClose, toast}) {
                 ))}
               </div>
             </div>
-            {/* Y-axis labels + Chart */}
-            <div style={{display:'flex',gap:0}}>
-              {/* Y axis */}
-              <div style={{display:'flex',flexDirection:'column',justifyContent:'space-between',height:180,padding:'0 6px 20px 0',fontSize:'.6rem',color:'var(--text3)',textAlign:'right',minWidth:35}}>
-                <span>{Math.ceil(maxChartMin/60)*60}m</span>
-                <span>{Math.ceil(maxChartMin*0.75/60)*60>0?Math.ceil(maxChartMin*0.75/60)*60+'m':''}</span>
-                <span>{Math.ceil(maxChartMin*0.5/60)*60>0?Math.ceil(maxChartMin*0.5/60)*60+'m':''}</span>
-                <span>{Math.ceil(maxChartMin*0.25/60)*60>0?Math.ceil(maxChartMin*0.25/60)*60+'m':''}</span>
-                <span>0m</span>
-              </div>
-              {/* Bars + grid */}
-              <div style={{flex:1,position:'relative',height:180}}>
-                {/* Grid lines */}
-                {[0,0.25,0.5,0.75,1].map(pct=>(
-                  <div key={pct} style={{position:'absolute',left:0,right:0,bottom:(pct*100)+'%',height:1,background:pct===0?'rgba(255,255,255,.1)':'rgba(255,255,255,.04)',zIndex:0}}/>
-                ))}
-                {/* Bars */}
-                <div style={{display:'flex',alignItems:'flex-end',gap:chartDays<=30?3:chartDays<=90?1:0,height:'100%',position:'relative',zIndex:1,paddingBottom:20}}>
-                  {periodData.map((d,i)=>{
-                    const hPct = d.minutes>0?Math.max(3,(d.minutes/maxChartMin)*100):0;
-                    const showVal = chartDays<=30 || (chartDays<=90 && i%3===0);
-                    return (
-                      <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
-                        {showVal && d.minutes>0 && <div style={{fontSize:'.58rem',color:'var(--text2)',fontWeight:600,marginBottom:2,whiteSpace:'nowrap'}}>{d.minutes>=60?Math.floor(d.minutes/60)+'h'+(d.minutes%60>0?d.minutes%60+'m':''):d.minutes+'m'}</div>}
-                        <div style={{width:'100%',background:d.minutes>0?'linear-gradient(180deg,#10B981 0%,#059669 100%)':'rgba(255,255,255,.04)',borderRadius:chartDays<=30?'4px 4px 0 0':'2px 2px 0 0',height:hPct+'%',minHeight:d.minutes>0?3:0,transition:'height .4s ease',position:'relative',cursor:'pointer'}} title={d.date+': '+d.minutes+' min ('+d.sessions+' sessioni)'}/>
-                        {/* Date label */}
-                        {((chartDays<=30)||((chartDays<=90)&&i%7===0)||(chartDays>90&&i%(Math.floor(chartDays/12))===0)) && <div style={{fontSize:'.55rem',color:'var(--text3)',marginTop:4,whiteSpace:'nowrap',position:'absolute',bottom:-16}}>{d.day}</div>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+            {/* Simple bar chart */}
+            <div style={{display:'flex',alignItems:'flex-end',gap:chartDays<=7?8:chartDays<=30?4:1,height:160,paddingBottom:24}}>
+              {periodData.map((d,i)=>{
+                const hPct = d.minutes>0?Math.max(4,(d.minutes/maxChartMin)*100):0;
+                return (
+                  <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
+                    {d.minutes>0 && <div style={{fontSize:chartDays<=30?'.68rem':'.55rem',color:'var(--text2)',fontWeight:700,marginBottom:3,whiteSpace:'nowrap'}}>{d.minutes>=60?Math.floor(d.minutes/60)+'h'+(d.minutes%60>0?' '+d.minutes%60+'m':''):d.minutes+'min'}</div>}
+                    <div style={{width:'100%',background:d.minutes>0?'#10B981':'rgba(255,255,255,.06)',borderRadius:'4px 4px 0 0',height:hPct+'%',minHeight:d.minutes>0?4:0,transition:'height .4s',cursor:'pointer'}} title={d.date+': '+d.minutes+' min'}/>
+                    {((chartDays<=7)||((chartDays<=30)&&i%3===0)||(chartDays>30&&i%(Math.ceil(chartDays/10))===0)) && <div style={{fontSize:'.6rem',color:'var(--text3)',marginTop:6,whiteSpace:'nowrap'}}>{d.day}</div>}
+                  </div>
+                );
+              })}
             </div>
-            {/* Summary bar */}
-            <div style={{display:'flex',gap:16,marginTop:24,padding:'10px 14px',background:'rgba(255,255,255,.03)',borderRadius:10,fontSize:'.75rem',color:'var(--text2)',flexWrap:'wrap'}}>
+            {/* Summary */}
+            <div style={{display:'flex',gap:20,justifyContent:'center',padding:'10px 0',borderTop:'1px solid var(--border)',fontSize:'.78rem',color:'var(--text2)',flexWrap:'wrap'}}>
               <span>Media: <strong style={{color:'var(--accent)'}}>{periodTotalMinutes>0?(periodTotalMinutes/periodData.length).toFixed(0):0} min/giorno</strong></span>
               <span>Totale: <strong style={{color:'var(--green)'}}>{Math.floor(periodTotalMinutes/60)}h {periodTotalMinutes%60}m</strong></span>
               <span>Giorni attivi: <strong style={{color:'#06B6D4'}}>{periodData.filter(d=>d.minutes>0).length}/{periodData.length}</strong></span>
-              <span>Miglior giorno: <strong style={{color:'#8B5CF6'}}>{bestDay?new Date(bestDay+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'}):'-'} ({bestDay?byDate[bestDay].minutes:0}m)</strong></span>
             </div>
           </div>
         </>)}
@@ -24886,18 +24865,20 @@ function StudySessionsModal({onClose, toast}) {
         {/* ============ ANALYTICS TAB ============ */}
         {tab==='analytics' && (<>
           {/* Subject Breakdown */}
-          <div className="card" style={{marginBottom:16,padding:'16px 18px'}}>
-            <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>{'📖'} Tempo per materia</div>
+          <div className="card" style={{marginBottom:16,padding:'18px 20px'}}>
+            <div style={{fontWeight:700,marginBottom:16,fontSize:'.95rem'}}>{'📖'} Tempo per materia</div>
             {sortedSubjects.length===0 ? (
-              <div style={{fontSize:'.82rem',color:'var(--text2)'}}>Nessuna materia registrata. Aggiungi una materia quando inserisci sessioni manuali.</div>
+              <div style={{fontSize:'.82rem',color:'var(--text2)',textAlign:'center',padding:20}}>Nessuna materia registrata</div>
             ) : (
-              <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              <div style={{display:'flex',flexDirection:'column',gap:10}}>
                 {sortedSubjects.map(([name,min],i)=>(
-                  <div key={i} style={{display:'flex',alignItems:'center',gap:10}}>
-                    <div style={{width:90,fontSize:'.78rem',color:'var(--text2)',textAlign:'right',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{name}</div>
-                    <div style={{flex:1,height:20,background:'rgba(255,255,255,.04)',borderRadius:6,overflow:'hidden',position:'relative'}}>
-                      <div style={{height:'100%',width:(min/maxSubj*100)+'%',background:subjColors[i%subjColors.length],borderRadius:6,transition:'width .5s',opacity:.8}}/>
-                      <span style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',fontSize:'.7rem',fontWeight:700,color:'#fff'}}>{Math.floor(min/60)}h {min%60}m</span>
+                  <div key={i}>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
+                      <span style={{fontSize:'.82rem',color:'var(--text1)',fontWeight:600}}>{name}</span>
+                      <span style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:700}}>{Math.floor(min/60)}h {min%60}m</span>
+                    </div>
+                    <div style={{height:24,background:'rgba(255,255,255,.04)',borderRadius:8,overflow:'hidden'}}>
+                      <div style={{height:'100%',width:(min/maxSubj*100)+'%',background:subjColors[i%subjColors.length],borderRadius:8,transition:'width .5s',opacity:.85}}/>
                     </div>
                   </div>
                 ))}
@@ -24907,16 +24888,22 @@ function StudySessionsModal({onClose, toast}) {
 
           {/* Time of Day */}
           <div className="card" style={{marginBottom:16,padding:'16px 18px'}}>
-            <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>{'🕐'} Quando studi</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:10}}>
+            <div style={{fontWeight:700,marginBottom:14,fontSize:'.95rem'}}>{'🕐'} Quando studi</div>
+            {/* Stacked horizontal bar */}
+            <div style={{display:'flex',height:28,borderRadius:8,overflow:'hidden',marginBottom:12}}>
+              {Object.entries(todData).map(([period2,min])=>{
+                const pct = periodTotalMinutes>0?(min/periodTotalMinutes*100):0;
+                return pct>0 ? <div key={period2} style={{width:pct+'%',background:todColors[period2],transition:'width .5s',position:'relative'}} title={period2+': '+Math.floor(min/60)+'h '+min%60+'m ('+pct.toFixed(0)+'%)'}/>:null;
+              })}
+            </div>
+            {/* Legend */}
+            <div style={{display:'flex',gap:16,justifyContent:'center',flexWrap:'wrap'}}>
               {Object.entries(todData).map(([period2,min])=>(
-                <div key={period2} style={{textAlign:'center',padding:'14px 8px',background:'rgba(255,255,255,.03)',borderRadius:12}}>
-                  <div style={{fontSize:'1.8rem',marginBottom:6}}>{todIcons[period2]}</div>
-                  <div style={{fontWeight:700,fontSize:'1rem',color:todColors[period2]}}>{Math.floor(min/60)}h {min%60}m</div>
-                  <div style={{fontSize:'.72rem',color:'var(--text2)',marginTop:2}}>{period2}</div>
-                  <div style={{width:'100%',height:4,background:'rgba(255,255,255,.06)',borderRadius:2,marginTop:8}}>
-                    <div style={{height:'100%',width:(min/maxTod*100)+'%',background:todColors[period2],borderRadius:2,transition:'width .5s'}}/>
-                  </div>
+                <div key={period2} style={{display:'flex',alignItems:'center',gap:6,fontSize:'.78rem',color:'var(--text2)'}}>
+                  <div style={{width:10,height:10,borderRadius:3,background:todColors[period2]}}/>
+                  <span>{period2}</span>
+                  <strong style={{color:'var(--text1)'}}>{Math.floor(min/60)}h{min%60>0?' '+min%60+'m':''}</strong>
+                  <span style={{color:'var(--text3)',fontSize:'.7rem'}}>({periodTotalMinutes>0?(min/periodTotalMinutes*100).toFixed(0):0}%)</span>
                 </div>
               ))}
             </div>
@@ -24925,54 +24912,39 @@ function StudySessionsModal({onClose, toast}) {
           {/* Weekly Trend */}
           {sortedWeeks.length > 0 && (
             <div className="card" style={{marginBottom:16,padding:'18px 20px'}}>
-              <div style={{fontWeight:700,marginBottom:16,fontSize:'.95rem'}}>{'📊'} Trend settimanale</div>
-              <div style={{display:'flex',gap:0}}>
-                {/* Y axis */}
-                <div style={{display:'flex',flexDirection:'column',justifyContent:'space-between',height:160,padding:'0 6px 20px 0',fontSize:'.6rem',color:'var(--text3)',textAlign:'right',minWidth:40}}>
-                  <span>{Math.ceil(maxWeekMin/60)*60}m</span>
-                  <span>{Math.ceil(maxWeekMin*0.5/60)*60>0?Math.ceil(maxWeekMin*0.5/60)*60+'m':''}</span>
-                  <span>0m</span>
-                </div>
-                <div style={{flex:1,position:'relative',height:160}}>
-                  {[0,0.5,1].map(pct=>(
-                    <div key={pct} style={{position:'absolute',left:0,right:0,bottom:(pct*100)+'%',height:1,background:pct===0?'rgba(255,255,255,.1)':'rgba(255,255,255,.04)'}}/>
-                  ))}
-                  <div style={{display:'flex',alignItems:'flex-end',gap:6,height:'100%',position:'relative',zIndex:1,paddingBottom:20}}>
-                    {sortedWeeks.map(([wk,min],i)=>{
-                      const wkDate = new Date(wk+'T12:00');
-                      const label = wkDate.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
-                      return (
-                        <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
-                          <div style={{fontSize:'.6rem',color:'var(--text2)',fontWeight:600,marginBottom:2,whiteSpace:'nowrap'}}>{Math.floor(min/60)}h{min%60>0?' '+min%60+'m':''}</div>
-                          <div style={{width:'100%',background:'linear-gradient(180deg,#8B5CF6 0%,#6D28D9 100%)',borderRadius:'4px 4px 0 0',height:(min/maxWeekMin*100)+'%',minHeight:4,transition:'height .4s',cursor:'pointer'}} title={label+': '+min+' min'}/>
-                          <div style={{fontSize:'.55rem',color:'var(--text3)',marginTop:4,whiteSpace:'nowrap'}}>{label}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+              <div style={{fontWeight:700,marginBottom:14,fontSize:'.95rem'}}>{'📊'} Trend settimanale</div>
+              <div style={{display:'flex',alignItems:'flex-end',gap:6,height:150,paddingBottom:24}}>
+                {sortedWeeks.map(([wk,min],i)=>{
+                  const wkDate = new Date(wk+'T12:00');
+                  const label = wkDate.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+                  return (
+                    <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
+                      <div style={{fontSize:'.65rem',color:'var(--text2)',fontWeight:700,marginBottom:3,whiteSpace:'nowrap'}}>{Math.floor(min/60)}h{min%60>0?' '+min%60+'m':''}</div>
+                      <div style={{width:'100%',background:'#8B5CF6',borderRadius:'4px 4px 0 0',height:(min/maxWeekMin*100)+'%',minHeight:4,transition:'height .4s',cursor:'pointer'}} title={label+': '+min+' min'}/>
+                      <div style={{fontSize:'.6rem',color:'var(--text3)',marginTop:6,whiteSpace:'nowrap'}}>{label}</div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
           {/* Advanced Stats Grid */}
-          <div className="card" style={{padding:'16px 18px'}}>
-            <div style={{fontWeight:700,marginBottom:12,fontSize:'.9rem'}}>{'📈'} Statistiche avanzate</div>
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:8}}>
+          <div className="card" style={{padding:'18px 20px'}}>
+            <div style={{fontWeight:700,marginBottom:14,fontSize:'.95rem'}}>{'📈'} Riepilogo</div>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               {[
-                {l:'Media al giorno',v:avgPerDay.toFixed(0)+' min'},
-                {l:'Miglior giorno',v:bestDay?(byDate[bestDay].minutes+' min'):'-',sub:bestDay?new Date(bestDay+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''},
-                {l:'Media sessione',v:(periodSessions>0?(periodTotalMinutes/periodSessions).toFixed(0):0)+' min'},
-                {l:'Sessioni manuali',v:periodWorkLog.filter(e=>e.manual).length+''},
-                {l:'Sessioni al giorno',v:(periodDates.length>0?(periodSessions/periodDates.length).toFixed(1):'0')},
-                {l:'Giorni attivi',v:periodDates.length+'/'+(period===Infinity?sortedDates.length:period)},
-                {l:'Totale assoluto',v:Math.floor(totalMinutes/60)+'h '+totalMinutes%60+'m'},
-                {l:'Sessioni totali',v:workLog.length+''},
+                {l:'Media giornaliera',v:avgPerDay.toFixed(0)+' min',icon:'📊'},
+                {l:'Miglior giorno',v:bestDay?(byDate[bestDay].minutes+' min'):'-',icon:'🏆',sub:bestDay?new Date(bestDay+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'}):''},
+                {l:'Media sessione',v:(periodSessions>0?(periodTotalMinutes/periodSessions).toFixed(0):0)+' min',icon:'⏱️'},
+                {l:'Sessioni totali',v:workLog.length,icon:'🍅'},
+                {l:'Giorni attivi',v:periodDates.length+'/'+(period===Infinity?sortedDates.length:period),icon:'📅'},
+                {l:'Totale assoluto',v:Math.floor(totalMinutes/60)+'h '+totalMinutes%60+'m',icon:'🔥'},
               ].map((s,i)=>(
-                <div key={i} style={{padding:'10px 12px',background:'rgba(255,255,255,.03)',borderRadius:8}}>
-                  <div style={{fontSize:'.68rem',color:'var(--text2)'}}>{s.l}</div>
-                  <div style={{fontWeight:700,fontSize:'.92rem',color:'var(--accent)',marginTop:2}}>{s.v}</div>
-                  {s.sub && <div style={{fontSize:'.6rem',color:'var(--text3)',marginTop:1}}>{s.sub}</div>}
+                <div key={i} style={{padding:'12px 14px',background:'rgba(255,255,255,.03)',borderRadius:10}}>
+                  <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{s.icon} {s.l}</div>
+                  <div style={{fontWeight:700,fontSize:'1.05rem',color:'var(--accent)',marginTop:3}}>{s.v}</div>
+                  {s.sub && <div style={{fontSize:'.65rem',color:'var(--text3)',marginTop:1}}>{s.sub}</div>}
                 </div>
               ))}
             </div>
@@ -25141,44 +25113,14 @@ function StatsTab({toast}) {
       </div>
       
       <div className="cg" style={{marginBottom:20}}>
-        {stats.map((s,i)=>(
-          <div key={i} className="card" style={{textAlign:'center',padding:'20px 14px',position:'relative',overflow:'hidden',cursor:(s.icon==='🍅'||s.icon==='⏱️')?'pointer':'default',transition:'transform .15s,box-shadow .15s'}} onClick={(s.icon==='🍅'||s.icon==='⏱️')?()=>setSessionsOpen(true):undefined}>
+        {stats.filter(s=>s.icon!=='🍅'&&s.icon!=='⏱️').map((s,i)=>(
+          <div key={i} className="card" style={{textAlign:'center',padding:'16px 12px',position:'relative',overflow:'hidden'}}>
             <div style={{position:'absolute',top:-20,right:-20,width:80,height:80,borderRadius:'50%',background:'rgba(255,255,255,.06)'}}/>
-            <div style={{fontSize:'2rem',marginBottom:8}}>{s.icon}</div>
-            <div style={{fontSize:'1.8rem',fontWeight:800,color:s.color}}>{s.val}</div>
-            <div style={{fontSize:'.78rem',color:'var(--text2)',marginTop:4}}>{s.label}</div>
-            {(s.icon==='🍅'||s.icon==='⏱️')&&<div style={{position:'absolute',bottom:8,right:10,fontSize:'.6rem',color:'var(--text2)',opacity:.5}}>▶ clicca</div>}
+            <div style={{fontSize:'1.6rem',marginBottom:6}}>{s.icon}</div>
+            <div style={{fontSize:'1.5rem',fontWeight:800,color:s.color}}>{s.val}</div>
+            <div style={{fontSize:'.72rem',color:'var(--text2)',marginTop:4}}>{s.label}</div>
           </div>
         ))}
-      </div>
-      
-      <div className="card" style={{marginBottom:16}}>
-        <div style={{fontWeight:700,marginBottom:16,fontSize:'1rem'}}>📈 Attività ultimi 7 giorni</div>
-        <div style={{display:'flex',alignItems:'flex-end',gap:8,height:120}}>
-          {activityData.map((d,i)=>(
-            <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-              <div style={{width:'100%',display:'flex',gap:2,alignItems:'flex-end',height:100}}>
-                <div style={{flex:1,background:'rgba(255,209,102,.5)',borderRadius:'4px 4px 0 0',height:maxVal>0?(d.notes/maxVal*100)+'%':'0%',minHeight:d.notes>0?4:0}} title={`${d.notes} note`}/>
-                <div style={{flex:1,background:'rgba(6,214,160,.5)',borderRadius:'4px 4px 0 0',height:maxVal>0?(d.todos/maxVal*100)+'%':'0%',minHeight:d.todos>0?4:0}} title={`${d.todos} task`}/>
-                <div style={{flex:1,background:'rgba(244,63,94,.5)',borderRadius:'4px 4px 0 0',height:maxVal>0?(d.study/maxVal*100)+'%':'0%',minHeight:d.study>0?4:0}} title={`${d.study} min studio`}/>
-              </div>
-              <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{d.day}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{display:'flex',gap:16,marginTop:12,fontSize:'.75rem'}}>
-          <div style={{display:'flex',alignItems:'center',gap:6}}><div style={{width:10,height:10,borderRadius:2,background:'rgba(255,209,102,.5)'}}/> Note</div>
-          <div style={{display:'flex',alignItems:'center',gap:6}}><div style={{width:10,height:10,borderRadius:2,background:'rgba(6,214,160,.5)'}}/> Task</div>
-          <div style={{display:'flex',alignItems:'center',gap:6}}><div style={{width:10,height:10,borderRadius:2,background:'rgba(244,63,94,.5)'}}/> Studio</div>
-        </div>
-      </div>
-      
-      <div className="card">
-        <div style={{fontWeight:700,marginBottom:12,fontSize:'1rem'}}>💡 Consigli</div>
-        {notes.length===0&&<div style={{color:'var(--text2)',fontSize:'.85rem'}}>Inizia a creare note per tracciare i tuoi progressi!</div>}
-        {notes.length>0&&todos.length===0&&<div style={{color:'var(--text2)',fontSize:'.85rem'}}>Aggiungi task per organizzare meglio il tuo tempo!</div>}
-        {pomCycles<10&&todos.length>0&&<div style={{color:'var(--text2)',fontSize:'.85rem'}}>Hai completato {pomCycles} pomodori. Prova a usare il Pomodoro per studiare più efficacemente!</div>}
-        {pomCycles>=10&&<div style={{color:'var(--green)',fontSize:'.85rem'}}>🎉 Ottimo! {pomCycles} sessioni di studio completate. Continua così!</div>}
       </div>
       {sessionsOpen && <StudySessionsModal onClose={() => setSessionsOpen(false)} toast={toast}/>}
     </div>
