@@ -24907,16 +24907,18 @@ function NotesPage({onClose, toast}) {
   const {notes, addNote, updateNote, delNote} = useContext(DataCtx);
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [editId, setEditId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({title:'',body:'',color:'#FFD166',tags:''});
   const [sort, setSort] = useState('newest');
   const [filterTag, setFilterTag] = useState(null);
   const [confirmDel, setConfirmDel] = useState(null);
   const [pinnedIds, setPinnedIds] = useState(()=>{try{return JSON.parse(localStorage.getItem('pinnedNotes')||'[]');}catch(e){return [];}});
-  const [form, setForm] = useState({title:'', body:'', color:'#FFD166', tags:''});
   const [mobileView, setMobileView] = useState('list');
   const [isMobile, setIsMobile] = useState(()=>window.innerWidth<=768);
-  const textareaRef = useRef(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const titleRef = useRef(null);
+  const bodyRef = useRef(null);
+  const saveTimer = useRef(null);
 
   useEffect(()=>{
     const check=()=>setIsMobile(window.innerWidth<=768);
@@ -24935,7 +24937,15 @@ function NotesPage({onClose, toast}) {
     });
   };
 
-  let filtered = (notes|| []).map(n=>({...n, pinned:pinnedIds.includes(n.id)}))
+  // Auto-save with debounce
+  const autoSave = useCallback((id, updates) => {
+    if(saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(()=>{
+      updateNote(id, updates);
+    }, 800);
+  }, [updateNote]);
+
+  let filtered = (notes||[]).map(n=>({...n, pinned:pinnedIds.includes(n.id)}))
     .filter(n => {
       if(filterTag) return (n.tags||[]).includes(filterTag);
       if(!search) return true;
@@ -24949,29 +24959,86 @@ function NotesPage({onClose, toast}) {
 
   const selected = selectedId ? (notes||[]).find(n=>n.id===selectedId) : null;
 
-  const openCreate = () => { setForm({title:'',body:'',color:'#FFD166',tags:''}); setEditId(null); setShowForm(true); };
-  const openEdit = (n) => { setForm({title:n.title, body:n.body, color:n.color||'#FFD166', tags:(n.tags||[]).join(', ')}); setEditId(n.id); setShowForm(true); };
-  const saveNote = () => {
-    if(!form.title.trim() && !form.body.trim()) { toast('Scrivi qualcosa','var(--red)'); return; }
-    const tags = form.tags ? form.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
-    if(editId) { updateNote(editId, {...form, tags}); toast('Nota aggiornata!'); }
-    else { addNote({...form, tags}); toast('Nota creata!'); }
-    setShowForm(false); setEditId(null); setForm({title:'',body:'',color:'#FFD166',tags:''});
-  };
-  const deleteNote = (id) => { delNote(id); setConfirmDel(null); if(selectedId===id) setSelectedId(null); toast('Eliminata','var(--red)'); };
-  const selectNote = (n) => { setSelectedId(n.id); setMobileView('detail'); };
-
   const formatDate = (id) => {
     const d = new Date(id);
     return d.toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
   };
+
+  // Create new note — immediately editable
+  const createNote = () => {
+    const tags = [];
+    addNote({title:'', body:'', color:'#FFD166', tags});
+    setTimeout(()=>{
+      const newest = (notes||[])[0];
+      if(newest) {
+        setSelectedId(newest.id);
+        setEditingId(newest.id);
+        setEditForm({title:'',body:'',color:'#FFD166',tags:''});
+        setMobileView('detail');
+        setTimeout(()=>titleRef.current?.focus(),100);
+      }
+    },50);
+  };
+
+  // Select a note to view
+  const selectNote = (n) => {
+    if(editingId && editingId !== n.id) {
+      // Save current before switching
+      if(saveTimer.current) clearTimeout(saveTimer.current);
+      const tags = editForm.tags ? editForm.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
+      updateNote(editingId, {...editForm, tags});
+    }
+    setSelectedId(n.id);
+    setEditingId(null);
+    setMobileView('detail');
+  };
+
+  // Start editing selected note
+  const startEdit = () => {
+    if(!selected) return;
+    setEditingId(selected.id);
+    setEditForm({
+      title: selected.title || '',
+      body: selected.body || '',
+      color: selected.color || '#FFD166',
+      tags: (selected.tags||[]).join(', ')
+    });
+    setTimeout(()=>bodyRef.current?.focus(),100);
+  };
+
+  // Handle typing in editor
+  const handleEdit = (field, val) => {
+    const newForm = {...editForm, [field]:val};
+    setEditForm(newForm);
+    if(editingId) {
+      const tags = newForm.tags ? newForm.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
+      autoSave(editingId, {...newForm, tags});
+    }
+  };
+
+  // Stop editing
+  const stopEdit = () => {
+    if(editingId && saveTimer.current) clearTimeout(saveTimer.current);
+    if(editingId) {
+      const tags = editForm.tags ? editForm.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
+      updateNote(editingId, {...editForm, tags});
+    }
+    setEditingId(null);
+    // Delete empty notes
+    if(selected && !selected.title.trim() && !selected.body.trim()) {
+      delNote(selected.id);
+      setSelectedId(null);
+    }
+  };
+
+  const deleteNote = (id) => { delNote(id); setConfirmDel(null); if(selectedId===id) setSelectedId(null); toast('Eliminata','var(--red)'); };
 
   return (
     <div style={{position:'fixed',inset:0,zIndex:99999,background:'var(--bg)',display:'flex',flexDirection:'column',overflow:'hidden'}}>
 
       {/* Header */}
       <div style={{padding:'12px 20px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:12,flexShrink:0,background:'var(--surface)',zIndex:10}}>
-        <button onClick={onClose} style={{display:'flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'7px 12px',cursor:'pointer',color:'var(--text)',fontSize:'.8rem',fontWeight:600,fontFamily:'inherit',transition:'all .2s',flexShrink:0}}>
+        <button onClick={()=>{if(editingId)stopEdit();onClose();}} style={{display:'flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'7px 12px',cursor:'pointer',color:'var(--text)',fontSize:'.8rem',fontWeight:600,fontFamily:'inherit',transition:'all .2s',flexShrink:0}}>
           {'←'} Note & Password
         </button>
         <div style={{position:'relative',flex:1,maxWidth:400}}>
@@ -24984,7 +25051,7 @@ function NotesPage({onClose, toast}) {
             <option value="oldest">Più vecchio</option>
             <option value="title">A → Z</option>
           </select>
-          <button onClick={openCreate} style={{background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'7px 16px',fontSize:'.82rem',fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>
+          <button onClick={createNote} style={{background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'7px 16px',fontSize:'.82rem',fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>
             {'＋'} Nuova
           </button>
         </div>
@@ -25010,7 +25077,7 @@ function NotesPage({onClose, toast}) {
               <div style={{fontSize:'3rem',marginBottom:12,opacity:.3}}>📝</div>
               <div style={{fontWeight:700,fontSize:'1rem',color:'var(--text2)',marginBottom:4}}>{search?'Nessun risultato':'Nessuna nota'}</div>
               <div style={{fontSize:'.82rem',color:'var(--text3)'}}>{search?'Prova con altri termini':'Crea la tua prima nota'}</div>
-              {!search && <button onClick={openCreate} style={{marginTop:16,background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'8px 20px',fontSize:'.85rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{'＋'} Nuova nota</button>}
+              {!search && <button onClick={createNote} style={{marginTop:16,background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'8px 20px',fontSize:'.85rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{'＋'} Nuova nota</button>}
             </div>
           ) : (
             <div style={{padding:8}}>
@@ -25033,89 +25100,88 @@ function NotesPage({onClose, toast}) {
           )}
         </div>
 
-        {/* Detail Panel */}
+        {/* Detail Panel — inline edit or view */}
         <div className="np-detail" style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',...(isMobile && mobileView==='list' ? {display:'none'} : {position:isMobile?'fixed':undefined,inset:isMobile?'0':undefined,zIndex:isMobile?99997:undefined})}}>
-          {mobileView==='list' && <div className="np-mobile-back" style={{display:'none'}}/>}
-          {!selected ? (
+          {!selected && editingId ? null : !selected ? (
             <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:40,textAlign:'center'}}>
               <div style={{fontSize:'4rem',marginBottom:16,opacity:.15}}>📝</div>
               <div style={{fontWeight:700,fontSize:'1.1rem',color:'var(--text3)',marginBottom:6}}>Seleziona una nota</div>
               <div style={{fontSize:'.85rem',color:'var(--text3)',opacity:.6}}>oppure creane una nuova</div>
             </div>
           ) : (
-            <div style={{maxWidth:700,margin:'0 auto',padding:'28px 32px',width:'100%'}}>
-              {/* Note header */}
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}}>
-                <div style={{flex:1}}>
-                  <div style={{marginBottom:12}}>
-                    <button onClick={()=>{setSelectedId(null);setMobileView('list');}} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:8,padding:'5px 10px',cursor:'pointer',color:'var(--text)',fontSize:'.78rem',fontFamily:'inherit',display:isMobile?'inline-block':'none'}}>← Indietro</button>
+            <div style={{maxWidth:700,margin:'0 auto',padding:'28px 32px',width:'100%',flex:1,display:'flex',flexDirection:'column'}}>
+              {/* Back button (mobile) */}
+              {isMobile && <div style={{marginBottom:12}}>
+                <button onClick={()=>{if(editingId)stopEdit();setSelectedId(null);setMobileView('list');}} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:8,padding:'5px 10px',cursor:'pointer',color:'var(--text)',fontSize:'.78rem',fontFamily:'inherit'}}>← Indietro</button>
+              </div>}
+
+              {editingId === selected.id ? (
+                /* === INLINE EDITOR === */
+                <div style={{flex:1,display:'flex',flexDirection:'column'}}>
+                  {/* Color picker row */}
+                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:16,flexWrap:'wrap'}}>
+                    <div onClick={()=>setShowColorPicker(!showColorPicker)} style={{width:18,height:18,borderRadius:'50%',background:editForm.color,cursor:'pointer',border:'2px solid rgba(255,255,255,.2)',flexShrink:0}} title="Cambia colore"/>
+                    {showColorPicker && COLORS.map(c=>(
+                      <div key={c} onClick={()=>{setShowColorPicker(false);handleEdit('color',c);}} style={{width:22,height:22,borderRadius:'50%',background:c,cursor:'pointer',border:editForm.color===c?'2px solid #fff':'2px solid transparent',transition:'all .15s'}}/>
+                    ))}
+                    <div style={{flex:1}}/>
+                    <button onClick={stopEdit} style={{background:'var(--accent)',color:'#fff',border:'none',borderRadius:8,padding:'6px 16px',fontSize:'.78rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>✓ Fatto</button>
                   </div>
-                  <h1 style={{margin:0,fontSize:'1.6rem',fontWeight:800,lineHeight:1.3,wordBreak:'break-word'}}>{selected.title}</h1>
-                  <div style={{display:'flex',gap:8,alignItems:'center',marginTop:8,flexWrap:'wrap'}}>
-                    <span style={{fontSize:'.75rem',color:'var(--text3)'}}>{formatDate(selected.id)}</span>
-                    <span style={{fontSize:'.75rem',color:'var(--text3)'}}>·</span>
-                    <span style={{fontSize:'.75rem',color:'var(--text3)'}}>{selected.body.length} caratteri</span>
-                    {selected.color && <div style={{width:10,height:10,borderRadius:'50%',background:selected.color,flexShrink:0}}/>}
+
+                  {/* Title input — large, clean */}
+                  <input ref={titleRef} value={editForm.title} onChange={e=>handleEdit('title',e.target.value)} placeholder="Titolo..." style={{width:'100%',border:'none',outline:'none',background:'transparent',fontSize:'1.5rem',fontWeight:800,color:'var(--text)',marginBottom:4,lineHeight:1.3,fontFamily:'inherit'}}/>
+
+                  {/* Tags input */}
+                  <input value={editForm.tags} onChange={e=>handleEdit('tags',e.target.value)} placeholder="Tag (separati da virgola)..." style={{width:'100%',border:'none',outline:'none',background:'transparent',fontSize:'.82rem',color:'var(--text2)',marginBottom:16,fontFamily:'inherit'}}/>
+
+                  {/* Body textarea — auto-growing feel */}
+                  <textarea ref={bodyRef} value={editForm.body} onChange={e=>handleEdit('body',e.target.value)} placeholder="Inizia a scrivere..." style={{width:'100%',flex:1,minHeight:300,border:'none',outline:'none',background:'transparent',fontSize:'.95rem',lineHeight:1.85,color:'var(--text)',resize:'none',fontFamily:'inherit'}}/>
+
+                  {/* Footer */}
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',paddingTop:12,borderTop:'1px solid var(--border)',fontSize:'.72rem',color:'var(--text3)'}}>
+                    <span>{formatDate(selected.id)} · {editForm.body.length} caratteri</span>
+                    <span style={{color:'var(--green)',opacity:.6}}>Salvataggio automatico</span>
                   </div>
-                  {(selected.tags||[]).length > 0 && (
-                    <div style={{display:'flex',gap:4,marginTop:8,flexWrap:'wrap'}}>
-                      {selected.tags.map(t=><span key={t} style={{fontSize:'.7rem',padding:'2px 10px',borderRadius:12,background:'rgba(255,255,255,.06)',color:'var(--text2)',border:'1px solid rgba(255,255,255,.08)'}}>{t}</span>)}
-                    </div>
-                  )}
                 </div>
-              </div>
+              ) : (
+                /* === READ VIEW === */
+                <div style={{flex:1,display:'flex',flexDirection:'column'}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}}>
+                    <div style={{flex:1}}>
+                      <h1 style={{margin:0,fontSize:'1.6rem',fontWeight:800,lineHeight:1.3,wordBreak:'break-word'}}>{selected.title || 'Senza titolo'}</h1>
+                      <div style={{display:'flex',gap:8,alignItems:'center',marginTop:8,flexWrap:'wrap'}}>
+                        <span style={{fontSize:'.75rem',color:'var(--text3)'}}>{formatDate(selected.id)}</span>
+                        <span style={{fontSize:'.75rem',color:'var(--text3)'}}>·</span>
+                        <span style={{fontSize:'.75rem',color:'var(--text3)'}}>{selected.body.length} caratteri</span>
+                        {selected.color && <div style={{width:10,height:10,borderRadius:'50%',background:selected.color,flexShrink:0}}/>}
+                      </div>
+                      {(selected.tags||[]).length > 0 && (
+                        <div style={{display:'flex',gap:4,marginTop:8,flexWrap:'wrap'}}>
+                          {selected.tags.map(t=><span key={t} style={{fontSize:'.7rem',padding:'2px 10px',borderRadius:12,background:'rgba(255,255,255,.06)',color:'var(--text2)',border:'1px solid rgba(255,255,255,.08)'}}>{t}</span>)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-              {/* Note body */}
-              <div style={{fontSize:'.95rem',lineHeight:1.85,color:'var(--text)',whiteSpace:'pre-wrap',wordBreak:'break-word',paddingBottom:40}}>
-                {selected.body}
-              </div>
+                  {/* Note body — clickable to edit */}
+                  <div onClick={startEdit} style={{fontSize:'.95rem',lineHeight:1.85,color:'var(--text)',whiteSpace:'pre-wrap',wordBreak:'break-word',paddingBottom:20,flex:1,cursor:'text',minHeight:100}}>
+                    {selected.body || <span style={{color:'var(--text3)',fontStyle:'italic'}}>Tocca per iniziare a scrivere...</span>}
+                  </div>
 
-              {/* Actions bar */}
-              <div style={{position:'sticky',bottom:0,display:'flex',gap:8,padding:'12px 0',borderTop:'1px solid var(--border)',background:'var(--bg)',flexWrap:'wrap'}}>
-                <button onClick={()=>openEdit(selected)} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px 16px',color:'var(--text)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>✏️ Modifica</button>
-                <button onClick={()=>pinNote(selected.id)} style={{background:selected.pinned?'rgba(255,209,102,.12)':'rgba(255,255,255,.06)',border:`1px solid ${selected.pinned?'rgba(255,209,102,.3)':'rgba(255,255,255,.1)'}`,borderRadius:10,padding:'8px 16px',color:selected.pinned?'#FFD166':'var(--text2)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{selected.pinned?'📌 Appuntata':'📌 Appunta'}</button>
-                <button onClick={()=>navigator.share?navigator.share({title:selected.title,text:selected.body}):navigator.clipboard.writeText(selected.body).then(()=>toast('Copiata!'))} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px 16px',color:'var(--text)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{navigator.share?'📤 Condividi':'📋 Copia'}</button>
-                <div style={{flex:1}}/>
-                <button onClick={()=>setConfirmDel(selected.id)} style={{background:'rgba(239,68,68,.08)',border:'1px solid rgba(239,68,68,.2)',borderRadius:10,padding:'8px 16px',color:'#EF4444',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>🗑️ Elimina</button>
-              </div>
+                  {/* Actions bar */}
+                  <div style={{display:'flex',gap:8,padding:'12px 0',borderTop:'1px solid var(--border)',flexWrap:'wrap'}}>
+                    <button onClick={startEdit} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px 16px',color:'var(--text)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>✏️ Modifica</button>
+                    <button onClick={()=>pinNote(selected.id)} style={{background:selected.pinned?'rgba(255,209,102,.12)':'rgba(255,255,255,.06)',border:`1px solid ${selected.pinned?'rgba(255,209,102,.3)':'rgba(255,255,255,.1)'}`,borderRadius:10,padding:'8px 16px',color:selected.pinned?'#FFD166':'var(--text2)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{selected.pinned?'📌 Appuntata':'📌 Appunta'}</button>
+                    <button onClick={()=>navigator.share?navigator.share({title:selected.title,text:selected.body}):navigator.clipboard.writeText(selected.body).then(()=>toast('Copiata!'))} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px 16px',color:'var(--text)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{navigator.share?'📤 Condividi':'📋 Copia'}</button>
+                    <div style={{flex:1}}/>
+                    <button onClick={()=>setConfirmDel(selected.id)} style={{background:'rgba(239,68,68,.08)',border:'1px solid rgba(239,68,68,.2)',borderRadius:10,padding:'8px 16px',color:'#EF4444',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>🗑️ Elimina</button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
-
-      {/* Create / Edit Modal */}
-      {showForm && (
-        <div style={{position:'fixed',inset:0,zIndex:999999,background:'rgba(0,0,0,.5)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setShowForm(false)}>
-          <div onClick={e=>e.stopPropagation()} style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:20,padding:28,width:'100%',maxWidth:520,maxHeight:'90vh',overflowY:'auto',boxShadow:'0 24px 80px rgba(0,0,0,.5)'}}>
-            <div style={{fontWeight:800,fontSize:'1.1rem',marginBottom:20}}>{editId?'✏️ Modifica nota':'📝 Nuova nota'}</div>
-            <div style={{marginBottom:14}}>
-              <label style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:600,display:'block',marginBottom:6}}>Titolo</label>
-              <input className="field" placeholder="Titolo della nota..." value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} style={{width:'100%',fontSize:'.95rem',fontWeight:600}}/>
-            </div>
-            <div style={{marginBottom:14}}>
-              <label style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:600,display:'block',marginBottom:6}}>Contenuto</label>
-              <textarea ref={textareaRef} className="field" placeholder="Scrivi qui..." value={form.body} onChange={e=>setForm(f=>({...f,body:e.target.value}))} style={{width:'100%',minHeight:180,resize:'vertical',lineHeight:1.7,fontSize:'.9rem'}}/>
-              <div style={{fontSize:'.68rem',color:'var(--text3)',textAlign:'right',marginTop:4}}>{form.body.length} caratteri</div>
-            </div>
-            <div style={{marginBottom:14}}>
-              <label style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:600,display:'block',marginBottom:6}}>Tag</label>
-              <input className="field" placeholder="importante, studio, idee..." value={form.tags} onChange={e=>setForm(f=>({...f,tags:e.target.value}))} style={{width:'100%'}}/>
-            </div>
-            <div style={{marginBottom:20}}>
-              <label style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:600,display:'block',marginBottom:8}}>Colore</label>
-              <div style={{display:'flex',gap:8}}>
-                {COLORS.map(c=>(
-                  <div key={c} onClick={()=>setForm(f=>({...f,color:c}))} style={{width:28,height:28,borderRadius:'50%',background:c,cursor:'pointer',border:form.color===c?'3px solid #fff':'3px solid transparent',boxShadow:form.color===c?'0 0 0 2px '+c:'none',transition:'all .15s'}}/>
-                ))}
-              </div>
-            </div>
-            <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-              <button onClick={()=>setShowForm(false)} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'9px 20px',color:'var(--text2)',fontSize:'.85rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Annulla</button>
-              <button onClick={saveNote} style={{background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'9px 24px',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>{editId?'Salva':'Crea'}</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Delete confirmation */}
       {confirmDel && (
@@ -25126,13 +25192,11 @@ function NotesPage({onClose, toast}) {
             <div style={{fontSize:'.82rem',color:'var(--text2)',marginBottom:20}}>Questa azione non puo essere annullata.</div>
             <div style={{display:'flex',gap:8,justifyContent:'center'}}>
               <button onClick={()=>setConfirmDel(null)} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px 20px',color:'var(--text2)',fontSize:'.85rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Annulla</button>
-              <button onClick={()=>deleteNote(confirmDel)} style={{background:'#EF4444',color:'#fff',border:'none',borderRadius:10,padding:'8px 20px',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Elimina</button>
+              <button onClick={()=>deleteNote(confirmDel)} style={{background:'#EF4444',color:'#fff',border:'none',borderRadius:10,payload:'8px 20px',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Elimina</button>
             </div>
           </div>
         </div>
       )}
-
-      {/* Responsive handled via isMobile state */}
     </div>
   );
 }
