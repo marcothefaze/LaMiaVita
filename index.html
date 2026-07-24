@@ -24730,45 +24730,84 @@ function StudySessionsModal({onClose, toast}) {
           {/* Heatmap Calendar */}
           <div className="card" style={{marginBottom:16,padding:'16px 18px'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-              <div style={{fontWeight:700,fontSize:'.9rem'}}>{'📅'} Calendario studio (12 mesi)</div>
-              <div style={{display:'flex',gap:4,alignItems:'center',fontSize:'.65rem',color:'var(--text3)'}}>
+              <div style={{fontWeight:700,fontSize:'.95rem'}}>{'📅'} Calendario studio (12 mesi)</div>
+              <div style={{display:'flex',gap:4,alignItems:'center',fontSize:'.68rem',color:'var(--text3)'}}>
                 <span>Meno</span>
-                {[0,15,45,90,150].map(m=><div key={m} style={{width:12,height:12,borderRadius:2,background:heatColor(m,false)}}/>)}
+                {[0,15,45,90,150].map(m=><div key={m} style={{width:14,height:14,borderRadius:3,background:heatColor(m,false)}}/>)}
                 <span>Più</span>
               </div>
             </div>
             <div style={{overflowX:'auto',paddingBottom:4}}>
+              {/* Month labels */}
+              <div style={{display:'grid',gridTemplateColumns:'repeat(53,1fr)',gap:2,minWidth:500,marginBottom:4}}>
+                {Array.from({length:53},(_, w)=>{
+                  const d = new Date(hmStart); d.setDate(d.getDate()+w*7+3);
+                  const m = d.getMonth();
+                  const prevM = w>0?(new Date(hmStart).setDate(hmStart.getDate()+(w-1)*7+3),new Date(hmStart).getMonth()):-1;
+                  if(w===0 || m!==prevM) return <div key={w} style={{fontSize:'.55rem',color:'var(--text3)',textAlign:'left'}}>{d.toLocaleDateString('it-IT',{month:'short'}).slice(0,3)}</div>;
+                  return <div key={w}/>;
+                })}
+              </div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(53,1fr)',gridTemplateRows:'repeat(7,1fr)',gap:2,minWidth:500}}>
                 {heatmapCells.map((cell,i)=>(
-                  <div key={i} title={cell.date+': '+(cell.minutes>0?cell.minutes+' min':'Nessuno studio')} style={{width:'100%',aspectRatio:'1',borderRadius:2,background:heatColor(cell.minutes,cell.future),transition:'background .2s',cursor:cell.future?'default':'pointer'}}/>
+                  <div key={i} title={cell.date+': '+(cell.minutes>0?cell.minutes+' min':'Nessuno studio')} style={{width:'100%',aspectRatio:'1',borderRadius:3,background:heatColor(cell.minutes,cell.future),transition:'background .2s',cursor:cell.future?'default':'pointer'}}/>
                 ))}
               </div>
             </div>
-            <div style={{display:'flex',gap:16,marginTop:8,fontSize:'.65rem',color:'var(--text3)'}}>
-              <span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span>
+            <div style={{display:'flex',gap:0,marginTop:6,fontSize:'.6rem',color:'var(--text3)',paddingLeft:0}}>
+              <span style={{width:20}}>L</span><span style={{width:20}}>M</span><span style={{width:20}}>M</span><span style={{width:20}}>G</span><span style={{width:20}}>V</span><span style={{width:20}}>S</span><span style={{width:20}}>D</span>
             </div>
           </div>
 
           {/* Chart */}
-          <div className="card" style={{marginBottom:16,padding:'16px 18px'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-              <div style={{fontWeight:700,fontSize:'.9rem'}}>{'📈'} Minuti studio</div>
+          <div className="card" style={{marginBottom:16,padding:'18px 20px'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+              <div style={{fontWeight:700,fontSize:'.95rem'}}>{'📈'} Minuti studio giornalieri</div>
               <div style={{display:'flex',gap:4}}>
                 {[{l:'7g',v:7},{l:'1m',v:30},{l:'3m',v:90},{l:'Tutto',v:Infinity}].map(p=>(
-                  <button key={p.v} onClick={()=>setPeriod(p.v)} style={{background:period===p.v?'var(--accent)':'transparent',color:period===p.v?'#fff':'var(--text2)',border:'none',borderRadius:6,padding:'3px 10px',fontSize:'.68rem',cursor:'pointer',fontWeight:600}}>{p.l}</button>
+                  <button key={p.v} onClick={()=>setPeriod(p.v)} style={{background:period===p.v?'var(--accent)':'transparent',color:period===p.v?'#fff':'var(--text2)',border:'none',borderRadius:6,padding:'4px 12px',fontSize:'.72rem',cursor:'pointer',fontWeight:600}}>{p.l}</button>
                 ))}
               </div>
             </div>
-            <div style={{display:'flex',alignItems:'flex-end',gap:2,height:100}}>
-              {periodData.map((d,i)=>(
-                <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
-                  <div style={{width:'100%',background:d.minutes>0?'linear-gradient(180deg,#10B981,#059669)':'rgba(255,255,255,.04)',borderRadius:'3px 3px 0 0',height:d.minutes>0?Math.max(4,(d.minutes/maxChartMin)*100)+'%':'2%',transition:'height .4s'}} title={d.date+': '+d.minutes+' min'}/>
-                  {chartDays<=30 && <div style={{fontSize:'.55rem',color:'var(--text3)'}}>{d.day}</div>}
+            {/* Y-axis labels + Chart */}
+            <div style={{display:'flex',gap:0}}>
+              {/* Y axis */}
+              <div style={{display:'flex',flexDirection:'column',justifyContent:'space-between',height:180,padding:'0 6px 20px 0',fontSize:'.6rem',color:'var(--text3)',textAlign:'right',minWidth:35}}>
+                <span>{Math.ceil(maxChartMin/60)*60}m</span>
+                <span>{Math.ceil(maxChartMin*0.75/60)*60>0?Math.ceil(maxChartMin*0.75/60)*60+'m':''}</span>
+                <span>{Math.ceil(maxChartMin*0.5/60)*60>0?Math.ceil(maxChartMin*0.5/60)*60+'m':''}</span>
+                <span>{Math.ceil(maxChartMin*0.25/60)*60>0?Math.ceil(maxChartMin*0.25/60)*60+'m':''}</span>
+                <span>0m</span>
+              </div>
+              {/* Bars + grid */}
+              <div style={{flex:1,position:'relative',height:180}}>
+                {/* Grid lines */}
+                {[0,0.25,0.5,0.75,1].map(pct=>(
+                  <div key={pct} style={{position:'absolute',left:0,right:0,bottom:(pct*100)+'%',height:1,background:pct===0?'rgba(255,255,255,.1)':'rgba(255,255,255,.04)',zIndex:0}}/>
+                ))}
+                {/* Bars */}
+                <div style={{display:'flex',alignItems:'flex-end',gap:chartDays<=30?3:chartDays<=90?1:0,height:'100%',position:'relative',zIndex:1,paddingBottom:20}}>
+                  {periodData.map((d,i)=>{
+                    const hPct = d.minutes>0?Math.max(3,(d.minutes/maxChartMin)*100):0;
+                    const showVal = chartDays<=30 || (chartDays<=90 && i%3===0);
+                    return (
+                      <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
+                        {showVal && d.minutes>0 && <div style={{fontSize:'.58rem',color:'var(--text2)',fontWeight:600,marginBottom:2,whiteSpace:'nowrap'}}>{d.minutes>=60?Math.floor(d.minutes/60)+'h'+(d.minutes%60>0?d.minutes%60+'m':''):d.minutes+'m'}</div>}
+                        <div style={{width:'100%',background:d.minutes>0?'linear-gradient(180deg,#10B981 0%,#059669 100%)':'rgba(255,255,255,.04)',borderRadius:chartDays<=30?'4px 4px 0 0':'2px 2px 0 0',height:hPct+'%',minHeight:d.minutes>0?3:0,transition:'height .4s ease',position:'relative',cursor:'pointer'}} title={d.date+': '+d.minutes+' min ('+d.sessions+' sessioni)'}/>
+                        {/* Date label */}
+                        {((chartDays<=30)||((chartDays<=90)&&i%7===0)||(chartDays>90&&i%(Math.floor(chartDays/12))===0)) && <div style={{fontSize:'.55rem',color:'var(--text3)',marginTop:4,whiteSpace:'nowrap',position:'absolute',bottom:-16}}>{d.day}</div>}
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
+              </div>
             </div>
-            <div style={{marginTop:8,fontSize:'.7rem',color:'var(--text3)'}}>
-              Media: {periodTotalMinutes>0?(periodTotalMinutes/periodData.length).toFixed(0):0} min/giorno
+            {/* Summary bar */}
+            <div style={{display:'flex',gap:16,marginTop:24,padding:'10px 14px',background:'rgba(255,255,255,.03)',borderRadius:10,fontSize:'.75rem',color:'var(--text2)',flexWrap:'wrap'}}>
+              <span>Media: <strong style={{color:'var(--accent)'}}>{periodTotalMinutes>0?(periodTotalMinutes/periodData.length).toFixed(0):0} min/giorno</strong></span>
+              <span>Totale: <strong style={{color:'var(--green)'}}>{Math.floor(periodTotalMinutes/60)}h {periodTotalMinutes%60}m</strong></span>
+              <span>Giorni attivi: <strong style={{color:'#06B6D4'}}>{periodData.filter(d=>d.minutes>0).length}/{periodData.length}</strong></span>
+              <span>Miglior giorno: <strong style={{color:'#8B5CF6'}}>{bestDay?new Date(bestDay+'T12:00').toLocaleDateString('it-IT',{day:'numeric',month:'short'}):'-'} ({bestDay?byDate[bestDay].minutes:0}m)</strong></span>
             </div>
           </div>
         </>)}
@@ -24885,20 +24924,33 @@ function StudySessionsModal({onClose, toast}) {
 
           {/* Weekly Trend */}
           {sortedWeeks.length > 0 && (
-            <div className="card" style={{marginBottom:16,padding:'16px 18px'}}>
-              <div style={{fontWeight:700,marginBottom:14,fontSize:'.9rem'}}>{'📊'} Trend settimanale</div>
-              <div style={{display:'flex',alignItems:'flex-end',gap:6,height:100}}>
-                {sortedWeeks.map(([wk,min],i)=>{
-                  const wkDate = new Date(wk+'T12:00');
-                  const label = wkDate.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
-                  return (
-                    <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-                      <div style={{fontSize:'.6rem',color:'var(--text2)',whiteSpace:'nowrap'}}>{Math.floor(min/60)}h</div>
-                      <div style={{width:'100%',background:'linear-gradient(180deg,#8B5CF6,#6D28D9)',borderRadius:'4px 4px 0 0',height:(min/maxWeekMin*100)+'%',minHeight:4,transition:'height .4s'}}/>
-                      <div style={{fontSize:'.55rem',color:'var(--text3)',textAlign:'center'}}>{label}</div>
-                    </div>
-                  );
-                })}
+            <div className="card" style={{marginBottom:16,padding:'18px 20px'}}>
+              <div style={{fontWeight:700,marginBottom:16,fontSize:'.95rem'}}>{'📊'} Trend settimanale</div>
+              <div style={{display:'flex',gap:0}}>
+                {/* Y axis */}
+                <div style={{display:'flex',flexDirection:'column',justifyContent:'space-between',height:160,padding:'0 6px 20px 0',fontSize:'.6rem',color:'var(--text3)',textAlign:'right',minWidth:40}}>
+                  <span>{Math.ceil(maxWeekMin/60)*60}m</span>
+                  <span>{Math.ceil(maxWeekMin*0.5/60)*60>0?Math.ceil(maxWeekMin*0.5/60)*60+'m':''}</span>
+                  <span>0m</span>
+                </div>
+                <div style={{flex:1,position:'relative',height:160}}>
+                  {[0,0.5,1].map(pct=>(
+                    <div key={pct} style={{position:'absolute',left:0,right:0,bottom:(pct*100)+'%',height:1,background:pct===0?'rgba(255,255,255,.1)':'rgba(255,255,255,.04)'}}/>
+                  ))}
+                  <div style={{display:'flex',alignItems:'flex-end',gap:6,height:'100%',position:'relative',zIndex:1,paddingBottom:20}}>
+                    {sortedWeeks.map(([wk,min],i)=>{
+                      const wkDate = new Date(wk+'T12:00');
+                      const label = wkDate.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+                      return (
+                        <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
+                          <div style={{fontSize:'.6rem',color:'var(--text2)',fontWeight:600,marginBottom:2,whiteSpace:'nowrap'}}>{Math.floor(min/60)}h{min%60>0?' '+min%60+'m':''}</div>
+                          <div style={{width:'100%',background:'linear-gradient(180deg,#8B5CF6 0%,#6D28D9 100%)',borderRadius:'4px 4px 0 0',height:(min/maxWeekMin*100)+'%',minHeight:4,transition:'height .4s',cursor:'pointer'}} title={label+': '+min+' min'}/>
+                          <div style={{fontSize:'.55rem',color:'var(--text3)',marginTop:4,whiteSpace:'nowrap'}}>{label}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           )}
