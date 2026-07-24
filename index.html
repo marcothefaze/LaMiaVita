@@ -24598,10 +24598,19 @@ function StudySessionsModal({onClose, toast}) {
   // Subject breakdown
   const subjects = {};
   periodWorkLog.forEach(e => {
-    const s = e.subject || 'Senza materia';
+    let s = (e.subject || '').trim();
+    if(!s) s = 'Senza materia';
+    else s = s.charAt(0).toUpperCase() + s.slice(1);
     subjects[s] = (subjects[s]||0) + (e.duration||25);
   });
-  const sortedSubjects = Object.entries(subjects).sort((a,b)=>b[1]-a[1]);
+  // Merge case-insensitive duplicates (e.g. "Matematica" and "matematica")
+  const merged = {};
+  Object.entries(subjects).forEach(([name,min])=>{
+    const key = name.toLowerCase();
+    if(merged[key]) merged[key].minutes += min;
+    else merged[key] = {name, minutes:min};
+  });
+  const sortedSubjects = Object.values(merged).sort((a,b)=>b.minutes-a.minutes).map(s=>[s.name,s.minutes]);
   const maxSubj = Math.max(...sortedSubjects.map(s=>s[1]),1);
   const subjColors = ['#8B5CF6','#F59E0B','#10B981','#EF4444','#3B82F6','#EC4899','#F97316','#06B6D4'];
 
