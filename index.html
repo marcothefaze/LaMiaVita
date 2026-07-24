@@ -24598,15 +24598,15 @@ function StudySessionsModal({onClose, toast}) {
   // Subject breakdown
   const subjects = {};
   periodWorkLog.forEach(e => {
-    let s = (e.subject || '').trim();
+    let s = (e.subject || '').trim().replace(/\s+/g,' ');
     if(!s) s = 'Senza materia';
     else s = s.charAt(0).toUpperCase() + s.slice(1);
     subjects[s] = (subjects[s]||0) + (e.duration||25);
   });
-  // Merge case-insensitive duplicates (e.g. "Matematica" and "matematica")
+  // Merge case-insensitive + accent/space variations
   const merged = {};
   Object.entries(subjects).forEach(([name,min])=>{
-    const key = name.toLowerCase();
+    const key = name.toLowerCase().replace(/[^a-z0-9]/g,'');
     if(merged[key]) merged[key].minutes += min;
     else merged[key] = {name, minutes:min};
   });
