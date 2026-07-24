@@ -24416,6 +24416,7 @@ function StudySessionsModal({onClose, toast}) {
   const [mf, setMf] = useState({date:todayStr, hours:1, minutes:0, subject:''});
   const [tab, setTab] = useState('overview');
   const [period, setPeriod] = useState(30);
+  const [analyticsPeriod, setAnalyticsPeriod] = useState('weeks12');
   const [weeklyGoal, setWeeklyGoal] = useState(() => parseInt(localStorage.getItem('study_weekly_goal') || '600'));
   const [editingGoal, setEditingGoal] = useState(false);
   const [goalInput, setGoalInput] = useState(String(weeklyGoal));
@@ -24618,7 +24619,7 @@ function StudySessionsModal({onClose, toast}) {
   const todIcons = {Mattina:'🌅', Pomeriggio:'☀️', Sera:'🌙', Notte:'🦉'};
   const todColors = {Mattina:'#F59E0B', Pomeriggio:'#F97316', Sera:'#8B5CF6', Notte:'#3B82F6'};
 
-  // Weekly trend (last 12 weeks)
+  // Weekly trend — responsive to analyticsPeriod
   const weeklyTrend = {};
   workLog.forEach(e => {
     const d = new Date(e.date);
@@ -24626,7 +24627,8 @@ function StudySessionsModal({onClose, toast}) {
     const key = ws.toISOString().split('T')[0];
     weeklyTrend[key] = (weeklyTrend[key]||0) + (e.duration||25);
   });
-  const sortedWeeks = Object.entries(weeklyTrend).sort((a,b)=>a[0].localeCompare(b[0])).slice(-12);
+  let maxWeeksToShow = analyticsPeriod==='weeks12'?12:analyticsPeriod==='months3'?13:analyticsPeriod==='months6'?26:52;
+  const sortedWeeks = Object.entries(weeklyTrend).sort((a,b)=>a[0].localeCompare(b[0])).slice(-maxWeeksToShow);
   const maxWeekMin = Math.max(...sortedWeeks.map(w=>w[1]),1);
 
   // Filtered sessions for search
@@ -24996,16 +24998,28 @@ function StudySessionsModal({onClose, toast}) {
           {/* Weekly Trend */}
           {sortedWeeks.length > 0 && (
             <div className="card" style={{marginBottom:16,padding:'18px 20px'}}>
-              <div style={{fontWeight:700,marginBottom:14,fontSize:'.95rem'}}>{'📊'} Trend settimanale</div>
-              <div style={{display:'flex',alignItems:'flex-end',gap:6,height:150,paddingBottom:24}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+                <div style={{fontWeight:700,fontSize:'.95rem'}}>{'📊'} Trend settimanale</div>
+                <div style={{display:'flex',gap:4}}>
+                  {[{l:'12 sett',v:'weeks12'},{l:'3 mesi',v:'months3'},{l:'6 mesi',v:'months6'},{l:'1 anno',v:'all'}].map(p=>(
+                    <button key={p.v} onClick={()=>setAnalyticsPeriod(p.v)} style={{background:analyticsPeriod===p.v?'var(--accent)':'transparent',color:analyticsPeriod===p.v?'#fff':'var(--text2)',border:'none',borderRadius:6,padding:'4px 10px',fontSize:'.7rem',cursor:'pointer',fontWeight:600}}>{p.l}</button>
+                  ))}
+                </div>
+              </div>
+              <div style={{display:'flex',alignItems:'flex-end',gap:sortedWeeks.length>20?3:sortedWeeks.length>12?5:7,height:150,paddingBottom:30}}>
                 {sortedWeeks.map(([wk,min],i)=>{
-                  const wkDate = new Date(wk+'T12:00');
-                  const label = wkDate.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+                  const wkStart = new Date(wk+'T12:00');
+                  const wkEnd = new Date(wkStart); wkEnd.setDate(wkEnd.getDate()+6);
+                  const startLabel = wkStart.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+                  const endLabel = wkEnd.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+                  const shortLabel = wkStart.toLocaleDateString('it-IT',{day:'numeric',month:'short'}).replace('.','');
                   return (
                     <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
-                      <div style={{fontSize:'.65rem',color:'var(--text2)',fontWeight:700,marginBottom:3,whiteSpace:'nowrap'}}>{Math.floor(min/60)}h{min%60>0?' '+min%60+'m':''}</div>
-                      <div style={{width:'100%',background:'#8B5CF6',borderRadius:'4px 4px 0 0',height:(min/maxWeekMin*100)+'%',minHeight:4,transition:'height .4s',cursor:'pointer'}} title={label+': '+min+' min'}/>
-                      <div style={{fontSize:'.6rem',color:'var(--text3)',marginTop:6,whiteSpace:'nowrap'}}>{label}</div>
+                      <div style={{fontSize:'.6rem',color:'var(--text2)',fontWeight:700,marginBottom:2,whiteSpace:'nowrap'}}>{Math.floor(min/60)}h{min%60>0?' '+min%60+'m':''}</div>
+                       <div style={{width:'100%',background:'#8B5CF6',borderRadius:'3px 3px 0 0',height:(min/maxWeekMin*100)+'%',minHeight:3,transition:'height .4s',cursor:'pointer'}} title={startLabel+' - '+endLabel+': '+Math.floor(min/60)+'h '+min%60+'m'}/>
+                      {sortedWeeks.length<=13 && <div style={{fontSize:'.55rem',color:'var(--text3)',marginTop:4,whiteSpace:'nowrap',textAlign:'center',lineHeight:1.2}}>{shortLabel}<br/><span style={{fontSize:'.5rem',opacity:.7}}>- {wkEnd.toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</span></div>}
+                      {sortedWeeks.length>13 && i%2===0 && <div style={{fontSize:'.5rem',color:'var(--text3)',marginTop:4,whiteSpace:'nowrap'}}>{shortLabel}</div>}
+                      {sortedWeeks.length>13 && i%2!==0 && <div style={{fontSize:'.5rem',color:'transparent',marginTop:4}}>·</div>}
                     </div>
                   );
                 })}
