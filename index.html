@@ -24639,18 +24639,61 @@ function StudySessionsModal({onClose, toast}) {
     return false;
   });
 
-  // Period data for chart
-  const chartDays = Math.min(period === Infinity ? 90 : period, 90);
-  const periodData = [];
-  for(let i=chartDays-1;i>=0;i--){
-    const d = new Date(); d.setDate(d.getDate()-i);
-    const ds = d.toISOString().split('T')[0];
-    const dd = byDate[ds]||{sessions:0,minutes:0};
-    let label;
-    if(chartDays<=30) label=d.toLocaleDateString('it-IT',{weekday:'short'}).slice(0,2);
-    else label=d.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
-    periodData.push({day:label, sessions:dd.sessions, minutes:dd.minutes, date:ds});
+  // Period data for chart — aggregated for longer periods
+  const rawDays = period === Infinity ? 365 : period;
+  let periodData = [];
+  let chartMode = 'day'; // day | week | month
+
+  if(period <= 7) {
+    // Daily bars
+    chartMode = 'day';
+    for(let i=6;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const ds = d.toISOString().split('T')[0];
+      const dd = byDate[ds]||{sessions:0,minutes:0};
+      periodData.push({label:d.toLocaleDateString('it-IT',{weekday:'short'}).slice(0,2), minutes:dd.minutes, date:ds});
+    }
+  } else if(period <= 30) {
+    // Weekly bars (aggregate by ISO week)
+    chartMode = 'week';
+    const weeks = {};
+    for(let i=rawDays-1;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const ds = d.toISOString().split('T')[0];
+      const ws = new Date(d); ws.setDate(d.getDate()-d.getDay()); ws.setHours(0,0,0,0);
+      const wk = ws.toISOString().split('T')[0];
+      if(!weeks[wk]) weeks[wk] = {minutes:0, start:d.toLocaleDateString('it-IT',{day:'numeric',month:'short'}), end:null, date:wk};
+      weeks[wk].minutes += (byDate[ds]||{minutes:0}).minutes;
+      weeks[wk].end = d.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+    }
+    periodData = Object.values(weeks).sort((a,b)=>a.date.localeCompare(b.date));
+  } else if(period <= 90) {
+    // Weekly bars
+    chartMode = 'week';
+    const weeks = {};
+    for(let i=rawDays-1;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const ds = d.toISOString().split('T')[0];
+      const ws = new Date(d); ws.setDate(d.getDate()-d.getDay()); ws.setHours(0,0,0,0);
+      const wk = ws.toISOString().split('T')[0];
+      if(!weeks[wk]) weeks[wk] = {minutes:0, label:d.toLocaleDateString('it-IT',{day:'numeric',month:'short'}), date:wk};
+      weeks[wk].minutes += (byDate[ds]||{minutes:0}).minutes;
+    }
+    periodData = Object.values(weeks).sort((a,b)=>a.date.localeCompare(b.date));
+  } else {
+    // Monthly bars
+    chartMode = 'month';
+    const months = {};
+    for(let i=rawDays-1;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const ds = d.toISOString().split('T')[0];
+      const mk = ds.slice(0,7); // YYYY-MM
+      if(!months[mk]) months[mk] = {minutes:0, label:monthNames[d.getMonth()], date:mk};
+      months[mk].minutes += (byDate[ds]||{minutes:0}).minutes;
+    }
+    periodData = Object.values(months).sort((a,b)=>a.date.localeCompare(b.date));
   }
+
   const maxChartMin = Math.max(...periodData.map(d=>d.minutes),1);
 
   return (
@@ -24768,7 +24811,7 @@ function StudySessionsModal({onClose, toast}) {
           {/* Chart */}
           <div className="card" style={{marginBottom:16,padding:'18px 20px'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <div style={{fontWeight:700,fontSize:'.95rem'}}>{'📈'} Minuti studio giornalieri</div>
+              <div style={{fontWeight:700,fontSize:'.95rem'}}>{'📈'} {chartMode==='day'?'Minuti studio giornalieri':chartMode==='week'?'Minuti studio settimanali':'Minuti studio mensili'}</div>
               <div style={{display:'flex',gap:4}}>
                 {[{l:'7g',v:7},{l:'1m',v:30},{l:'3m',v:90},{l:'Tutto',v:Infinity}].map(p=>(
                   <button key={p.v} onClick={()=>setPeriod(p.v)} style={{background:period===p.v?'var(--accent)':'transparent',color:period===p.v?'#fff':'var(--text2)',border:'none',borderRadius:6,padding:'4px 12px',fontSize:'.72rem',cursor:'pointer',fontWeight:600}}>{p.l}</button>
@@ -24776,23 +24819,23 @@ function StudySessionsModal({onClose, toast}) {
               </div>
             </div>
             {/* Simple bar chart */}
-            <div style={{display:'flex',alignItems:'flex-end',gap:chartDays<=7?8:chartDays<=30?4:1,height:160,paddingBottom:24}}>
+            <div style={{display:'flex',alignItems:'flex-end',gap:periodData.length<=7?10:periodData.length<=15?6:4,height:160,paddingBottom:28}}>
               {periodData.map((d,i)=>{
                 const hPct = d.minutes>0?Math.max(4,(d.minutes/maxChartMin)*100):0;
                 return (
                   <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
-                    {d.minutes>0 && <div style={{fontSize:chartDays<=30?'.68rem':'.55rem',color:'var(--text2)',fontWeight:700,marginBottom:3,whiteSpace:'nowrap'}}>{d.minutes>=60?Math.floor(d.minutes/60)+'h'+(d.minutes%60>0?' '+d.minutes%60+'m':''):d.minutes+'min'}</div>}
-                    <div style={{width:'100%',background:d.minutes>0?'#10B981':'rgba(255,255,255,.06)',borderRadius:'4px 4px 0 0',height:hPct+'%',minHeight:d.minutes>0?4:0,transition:'height .4s',cursor:'pointer'}} title={d.date+': '+d.minutes+' min'}/>
-                    {((chartDays<=7)||((chartDays<=30)&&i%3===0)||(chartDays>30&&i%(Math.ceil(chartDays/10))===0)) && <div style={{fontSize:'.6rem',color:'var(--text3)',marginTop:6,whiteSpace:'nowrap'}}>{d.day}</div>}
+                    {d.minutes>0 && <div style={{fontSize:'.68rem',color:'var(--text2)',fontWeight:700,marginBottom:3,whiteSpace:'nowrap'}}>{d.minutes>=60?Math.floor(d.minutes/60)+'h'+(d.minutes%60>0?' '+d.minutes%60+'m':''):d.minutes+'min'}</div>}
+                    <div style={{width:'100%',background:d.minutes>0?'#10B981':'rgba(255,255,255,.06)',borderRadius:'4px 4px 0 0',height:hPct+'%',minHeight:d.minutes>0?4:0,transition:'height .4s',cursor:'pointer'}} title={d.label+': '+d.minutes+' min'}/>
+                    <div style={{fontSize:periodData.length>12?'.55rem':'.6rem',color:'var(--text3)',marginTop:6,whiteSpace:'nowrap',textAlign:'center'}}>{d.label}</div>
                   </div>
                 );
               })}
             </div>
             {/* Summary */}
             <div style={{display:'flex',gap:20,justifyContent:'center',padding:'10px 0',borderTop:'1px solid var(--border)',fontSize:'.78rem',color:'var(--text2)',flexWrap:'wrap'}}>
-              <span>Media: <strong style={{color:'var(--accent)'}}>{periodTotalMinutes>0?(periodTotalMinutes/periodData.length).toFixed(0):0} min/giorno</strong></span>
+              <span>Media: <strong style={{color:'var(--accent)'}}>{periodTotalMinutes>0?(periodTotalMinutes/(period===Infinity?sortedDates.length:period)).toFixed(0):0} min/giorno</strong></span>
               <span>Totale: <strong style={{color:'var(--green)'}}>{Math.floor(periodTotalMinutes/60)}h {periodTotalMinutes%60}m</strong></span>
-              <span>Giorni attivi: <strong style={{color:'#06B6D4'}}>{periodData.filter(d=>d.minutes>0).length}/{periodData.length}</strong></span>
+              <span>Giorni attivi: <strong style={{color:'#06B6D4'}}>{periodDates.length}/{period===Infinity?sortedDates.length:period}</strong></span>
             </div>
           </div>
         </>)}
