@@ -9231,37 +9231,13 @@ function Login({onUser}) {
 
 // - PW TAB -
 function PwTab({toast}) {
-  const {passwords,notes,addPw,delPw,addNote,delNote,updateNote} = useContext(DataCtx);
+  const {passwords,notes,addPw,delPw} = useContext(DataCtx);
   const [sub,setSub]=useState('pw');
+  const [notesOpen, setNotesOpen] = useState(false);
   const [search,setSearch]=useState('');
   const [shown,setShown]=useState({});
   const [mod,setMod]=useState(null);
   const [pf,setPf]=useState({svc:'',usr:'',pwd:'',ico:'🌐',tags:''});
-  const [nf,setNf]=useState({title:'',body:'',color:'#FFD166',tags:''});
-  const [editNote,setEditNote]=useState(null);
-  const [viewNote,setViewNote]=useState(null);
-  const [pinnedIds,setPinnedIds]=useState(()=>{try{return JSON.parse(localStorage.getItem('pinnedNotes')||'[]');}catch(e){return [];}});
-  const [autosaveTimer, setAutosaveTimer] = useState(null);
-
-  const pinNote=(id)=>{
-    setPinnedIds(prev=>{
-      const n=prev.includes(id)?prev.filter(x=>x!==id):[...prev,id];
-      localStorage.setItem('pinnedNotes',JSON.stringify(n));return n;
-    });
-  };
-
-  // Auto-save for Note editing
-  useEffect(() => {
-    if (mod === 'editnote' && editNote) {
-      const timer = setTimeout(() => {
-        const tags = nf.tags ? nf.tags.split(',').map(t=>t.trim()).filter(t=>t) : [];
-        updateNote(editNote.id, {title:nf.title, body:nf.body, color:nf.color, tags});
-        console.log('Autosaved note:', editNote.id);
-      }, 1500);
-      setAutosaveTimer(timer);
-      return () => clearTimeout(timer);
-    }
-  }, [nf, mod, editNote, updateNote]);
 
   const str=pw=>{let s=0;if(pw.length>=8)s++;if(pw.length>=14)s++;if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;return s;};
   const genPw=()=>{const c='ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%';setPf(f=>({...f,pwd:Array.from({length:16},()=>c[Math.floor(Math.random()*c.length)]).join('')}));};
@@ -9270,54 +9246,8 @@ function PwTab({toast}) {
     const tags = pf.tags ? pf.tags.split(',').map(t=>t.trim()).filter(t=>t) : [];
     addPw({...pf,tags});
     setMod(null);setPf({svc:'',usr:'',pwd:'',ico:'🌐',tags:''});toast('Password salvata! 🔐');};
-  const saveNt=()=>{if(!nf.title||!nf.body){toast('Compila titolo e contenuto','var(--red)');return;}
-    const tags = nf.tags ? nf.tags.split(',').map(t=>t.trim()).filter(t=>t) : [];
-    addNote({...nf,tags});
-    setMod(null);setNf({title:'',body:'',color:'#FFD166',tags:''});toast('Nota salvata! 📝');};
-  const saveEditNt=()=>{
-    if(!nf.title||!nf.body){toast('Compila titolo e contenuto','var(--red)');return;}
-    const tags = nf.tags ? nf.tags.split(',').map(t=>t.trim()).filter(t=>t) : [];
-    updateNote(editNote.id, {title:nf.title, body:nf.body, color:nf.color, tags});
-    setMod(null);setEditNote(null);setNf({title:'',body:'',color:'#FFD166',tags:''});toast('Nota aggiornata! 📝');
-  };
-
-  const exportNoteMd = (note) => {
-    const md = `# ${note.title}\n\n${note.body}\n\n---\n*Esportata da LaMiaVita il ${new Date().toLocaleDateString('it-IT')}*`;
-    const blob = new Blob([md], {type:'text/markdown'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = note.title.replace(/[^a-z0-9]/gi,'_')+'.md';
-    a.click();
-    URL.revokeObjectURL(url);
-    toast('Scaricato come Markdown! 📥','var(--blue)');
-  };
-
-  const exportNotePdf = (note) => {
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${note.title}</title><style>body{font-family:system-ui;max-width:700px;margin:40px auto;padding:20px;line-height:1.6;color:#333}h1{color:#FF4D6D;border-bottom:2px solid #FFD166;padding-bottom:10px}h6{color:#888;font-size:.85rem;margin-top:30px}</style></head><body><h1>${note.title}</h1><p>${note.body.replace(/\n/g,'<br>')}</p><h6>Esportata da LaMiaVita</h6></body></html>`;
-    const blob = new Blob([html], {type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = note.title.replace(/[^a-z0-9]/gi,'_')+'.html';
-    a.click();
-    URL.revokeObjectURL(url);
-    toast('Scaricato come HTML! 📥','var(--purple)');
-  };
-
-  const shareNote = async (note) => {
-    if(navigator.share){
-      try{
-        await navigator.share({title:note.title,text:note.body});
-      }catch(e){}
-    } else {
-      navigator.clipboard.writeText(note.body);
-      toast('Copiato negli appunti! 📋','var(--green)');
-    }
-  };
 
   const filt=passwords.filter(p=>p.svc.toLowerCase().includes(search.toLowerCase())||p.usr.toLowerCase().includes(search.toLowerCase()));
-  const filtNotes=notes.map(n=>({...n,pinned:pinnedIds.includes(n.id)})).filter(n=>!search||n.title.toLowerCase().includes(search.toLowerCase())||n.body.toLowerCase().includes(search.toLowerCase()));
   const s=str(pf.pwd);const sc=s<=2?'var(--red)':s<=3?'var(--yellow)':'var(--green)';
 
   return (
@@ -9326,7 +9256,7 @@ function PwTab({toast}) {
         <div className="sht">🔐 Password & <em>Note</em></div>
         <div style={{display:'flex',gap:8}}>
           <button className="btn br bs" onClick={()=>setMod('pw')}>+ Password</button>
-          <button className="btn bt bs" onClick={()=>setMod('note')}>+ Nota</button>
+          <button className="btn bt bs" onClick={()=>setNotesOpen(true)}>+ Nota</button>
         </div>
       </div>
       <div className="stabs">
@@ -9353,104 +9283,17 @@ function PwTab({toast}) {
         ))}
       </>}
       {sub==='notes'&&<div>
-        <div className="note-search">
-          <input className="field" placeholder="🔍 Cerca nelle note..." value={search} onChange={e=>setSearch(e.target.value)} style={{flex:1}}/>
-          <span style={{fontSize:'.8rem',color:'var(--text2)',whiteSpace:'nowrap'}}>{notes.length} note</span>
-        </div>
-        {filtNotes.length===0&&<Empty icon="📝" text="Nessuna nota ancora" sub='Clicca "+ Nota" per aggiungerne una'/>}
-        <div className="notes-grid">
-          {[...filtNotes].sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)).map(n=>{
-            const isDoc = n.docType==='doc';
-            const isSheet = n.docType==='sheet';
-            const isSlides = n.docType==='slides';
-            const isDocument = isDoc || isSheet || isSlides;
-            const docIcon = isDoc?'📄':isSheet?'📊':'📽️';
-            const docLabel = isDoc?'Documento':isSheet?'Foglio':isSlides?'Slide':'Nota';
-            const docColor = isDoc?'var(--yellow)':isSheet?'var(--green)':'var(--purple)';
-            return(
-            <div key={n.id} className={`note-card${n.pinned?' pinned':''}`} style={{borderTop:`3px solid ${n.color||'#FFD166'}`, display: viewNote === n.id ? 'none' : 'block'}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:6}}>
-                <div style={{display:'flex',alignItems:'center',gap:8}}>
-                  <div className={`note-pin${n.pinned?' active':''}`} onClick={()=>pinNote(n.id)} title={n.pinned?'Rimuovi pin':'Appunta'}>📌</div>
-                  {isDocument && <span style={{fontSize:'.85rem',padding:'2px 8px',borderRadius:6,background:docColor+'22',color:docColor,fontWeight:600}}>{docIcon} {docLabel}</span>}
-                </div>
-                <div style={{display:'flex',gap:4,flexWrap:'wrap',justifyContent:'flex-end'}}>
-                  <div className="ib" onClick={()=>{setViewNote(n.id);}} style={{padding:'4px 8px',borderRadius:6,fontSize:'.7rem',background:'rgba(6,214,160,0.15)',color:'var(--green)'}} title="Apri">
-                    ▶ {isDocument?'Anteprima':'Apri'}
-                  </div>
-                  <div className="ib" onClick={()=>{setEditNote(n);setNf({title:n.title,body:n.body,color:n.color||'#FFD166'});setMod('editnote');}} style={{color:'var(--blue)'}} title="Modifica">✏️</div>
-                  <div className="ib" onClick={()=>navigator.clipboard.writeText(n.body).then(()=>toast('Copiata!'))} title="Copia">📋</div>
-                  <div className="ib" onClick={()=>{delNote(n.id);toast('Eliminata','var(--red)');}} style={{color:'var(--red)'}} title="Elimina">🗑️</div>
-                </div>
-              </div>
-               <div className="note-title">{n.title}</div>
-               <div style={{display:'flex',gap:4,flexWrap:'wrap',marginTop:4,marginBottom:8}}>
-                 {n.tags && n.tags.map(t=>(
-                   <span key={t} style={{fontSize:'.6rem',padding:'1px 6px',borderRadius:10,background:'rgba(255,255,255,0.1)',color:'var(--text2)',border:'1px solid rgba(255,255,255,0.1)'}}>{t}</span>
-                 ))}
-               </div>
-{viewNote === n.id ? (
-                 <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',zIndex:999999,width:'92%',maxWidth:750,maxHeight:'80vh',background:'var(--surface)',borderRadius:24,border:`2px solid ${n.color||'#FFD166'}40`,boxShadow:`0 24px 80px rgba(0,0,0,.6), 0 0 40px ${n.color||'#FFD166'}20`,overflow:'hidden',display:'flex',flexDirection:'column'}} onClick={()=>setViewNote(null)}>
-                  <div style={{position:'relative',zIndex:10,background:n.color||'#FFD166',padding:'16px 24px',display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
-                    <div style={{display:'flex',alignItems:'center',gap:12}}>
-                      {isDocument && <span style={{fontSize:'1.3rem'}}>{docIcon}</span>}
-                      <div style={{color:'#fff',fontWeight:800,fontSize:'1.1rem'}}>{n.title}</div>
-                    </div>
-                    <div style={{display:'flex',gap:8}}>
-                      <button onClick={(e)=>{e.stopPropagation();navigator.clipboard.writeText(n.body).then(()=>toast('Copiata!'));}} style={{background:'rgba(255,255,255,.2)',border:'none',borderRadius:10,padding:'8px 14px',color:'#fff',cursor:'pointer',fontSize:'.85rem'}}>📋 Copia</button>
-                      <button onClick={()=>setExpandedNotes(prev=>({...prev,[n.id]:false}))} style={{background:'rgba(255,255,255,.2)',border:'none',borderRadius:10,padding:'8px 14px',color:'#fff',cursor:'pointer',fontSize:'1.1rem'}}>✕</button>
-                    </div>
-                  </div>
-                  <div style={{padding:24,overflow:'auto',flex:1}} onClick={e=>e.stopPropagation()}>
-                    {isDocument ? (
-                      <div>
-                        {isDoc && (
-                          <div style={{background:'rgba(255,255,255,.04)',border:'1px solid var(--border)',borderRadius:16,padding:24}}>
-                            <div style={{fontWeight:700,marginBottom:16,color:'var(--yellow)',fontSize:'.95rem'}}>📄 Contenuto Documento</div>
-                            <div style={{whiteSpace:'pre-wrap',fontSize:'.92rem',lineHeight:1.8,color:'var(--text)'}}>{n.body.replace(/<[^>]*>/g,' ').substring(0,5000)}</div>
-                          </div>
-                        )}
-                        {isSheet && (
-                          <div style={{background:'rgba(255,255,255,.04)',border:'1px solid var(--border)',borderRadius:16,padding:24}}>
-                            <div style={{fontWeight:700,marginBottom:16,color:'var(--green)',fontSize:'.95rem'}}>📊 Contenuto Foglio</div>
-                            <div style={{fontFamily:'monospace',fontSize:'.88rem',whiteSpace:'pre-wrap',color:'var(--text)'}}>
-                              {(()=>{try{const data=JSON.parse(n.body);return 'Righe: '+data.length+'\nColonne: '+(data[0]?.length||0)+'\n\n'+data.map(r=>r.join(' | ')).join('\n');}catch(e){return n.body.substring(0,2000);}})()}
-                            </div>
-                          </div>
-                        )}
-                        {isSlides && (
-                          <div style={{background:'rgba(255,255,255,.04)',border:'1px solid var(--border)',borderRadius:16,padding:24}}>
-                            <div style={{fontWeight:700,marginBottom:16,color:'var(--purple)',fontSize:'.95rem'}}>📽️ Presentazione</div>
-                            {(()=>{try{const data=JSON.parse(n.body);return data.map((s,i)=>(
-                              <div key={i} style={{background:'rgba(255,255,255,.04)',borderRadius:12,padding:20,marginBottom:12}}>
-                                <div style={{fontWeight:700,marginBottom:8,color:'var(--purple)'}}>Slide {i+1}</div>
-                                <div style={{fontSize:'.9rem',color:'var(--text)',whiteSpace:'pre-wrap'}}>{s.content||s.title||''}</div>
-                              </div>
-                            ));}catch(e){return <div style={{fontSize:'.9rem',color:'var(--text)'}}>{n.body.substring(0,2000)}</div>};})()}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div style={{fontSize:'.95rem',color:'var(--text)',whiteSpace:'pre-wrap',wordBreak:'break-word',lineHeight:1.8,padding:20,background:'rgba(255,255,255,.03)',borderRadius:16}}>
-                        {n.body}
-                      </div>
-                    )}
-                    <div style={{marginTop:16,fontSize:'.78rem',color:'var(--text2)',display:'flex',justifyContent:'space-between'}}>
-                      <span>📅 {n.date}</span>
-                      <span>📝 {n.body.length} caratteri</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="note-body">{n.body}</div>
-              )}
-              <div className="note-foot">
-                <span className="note-date">📅 {n.date}</span>
-              </div>
-            </div>
-          )})}
+        <div style={{textAlign:'center',padding:'60px 20px'}}>
+          <div style={{fontSize:'3rem',marginBottom:16,opacity:.4}}>📝</div>
+          <div style={{fontWeight:700,fontSize:'1.1rem',color:'var(--text2)',marginBottom:8}}>Le tue note</div>
+          <div style={{fontSize:'.85rem',color:'var(--text3)',marginBottom:24}}>Gestisci le tue note in vista completa</div>
+          <button onClick={()=>setNotesOpen(true)} style={{background:'var(--accent)',color:'#fff',border:'none',borderRadius:12,padding:'12px 28px',fontSize:'.9rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>
+            📝 Apri Note
+          </button>
+          <div style={{marginTop:12,fontSize:'.75rem',color:'var(--text3)'}}>{notes.length} note salvate</div>
         </div>
       </div>}
+      {notesOpen && <NotesPage onClose={()=>setNotesOpen(false)} toast={toast}/>}
       <Modal open={mod==='pw'} onClose={()=>setMod(null)} title="🔐 Nuova Password" footer={<><button className="btn bg" onClick={()=>setMod(null)}>Annulla</button><button className="btn br" onClick={savePw}>Salva</button></>}>
         <div className="fl"><label>Servizio</label><input className="field" placeholder="Gmail, Netflix..." value={pf.svc} onChange={e=>setPf(f=>({...f,svc:e.target.value}))}/></div>
         <div className="fl"><label>Utente / Email</label><input className="field" placeholder="mario@example.com" value={pf.usr} onChange={e=>setPf(f=>({...f,usr:e.target.value}))}/></div>
@@ -9467,63 +9310,6 @@ function PwTab({toast}) {
             <option value="🌐">🌐 Sito web</option><option value="📧">📧 Email</option><option value="🎮">🎮 Gaming</option><option value="🏦">🏦 Banca</option><option value="🛒">🛒 Shopping</option><option value="💼">💼 Lavoro</option>
           </select>
         </div>
-      </Modal>
-      <Modal open={mod==='note'} onClose={()=>setMod(null)} title="📝 Nuova Nota" footer={<><button className="btn bg" onClick={()=>setMod(null)}>Annulla</button><button className="btn bt" onClick={saveNt}>Salva</button></>}>
-        <div className="fl"><label>Titolo</label><input className="field" placeholder="Titolo..." value={nf.title} onChange={e=>setNf(f=>({...f,title:e.target.value}))}/></div>
-        <div className="fl"><label>Contenuto</label><textarea className="field" rows={6} placeholder="Scrivi qui..." value={nf.body} onChange={e=>setNf(f=>({...f,body:e.target.value}))} style={{minHeight:120,resize:'vertical'}}/></div>
-        <div className="fl"><label>Tag (separati da virgola)</label><input className="field" placeholder="importante, studio, idee..." value={nf.tags} onChange={e=>setNf(f=>({...f,tags:e.target.value}))}/></div>
-        <div className="fl"><label>Colore</label>
-          <div style={{display:'flex',gap:8}}>
-            {['#FFD166','#06D6A0','#FF6B9D','#4CC9F0','#7B5EA7','#FF4D6D'].map(c=>(
-              <div key={c} onClick={()=>setNf(f=>({...f,color:c}))} style={{width:32,height:32,borderRadius:8,background:c,cursor:'pointer',border: nf.color===c?'3px solid #fff':'3px solid transparent'}}/>
-            ))}
-          </div>
-        </div>
-      </Modal>
-      
-      {/* MODIFICA NOTA */}
-      <Modal open={mod==='editnote'} onClose={()=>{setMod(null);setEditNote(null);setNf({title:'',body:'',color:'#FFD166'});}} title="✏️ Modifica Nota" footer={<><button className="btn bg" onClick={()=>{setMod(null);setEditNote(null);setNf({title:'',body:'',color:'#FFD166'});}}>Annulla</button><button className="btn bt" onClick={saveEditNt}>Salva</button></>}>
-        {editNote?.docType && (
-          <div style={{background:'rgba(76,201,240,.1)',border:'1px solid rgba(76,201,240,.2)',borderRadius:10,padding:'10px 14px',marginBottom:16,fontSize:'.82rem',color:'var(--blue)'}}>
-            📌 Questo contenuto è un {editNote.docType==='doc'?'Documento':editNote.docType==='sheet'?'Foglio di calcolo':'Presentazione'}. 
-            Per modificarlo completamente, vai in <strong>TUTT'UNI → Documenti</strong>.
-          </div>
-        )}
-        <div className="fl"><label>Titolo</label><input className="field" placeholder="Titolo..." value={nf.title} onChange={e=>setNf(f=>({...f,title:e.target.value}))}/></div>
-        <div className="fl">
-          <label>Contenuto {editNote?.docType?'(sola lettura)':''}</label>
-          {editNote?.docType==='doc' ? (
-            <textarea className="field" rows={8} placeholder="Contenuto documento..." value={nf.body.replace(/<[^>]*>/g,' ')} onChange={e=>setNf(f=>({...f,body:e.target.value}))} style={{minHeight:160,resize:'vertical',background:'rgba(255,255,255,.05)'}}/>
-          ) : editNote?.docType==='sheet' ? (
-            <div style={{background:'rgba(255,255,255,.05)',border:'1px solid var(--border)',borderRadius:10,padding:16,minHeight:120}}>
-              <div style={{color:'var(--green)',marginBottom:8}}>📊 Foglio di calcolo</div>
-              <div style={{fontSize:'.8rem',color:'var(--text2)'}}>Questo contenuto deve essere modificato in TUTT'UNI → Documenti</div>
-              <div style={{marginTop:12,fontFamily:'monospace',fontSize:'.75rem',background:'rgba(0,0,0,.2)',padding:10,borderRadius:8,whiteSpace:'pre-wrap',maxHeight:150,overflow:'auto'}}>
-                {(()=>{try{const d=JSON.parse(nf.body);return JSON.stringify(d,null,2).substring(0,500)+'...';}catch(e){return nf.body.substring(0,500);}})()}
-              </div>
-            </div>
-          ) : editNote?.docType==='slides' ? (
-            <div style={{background:'rgba(255,255,255,.05)',border:'1px solid var(--border)',borderRadius:10,padding:16,minHeight:120}}>
-              <div style={{color:'var(--purple)',marginBottom:8}}>📽️ Presentazione</div>
-              <div style={{fontSize:'.8rem',color:'var(--text2)'}}>Questo contenuto deve essere modificato in TUTT'UNI → Documenti</div>
-              <div style={{marginTop:12,fontFamily:'monospace',fontSize:'.75rem',background:'rgba(0,0,0,.2)',padding:10,borderRadius:8,whiteSpace:'pre-wrap',maxHeight:150,overflow:'auto'}}>
-                {(()=>{try{const d=JSON.parse(nf.body);return JSON.stringify(d,null,2).substring(0,500)+'...';}catch(e){return nf.body.substring(0,500);}})()}
-              </div>
-            </div>
-          ) : (
-            <textarea className="field" rows={8} placeholder="Scrivi qui..." value={nf.body} onChange={e=>setNf(f=>({...f,body:e.target.value}))} style={{minHeight:160,resize:'vertical'}}/>
-          )}
-        </div>
-        <div className="fl"><label>Tag (separati da virgola)</label><input className="field" placeholder="importante, studio, idee..." value={nf.tags} onChange={e=>setNf(f=>({...f,tags:e.target.value}))}/></div>
-        {!editNote?.docType && (
-          <div className="fl"><label>Colore</label>
-            <div style={{display:'flex',gap:8}}>
-              {['#FFD166','#06D6A0','#FF6B9D','#4CC9F0','#7B5EA7','#FF4D6D'].map(c=>(
-                <div key={c} onClick={()=>setNf(f=>({...f,color:c}))} style={{width:32,height:32,borderRadius:8,background:c,cursor:'pointer',border: nf.color===c?'3px solid #fff':'3px solid transparent'}}/>
-              ))}
-            </div>
-          </div>
-        )}
       </Modal>
     </div>
   );
@@ -25111,6 +24897,242 @@ function StudySessionsModal({onClose, toast}) {
         </div>
 
         </div>
+    </div>
+  );
+}
+
+
+// - NOTES PAGE -
+function NotesPage({onClose, toast}) {
+  const {notes, addNote, updateNote, delNote} = useContext(DataCtx);
+  const [search, setSearch] = useState('');
+  const [selectedId, setSelectedId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [sort, setSort] = useState('newest');
+  const [filterTag, setFilterTag] = useState(null);
+  const [confirmDel, setConfirmDel] = useState(null);
+  const [pinnedIds, setPinnedIds] = useState(()=>{try{return JSON.parse(localStorage.getItem('pinnedNotes')||'[]');}catch(e){return [];}});
+  const [form, setForm] = useState({title:'', body:'', color:'#FFD166', tags:''});
+  const [mobileView, setMobileView] = useState('list');
+  const [isMobile, setIsMobile] = useState(()=>window.innerWidth<=768);
+  const textareaRef = useRef(null);
+
+  useEffect(()=>{
+    const check=()=>setIsMobile(window.innerWidth<=768);
+    window.addEventListener('resize',check);
+    return()=>window.removeEventListener('resize',check);
+  },[]);
+
+  const COLORS = ['#FFD166','#06D6A0','#FF6B9D','#4CC9F0','#7B5EA7','#FF4D6D','#10B981','#F59E0B'];
+  const allTags = [...new Set((notes||[]).flatMap(n => n.tags || []))];
+
+  const pinNote = (id) => {
+    setPinnedIds(prev => {
+      const n = prev.includes(id) ? prev.filter(x=>x!==id) : [...prev,id];
+      localStorage.setItem('pinnedNotes', JSON.stringify(n));
+      return n;
+    });
+  };
+
+  let filtered = (notes|| []).map(n=>({...n, pinned:pinnedIds.includes(n.id)}))
+    .filter(n => {
+      if(filterTag) return (n.tags||[]).includes(filterTag);
+      if(!search) return true;
+      const q = search.toLowerCase();
+      return n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q) || (n.tags||[]).some(t=>t.toLowerCase().includes(q));
+    });
+  if(sort==='newest') filtered.sort((a,b)=>b.id-a.id);
+  else if(sort==='oldest') filtered.sort((a,b)=>a.id-b.id);
+  else if(sort==='title') filtered.sort((a,b)=>a.title.localeCompare(b.title));
+  filtered.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
+
+  const selected = selectedId ? (notes||[]).find(n=>n.id===selectedId) : null;
+
+  const openCreate = () => { setForm({title:'',body:'',color:'#FFD166',tags:''}); setEditId(null); setShowForm(true); };
+  const openEdit = (n) => { setForm({title:n.title, body:n.body, color:n.color||'#FFD166', tags:(n.tags||[]).join(', ')}); setEditId(n.id); setShowForm(true); };
+  const saveNote = () => {
+    if(!form.title.trim() && !form.body.trim()) { toast('Scrivi qualcosa','var(--red)'); return; }
+    const tags = form.tags ? form.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
+    if(editId) { updateNote(editId, {...form, tags}); toast('Nota aggiornata!'); }
+    else { addNote({...form, tags}); toast('Nota creata!'); }
+    setShowForm(false); setEditId(null); setForm({title:'',body:'',color:'#FFD166',tags:''});
+  };
+  const deleteNote = (id) => { delNote(id); setConfirmDel(null); if(selectedId===id) setSelectedId(null); toast('Eliminata','var(--red)'); };
+  const selectNote = (n) => { setSelectedId(n.id); setMobileView('detail'); };
+
+  const formatDate = (id) => {
+    const d = new Date(id);
+    return d.toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
+  };
+
+  return (
+    <div style={{position:'fixed',inset:0,zIndex:99999,background:'var(--bg)',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+
+      {/* Header */}
+      <div style={{padding:'12px 20px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:12,flexShrink:0,background:'var(--surface)',zIndex:10}}>
+        <button onClick={onClose} style={{display:'flex',alignItems:'center',gap:6,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'7px 12px',cursor:'pointer',color:'var(--text)',fontSize:'.8rem',fontWeight:600,fontFamily:'inherit',transition:'all .2s',flexShrink:0}}>
+          {'←'} Note & Password
+        </button>
+        <div style={{position:'relative',flex:1,maxWidth:400}}>
+          <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',fontSize:'.85rem',opacity:.4}}>🔍</span>
+          <input className="field" placeholder="Cerca note..." value={search} onChange={e=>setSearch(e.target.value)} style={{width:'100%',paddingLeft:32}}/>
+        </div>
+        <div style={{display:'flex',gap:6,alignItems:'center',flexShrink:0}}>
+          <select value={sort} onChange={e=>setSort(e.target.value)} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:8,padding:'6px 10px',color:'var(--text)',fontSize:'.75rem',cursor:'pointer',fontFamily:'inherit'}}>
+            <option value="newest">Più recente</option>
+            <option value="oldest">Più vecchio</option>
+            <option value="title">A → Z</option>
+          </select>
+          <button onClick={openCreate} style={{background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'7px 16px',fontSize:'.82rem',fontWeight:700,cursor:'pointer',whiteSpace:'nowrap',fontFamily:'inherit'}}>
+            {'＋'} Nuova
+          </button>
+        </div>
+      </div>
+
+      {/* Tag filters */}
+      {allTags.length > 0 && (
+        <div style={{padding:'8px 20px',display:'flex',gap:6,overflowX:'auto',flexShrink:0,borderBottom:filterTag?'1px solid var(--border)':'none'}}>
+          <div onClick={()=>setFilterTag(null)} style={{padding:'4px 12px',borderRadius:20,fontSize:'.72rem',fontWeight:600,cursor:'pointer',background:!filterTag?'var(--accent)':'rgba(255,255,255,.06)',color:!filterTag?'#fff':'var(--text2)',border:'1px solid rgba(255,255,255,.1)',whiteSpace:'nowrap',transition:'all .2s'}}>Tutte</div>
+          {allTags.map(t=>(
+            <div key={t} onClick={()=>setFilterTag(filterTag===t?null:t)} style={{padding:'4px 12px',borderRadius:20,fontSize:'.72rem',fontWeight:600,cursor:'pointer',background:filterTag===t?'var(--accent)':'rgba(255,255,255,.06)',color:filterTag===t?'#fff':'var(--text2)',border:'1px solid rgba(255,255,255,.1)',whiteSpace:'nowrap',transition:'all .2s'}}>{t}</div>
+          ))}
+        </div>
+      )}
+
+      {/* Body */}
+      <div style={{flex:1,display:'flex',overflow:'hidden'}}>
+
+        {/* List Panel */}
+        <div className="np-list" style={{width:isMobile?'100%':340,borderRight:isMobile?'none':'1px solid var(--border)',overflowY:'auto',flexShrink:0,display:(isMobile&&mobileView==='detail')?'none':'flex',flexDirection:'column'}}>
+          {filtered.length === 0 ? (
+            <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:40,textAlign:'center'}}>
+              <div style={{fontSize:'3rem',marginBottom:12,opacity:.3}}>📝</div>
+              <div style={{fontWeight:700,fontSize:'1rem',color:'var(--text2)',marginBottom:4}}>{search?'Nessun risultato':'Nessuna nota'}</div>
+              <div style={{fontSize:'.82rem',color:'var(--text3)'}}>{search?'Prova con altri termini':'Crea la tua prima nota'}</div>
+              {!search && <button onClick={openCreate} style={{marginTop:16,background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'8px 20px',fontSize:'.85rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{'＋'} Nuova nota</button>}
+            </div>
+          ) : (
+            <div style={{padding:8}}>
+              {filtered.map(n => (
+                <div key={n.id} onClick={()=>selectNote(n)} style={{padding:'12px 14px',borderRadius:12,cursor:'pointer',background:selectedId===n.id?'rgba(255,255,255,.08)':'transparent',transition:'background .15s',marginBottom:2,borderLeft:`3px solid ${selectedId===n.id?(n.color||'#FFD166'):'transparent'}`}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:4}}>
+                    {n.pinned && <span style={{fontSize:'.7rem'}}>📌</span>}
+                    <div style={{fontWeight:700,fontSize:'.88rem',lineHeight:1.3,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{n.title || 'Senza titolo'}</div>
+                  </div>
+                  <div style={{fontSize:'.78rem',color:'var(--text3)',lineHeight:1.4,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',marginBottom:6}}>{n.body.substring(0,80)}</div>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                    <span style={{fontSize:'.68rem',color:'var(--text3)'}}>{formatDate(n.id)}</span>
+                    <div style={{display:'flex',gap:3}}>
+                      {(n.tags||[]).slice(0,2).map(t=><span key={t} style={{fontSize:'.58rem',padding:'1px 6px',borderRadius:8,background:'rgba(255,255,255,.06)',color:'var(--text3)'}}>{t}</span>)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Detail Panel */}
+        <div className="np-detail" style={{flex:1,overflowY:'auto',display:'flex',flexDirection:'column',...(isMobile && mobileView==='list' ? {display:'none'} : {position:isMobile?'fixed':undefined,inset:isMobile?'0':undefined,zIndex:isMobile?99997:undefined})}}>
+          {mobileView==='list' && <div className="np-mobile-back" style={{display:'none'}}/>}
+          {!selected ? (
+            <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:40,textAlign:'center'}}>
+              <div style={{fontSize:'4rem',marginBottom:16,opacity:.15}}>📝</div>
+              <div style={{fontWeight:700,fontSize:'1.1rem',color:'var(--text3)',marginBottom:6}}>Seleziona una nota</div>
+              <div style={{fontSize:'.85rem',color:'var(--text3)',opacity:.6}}>oppure creane una nuova</div>
+            </div>
+          ) : (
+            <div style={{maxWidth:700,margin:'0 auto',padding:'28px 32px',width:'100%'}}>
+              {/* Note header */}
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20}}>
+                <div style={{flex:1}}>
+                  <div style={{marginBottom:12}}>
+                    <button onClick={()=>{setSelectedId(null);setMobileView('list');}} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:8,padding:'5px 10px',cursor:'pointer',color:'var(--text)',fontSize:'.78rem',fontFamily:'inherit',display:isMobile?'inline-block':'none'}}>← Indietro</button>
+                  </div>
+                  <h1 style={{margin:0,fontSize:'1.6rem',fontWeight:800,lineHeight:1.3,wordBreak:'break-word'}}>{selected.title}</h1>
+                  <div style={{display:'flex',gap:8,alignItems:'center',marginTop:8,flexWrap:'wrap'}}>
+                    <span style={{fontSize:'.75rem',color:'var(--text3)'}}>{formatDate(selected.id)}</span>
+                    <span style={{fontSize:'.75rem',color:'var(--text3)'}}>·</span>
+                    <span style={{fontSize:'.75rem',color:'var(--text3)'}}>{selected.body.length} caratteri</span>
+                    {selected.color && <div style={{width:10,height:10,borderRadius:'50%',background:selected.color,flexShrink:0}}/>}
+                  </div>
+                  {(selected.tags||[]).length > 0 && (
+                    <div style={{display:'flex',gap:4,marginTop:8,flexWrap:'wrap'}}>
+                      {selected.tags.map(t=><span key={t} style={{fontSize:'.7rem',padding:'2px 10px',borderRadius:12,background:'rgba(255,255,255,.06)',color:'var(--text2)',border:'1px solid rgba(255,255,255,.08)'}}>{t}</span>)}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Note body */}
+              <div style={{fontSize:'.95rem',lineHeight:1.85,color:'var(--text)',whiteSpace:'pre-wrap',wordBreak:'break-word',paddingBottom:40}}>
+                {selected.body}
+              </div>
+
+              {/* Actions bar */}
+              <div style={{position:'sticky',bottom:0,display:'flex',gap:8,padding:'12px 0',borderTop:'1px solid var(--border)',background:'var(--bg)',flexWrap:'wrap'}}>
+                <button onClick={()=>openEdit(selected)} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px 16px',color:'var(--text)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>✏️ Modifica</button>
+                <button onClick={()=>pinNote(selected.id)} style={{background:selected.pinned?'rgba(255,209,102,.12)':'rgba(255,255,255,.06)',border:`1px solid ${selected.pinned?'rgba(255,209,102,.3)':'rgba(255,255,255,.1)'}`,borderRadius:10,padding:'8px 16px',color:selected.pinned?'#FFD166':'var(--text2)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{selected.pinned?'📌 Appuntata':'📌 Appunta'}</button>
+                <button onClick={()=>navigator.share?navigator.share({title:selected.title,text:selected.body}):navigator.clipboard.writeText(selected.body).then(()=>toast('Copiata!'))} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px 16px',color:'var(--text)',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>{navigator.share?'📤 Condividi':'📋 Copia'}</button>
+                <div style={{flex:1}}/>
+                <button onClick={()=>setConfirmDel(selected.id)} style={{background:'rgba(239,68,68,.08)',border:'1px solid rgba(239,68,68,.2)',borderRadius:10,padding:'8px 16px',color:'#EF4444',fontSize:'.8rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>🗑️ Elimina</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Create / Edit Modal */}
+      {showForm && (
+        <div style={{position:'fixed',inset:0,zIndex:999999,background:'rgba(0,0,0,.5)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setShowForm(false)}>
+          <div onClick={e=>e.stopPropagation()} style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:20,padding:28,width:'100%',maxWidth:520,maxHeight:'90vh',overflowY:'auto',boxShadow:'0 24px 80px rgba(0,0,0,.5)'}}>
+            <div style={{fontWeight:800,fontSize:'1.1rem',marginBottom:20}}>{editId?'✏️ Modifica nota':'📝 Nuova nota'}</div>
+            <div style={{marginBottom:14}}>
+              <label style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:600,display:'block',marginBottom:6}}>Titolo</label>
+              <input className="field" placeholder="Titolo della nota..." value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))} style={{width:'100%',fontSize:'.95rem',fontWeight:600}}/>
+            </div>
+            <div style={{marginBottom:14}}>
+              <label style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:600,display:'block',marginBottom:6}}>Contenuto</label>
+              <textarea ref={textareaRef} className="field" placeholder="Scrivi qui..." value={form.body} onChange={e=>setForm(f=>({...f,body:e.target.value}))} style={{width:'100%',minHeight:180,resize:'vertical',lineHeight:1.7,fontSize:'.9rem'}}/>
+              <div style={{fontSize:'.68rem',color:'var(--text3)',textAlign:'right',marginTop:4}}>{form.body.length} caratteri</div>
+            </div>
+            <div style={{marginBottom:14}}>
+              <label style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:600,display:'block',marginBottom:6}}>Tag</label>
+              <input className="field" placeholder="importante, studio, idee..." value={form.tags} onChange={e=>setForm(f=>({...f,tags:e.target.value}))} style={{width:'100%'}}/>
+            </div>
+            <div style={{marginBottom:20}}>
+              <label style={{fontSize:'.78rem',color:'var(--text2)',fontWeight:600,display:'block',marginBottom:8}}>Colore</label>
+              <div style={{display:'flex',gap:8}}>
+                {COLORS.map(c=>(
+                  <div key={c} onClick={()=>setForm(f=>({...f,color:c}))} style={{width:28,height:28,borderRadius:'50%',background:c,cursor:'pointer',border:form.color===c?'3px solid #fff':'3px solid transparent',boxShadow:form.color===c?'0 0 0 2px '+c:'none',transition:'all .15s'}}/>
+                ))}
+              </div>
+            </div>
+            <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
+              <button onClick={()=>setShowForm(false)} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'9px 20px',color:'var(--text2)',fontSize:'.85rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Annulla</button>
+              <button onClick={saveNote} style={{background:'var(--accent)',color:'#fff',border:'none',borderRadius:10,padding:'9px 24px',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>{editId?'Salva':'Crea'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation */}
+      {confirmDel && (
+        <div style={{position:'fixed',inset:0,zIndex:999999,background:'rgba(0,0,0,.5)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setConfirmDel(null)}>
+          <div onClick={e=>e.stopPropagation()} style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:20,padding:28,maxWidth:340,textAlign:'center',boxShadow:'0 24px 80px rgba(0,0,0,.5)'}}>
+            <div style={{fontSize:'2rem',marginBottom:10}}>🗑️</div>
+            <div style={{fontWeight:700,fontSize:'1rem',marginBottom:6}}>Eliminare nota?</div>
+            <div style={{fontSize:'.82rem',color:'var(--text2)',marginBottom:20}}>Questa azione non puo essere annullata.</div>
+            <div style={{display:'flex',gap:8,justifyContent:'center'}}>
+              <button onClick={()=>setConfirmDel(null)} style={{background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',borderRadius:10,padding:'8px 20px',color:'var(--text2)',fontSize:'.85rem',fontWeight:600,cursor:'pointer',fontFamily:'inherit'}}>Annulla</button>
+              <button onClick={()=>deleteNote(confirmDel)} style={{background:'#EF4444',color:'#fff',border:'none',borderRadius:10,padding:'8px 20px',fontSize:'.85rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>Elimina</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Responsive handled via isMobile state */}
     </div>
   );
 }
