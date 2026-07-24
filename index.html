@@ -25060,19 +25060,25 @@ function NotesPage({onClose, toast}) {
     },50);
   };
 
+  // Safe: convert tags to comma string for editing
+  const tagsToString = (t) => Array.isArray(t) ? t.join(', ') : (typeof t === 'string' ? t : '');
+  const tagsToArray = (t) => {
+    const s = Array.isArray(t) ? t.join(', ') : (typeof t === 'string' ? t : '');
+    return s ? s.split(',').map(x=>x.trim()).filter(Boolean) : [];
+  };
+
   // Select a note — immediately editable (no read/edit toggle)
   const selectNote = (n) => {
     if(selectedId && selectedId !== n.id) {
       if(saveTimer.current) clearTimeout(saveTimer.current);
-      const tags = editForm.tags ? editForm.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
-      updateNote(selectedId, {...editForm, tags});
+      updateNote(selectedId, {...editForm, tags: tagsToArray(editForm.tags)});
     }
     setSelectedId(n.id);
     setEditForm({
       title: n.title || '',
       body: n.body || '',
       color: n.color || '#FFD166',
-      tags: (n.tags||[]).join(', '),
+      tags: tagsToString(n.tags),
       media: n.media || []
     });
     setMobileView('detail');
@@ -25083,8 +25089,7 @@ function NotesPage({onClose, toast}) {
     const newForm = {...editForm, [field]:val};
     setEditForm(newForm);
     if(selectedId) {
-      const tags = newForm.tags ? newForm.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
-      autoSave(selectedId, {...newForm, tags});
+      autoSave(selectedId, {...newForm, tags: tagsToArray(newForm.tags)});
     }
   };
 
@@ -25092,8 +25097,7 @@ function NotesPage({onClose, toast}) {
   const handleBack = () => {
     if(saveTimer.current) clearTimeout(saveTimer.current);
     if(selectedId) {
-      const tags = editForm.tags ? editForm.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
-      updateNote(selectedId, {...editForm, tags});
+      updateNote(selectedId, {...editForm, tags: tagsToArray(editForm.tags)});
       if(!editForm.title.trim() && !editForm.body.trim() && !(editForm.media||[]).length) {
         delNote(selectedId);
       }
@@ -25106,7 +25110,7 @@ function NotesPage({onClose, toast}) {
 
   const hasChanges = selected && (
     selected.title !== editForm.title || selected.body !== editForm.body ||
-    selected.color !== editForm.color || JSON.stringify(selected.tags) !== JSON.stringify((editForm.tags||[]).split(',').map(t=>t.trim()).filter(Boolean)) ||
+    selected.color !== editForm.color || JSON.stringify(selected.tags) !== JSON.stringify(tagsToArray(editForm.tags)) ||
     JSON.stringify(selected.media||[]) !== JSON.stringify(editForm.media||[])
   );
 
