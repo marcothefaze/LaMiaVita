@@ -28120,10 +28120,13 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
             </div>
           )})}
           {/* Focus Mode Modal */}
-          {focusModeOpen && (
+          {focusModeOpen && (() => {
+            const focusEditMin = focusSecs / 60;
+            const focusQuickPresets = [5,10,15,20,25,30,45,60];
+            return (
             <div style={{position:'fixed',inset:0,background:'rgba(5,5,10,.97)',zIndex:99999,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:20}}>
               <div className="ib" onClick={()=>{setFocusModeOpen(false);setFocusRunning(false);}} style={{position:'absolute',top:20,right:20,fontSize:'1.2rem',color:'#fff',zIndex:10}}>{'\u2715'}</div>
-              <div style={{display:'flex',gap:6,marginBottom:32}}>
+              <div style={{display:'flex',gap:6,marginBottom:16}}>
                 {[['work','Studio','#FF4D6D'],['short','Pausa','#06D6A0'],['long','Lunga','#4CC9F0']].map(([m,l,c])=>(
                   <button key={m} onClick={()=>{setFocusRunning(false);setFocusMode(m);setFocusSecs(focusDurations[m]*60);}} style={{padding:'6px 16px',borderRadius:20,border:'none',background:focusMode===m?c:'rgba(255,255,255,.08)',color:focusMode===m?'#fff':'rgba(255,255,255,.5)',fontSize:'.75rem',fontWeight:600,cursor:'pointer',transition:'.2s'}}>
                     {l}
@@ -28133,9 +28136,22 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
               <div style={{fontSize:'6rem',fontWeight:900,fontFamily:'monospace',color:focusColors[focusMode],textShadow:'0 0 60px '+focusColors[focusMode]+'44',lineHeight:1,marginBottom:8,letterSpacing:4}}>
                 {String(Math.floor(focusSecs/60)).padStart(2,'0')}:{String(focusSecs%60).padStart(2,'0')}
               </div>
-              <div style={{width:240,height:4,background:'rgba(255,255,255,.08)',borderRadius:2,marginBottom:36,overflow:'hidden'}}>
+              <div style={{width:240,height:4,background:'rgba(255,255,255,.08)',borderRadius:2,marginBottom:20,overflow:'hidden'}}>
                 <div style={{width:(1-focusSecs/(focusDurations[focusMode]*60))*100+'%',height:'100%',background:focusColors[focusMode],transition:'width 1s linear',borderRadius:2}}/>
               </div>
+              {/* Duration presets */}
+              {!focusRunning && (
+                <div style={{display:'flex',gap:5,marginBottom:28,flexWrap:'wrap',justifyContent:'center'}}>
+                  {focusQuickPresets.map(m => (
+                    <div key={m} onClick={()=>{setFocusSecs(m*60);setFocusDurations(d=>{const nd={...d,[focusMode]:m};localStorage.setItem('focus_durations',JSON.stringify(nd));return nd;});}} style={{padding:'5px 12px',borderRadius:8,background:focusSecs===m*60?focusColors[focusMode]+'33':'rgba(255,255,255,.06)',border:focusSecs===m*60?'1px solid '+focusColors[focusMode]:'1px solid rgba(255,255,255,.08)',color:focusSecs===m*60?focusColors[focusMode]:'rgba(255,255,255,.45)',fontSize:'.72rem',fontWeight:600,cursor:'pointer',transition:'.2s'}}>
+                      {m >= 60 ? Math.floor(m/60)+'h'+(m%60>0?m%60+'m':'') : m+'m'}
+                    </div>
+                  ))}
+                  <input type="number" min="1" max="300" placeholder="..." 
+                    onKeyDown={e=>{if(e.key==='Enter'){const v=parseInt(e.target.value);if(v>0&&v<=300){setFocusSecs(v*60);setFocusDurations(d=>{const nd={...d,[focusMode]:v};localStorage.setItem('focus_durations',JSON.stringify(nd));return nd;});e.target.value='';}}}}
+                    style={{width:48,height:28,borderRadius:8,background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.12)',color:'rgba(255,255,255,.6)',fontSize:'.72rem',fontWeight:600,textAlign:'center',padding:0,outline:'none'}}/>
+                </div>
+              )}
               <div style={{display:'flex',gap:16,alignItems:'center',marginBottom:36}}>
                 <div onClick={focusReset} style={{width:44,height:44,borderRadius:'50%',background:'rgba(255,255,255,.06)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:'.9rem',transition:'.2s'}} title="Reset">
                   {'\u21BA'}
@@ -28152,7 +28168,8 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
                 <span>{focusSessions*focusDurations.work}m totali</span>
               </div>
             </div>
-          )}
+            );
+          })()}
           
           <div className="content">
              {tab==='home'&&<DashboardHome toast={toast} setTab={setTab} setNotesOpen={setNotesOpen}/>}
