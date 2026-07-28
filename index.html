@@ -9233,10 +9233,9 @@ function Login({onUser}) {
 }
 
 // - PW TAB -
-function PwTab({toast}) {
+function PwTab({toast, setNotesOpen}) {
   const {passwords,notes,addPw,delPw} = useContext(DataCtx);
   const [sub,setSub]=useState('pw');
-  const [notesOpen, setNotesOpen] = useState(false);
   const [search,setSearch]=useState('');
   const [shown,setShown]=useState({});
   const [mod,setMod]=useState(null);
@@ -9296,7 +9295,6 @@ function PwTab({toast}) {
           <div style={{marginTop:12,fontSize:'.75rem',color:'var(--text3)'}}>{notes.length} note salvate</div>
         </div>
       </div>}
-      {notesOpen && <NotesPage onClose={()=>setNotesOpen(false)} toast={toast}/>}
       <Modal open={mod==='pw'} onClose={()=>setMod(null)} title="🔐 Nuova Password" footer={<><button className="btn bg" onClick={()=>setMod(null)}>Annulla</button><button className="btn br" onClick={savePw}>Salva</button></>}>
         <div className="fl"><label>Servizio</label><input className="field" placeholder="Gmail, Netflix..." value={pf.svc} onChange={e=>setPf(f=>({...f,svc:e.target.value}))}/></div>
         <div className="fl"><label>Utente / Email</label><input className="field" placeholder="mario@example.com" value={pf.usr} onChange={e=>setPf(f=>({...f,usr:e.target.value}))}/></div>
@@ -25717,202 +25715,240 @@ function SlidesEditor({doc, onSave}) {
 
 
 
-function DashboardHome({toast, setTab}) {
+function DashboardHome({toast, setTab, setNotesOpen}) {
   const {events, reminders, todos, notes, wallet, birthdays, passwords} = useContext(DataCtx);
   const now = new Date();
   const today = now.toISOString().slice(0,10);
+  const h = now.getHours();
   const days = ['Domenica','Luned\u00EC','Marted\u00EC','Mercoled\u00EC','Gioved\u00EC','Venerd\u00EC','Sabato'];
   const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
-  const greeting = now.getHours() < 12 ? 'Buongiorno' : now.getHours() < 18 ? 'Buonasera' : 'Buonanotte';
-  const todayEvents = (events||[]).filter(e => e.date === today);
-  const upcomingEvents = (events||[]).filter(e => e.date > today).sort((a,b) => a.date.localeCompare(b.date)).slice(0,3);
-  const activeReminders = (reminders||[]).filter(r => !r.done);
-  const pendingTodos = (todos||[]).filter(t => !t.done);
-  const doneTodos = (todos||[]).filter(t => t.done);
-  const recentNotes = (notes||[]).slice(0,3);
-  const upcomingBirthdays = (birthdays||[]).filter(b => {
-    const bday = b.month + '-' + String(b.day).padStart(2,'0');
-    return bday >= today.slice(5);
+  const greeting = h < 12 ? 'Buongiorno' : h < 18 ? 'Buonasera' : 'Buonanotte';
+  const smiley = h < 12 ? '\u2600\uFE0F' : h < 18 ? '\u26C5' : '\uD83C\uDF19';
+  const todayEv = (events||[]).filter(e => e.date === today);
+  const nextEv = (events||[]).filter(e => e.date > today).sort((a,b) => a.date.localeCompare(b.date)).slice(0,3);
+  const activeRem = (reminders||[]).filter(r => !r.done);
+  const pendTodo = (todos||[]).filter(t => !t.done);
+  const doneTodo = (todos||[]).filter(t => t.done);
+  const recentN = (notes||[]).slice(0,3);
+  const upBdays = (birthdays||[]).filter(b => {
+    const bd = b.month + '-' + String(b.day).padStart(2,'0');
+    return bd >= today.slice(5);
   }).sort((a,b) => (a.month+'-'+String(a.day).padStart(2,'0')).localeCompare(b.month+'-'+String(b.day).padStart(2,'0'))).slice(0,3);
-  const totalPw = (passwords||[]).length;
+  const totPw = (passwords||[]).length;
+
+  const [entered, setEntered] = useState(false);
+
+  if(!entered) {
+    return (
+      <div style={{minHeight:'100vh',background:'linear-gradient(135deg,#0f0c29,#302b63,#24243e)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'20px',position:'relative',overflow:'hidden'}}>
+        <div style={{position:'absolute',top:-80,right:-80,width:250,height:250,borderRadius:'50%',background:'radial-gradient(circle,rgba(255,77,109,.15),transparent 70%)',pointerEvents:'none'}}/>
+        <div style={{position:'absolute',bottom:-60,left:-60,width:200,height:200,borderRadius:'50%',background:'radial-gradient(circle,rgba(6,214,160,.12),transparent 70%)',pointerEvents:'none'}}/>
+        <div style={{position:'absolute',top:'30%',left:'10%',width:120,height:120,borderRadius:'50%',background:'radial-gradient(circle,rgba(102,126,234,.1),transparent 70%)',pointerEvents:'none'}}/>
+
+        <div style={{fontSize:64,marginBottom:8,animation:'float 3s ease-in-out infinite'}}>{'\uD83D\uDC51'}</div>
+        <div style={{fontSize:15,color:'rgba(255,255,255,.5)',marginBottom:4,letterSpacing:3,textTransform:'uppercase',fontWeight:600}}>{days[now.getDay()]} {now.getDate()} {months[now.getMonth()]}</div>
+        <div style={{fontSize:32,fontWeight:800,color:'#fff',marginBottom:6,textAlign:'center'}}>{greeting}, Marco {smiley}</div>
+        <div style={{fontSize:14,color:'rgba(255,255,255,.45)',marginBottom:32,textAlign:'center'}}>La tua giornata in un'occhiata</div>
+
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,width:'100%',maxWidth:340,marginBottom:36}}>
+          {[
+            {n:todayEv.length, l:'Eventi Oggi', c:'#FF6B6B', i:'\uD83D\uDCC5'},
+            {n:activeRem.length, l:'Promemoria', c:'#FFD93D', i:'\uD83D\uDD14'},
+            {n:pendTodo.length, l:'To-Do', c:'#6BCB77', i:'\u2705'},
+          ].map(s => (
+            <div key={s.l} style={{background:'rgba(255,255,255,.06)',backdropFilter:'blur(10px)',borderRadius:16,padding:'18px 10px',textAlign:'center',border:'1px solid rgba(255,255,255,.08)'}}>
+              <div style={{fontSize:22,marginBottom:4}}>{s.i}</div>
+              <div style={{fontSize:24,fontWeight:800,color:s.c}}>{s.n}</div>
+              <div style={{fontSize:11,color:'rgba(255,255,255,.45)',marginTop:2}}>{s.l}</div>
+            </div>
+          ))}
+        </div>
+
+        <button onClick={()=>setEntered(true)} style={{background:'linear-gradient(135deg,#FF4D6D,#FF6B9D)',color:'#fff',border:'none',borderRadius:50,padding:'16px 48px',fontSize:16,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 32px rgba(255,77,109,.4)',transition:'all .2s',letterSpacing:.5}}>
+          Entra nell'app {'\u2192'}
+        </button>
+        <div style={{marginTop:16,fontSize:12,color:'rgba(255,255,255,.3)'}}>{(notes||[]).length} note {'\u2022'} {(todos||[]).length} to-do {'\u2022'} {'\u20AC'}{(wallet?.balance||0).toFixed(0)}</div>
+      </div>
+    );
+  }
 
   const quickActions = [
-    {icon:'\uD83D\uDCDD', label:'Nota', tab:'notes'},
-    {icon:'\u2705', label:'To-Do', tab:'todo'},
-    {icon:'\uD83D\uDCC5', label:'Evento', tab:'cal'},
-    {icon:'\uD83D\uDD14', label:'Promemoria', tab:'reminders'},
-    {icon:'\uD83D\uDCB0', label:'Wallet', tab:'wallet'},
-    {icon:'\uD83D\uDD10', label:'Password', tab:'pw'},
+    {icon:'\uD83D\uDCDD', label:'Note', action:()=>setNotesOpen(true), c:'linear-gradient(135deg,#667eea,#764ba2)'},
+    {icon:'\u2705', label:'To-Do', action:()=>setTab('todo'), c:'linear-gradient(135deg,#6BCB77,#2ECC71)'},
+    {icon:'\uD83D\uDCC5', label:'Calendario', action:()=>setTab('cal'), c:'linear-gradient(135deg,#FF6B6B,#FF4D6D)'},
+    {icon:'\uD83D\uDD14', label:'Promemoria', action:()=>setTab('reminders'), c:'linear-gradient(135deg,#FFD93D,#FFC107)'},
+    {icon:'\uD83D\uDCB0', label:'Wallet', action:()=>setTab('wallet'), c:'linear-gradient(135deg,#06D6A0,#00B894)'},
+    {icon:'\uD83D\uDD10', label:'Password', action:()=>setTab('pw'), c:'linear-gradient(135deg,#4D96FF,#3742FA)'},
+    {icon:'\uD83C\uDFAE', label:'Giochi', action:()=>setTab('games'), c:'linear-gradient(135deg,#A855F7,#7C3AED)'},
+    {icon:'\uD83D\uDCFA', label:'AI', action:()=>setTab('ai'), c:'linear-gradient(135deg,#FF8C42,#FF6348)'},
+    {icon:'\u2699\uFE0F', label:'Impostazioni', action:()=>setTab('settings'), c:'linear-gradient(135deg,#94A3B8,#64748B)'},
   ];
 
-  const card = {background:'var(--card)',borderRadius:16,padding:'16px 18px',marginBottom:14,border:'1px solid var(--border)'};
-  const sectionTitle = {fontSize:13,fontWeight:700,color:'var(--accent)',marginBottom:10,textTransform:'uppercase',letterSpacing:'0.5px'};
-  const chip = (color) => ({display:'inline-block',padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:600,color:'#fff',background:color||'var(--accent)'});
+  const chip = (color) => ({display:'inline-block',padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:600,color:'#fff',background:color});
 
   return (
-    <div style={{maxWidth:600,margin:'0 auto',padding:'0 12px 120px'}}>
-      {/* Header */}
-      <div style={{padding:'24px 4px 16px',textAlign:'center'}}>
-        <div style={{fontSize:14,color:'var(--muted)'}}>{days[now.getDay()]} {now.getDate()} {months[now.getMonth()]} {now.getFullYear()}</div>
-        <div style={{fontSize:28,fontWeight:800,marginTop:4,background:'linear-gradient(135deg,var(--accent),var(--green))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>{greeting}! {'\uD83D\uDC4B'}</div>
-      </div>
+    <div style={{minHeight:'100vh',background:'linear-gradient(180deg,#0f0c29 0%,#1a1740 40%,#24243e 100%)',padding:'0 0 120px'}}>
+      <div style={{maxWidth:600,margin:'0 auto',padding:'0 16px'}}>
 
-      {/* Quick Actions */}
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:16}}>
-        {quickActions.map(q => (
-          <div key={q.tab} onClick={() => setTab(q.tab)} style={{background:'var(--card)',border:'1px solid var(--border)',borderRadius:14,padding:'14px 8px',textAlign:'center',cursor:'pointer',transition:'all .15s'}}>
-            <div style={{fontSize:24,marginBottom:4}}>{q.icon}</div>
-            <div style={{fontSize:11,fontWeight:600,color:'var(--text)'}}>{q.label}</div>
-          </div>
-        ))}
-      </div>
+        {/* Hero Header */}
+        <div style={{padding:'32px 0 24px',textAlign:'center',position:'relative'}}>
+          <div style={{position:'absolute',top:-40,right:-20,width:150,height:150,borderRadius:'50%',background:'radial-gradient(circle,rgba(255,77,109,.08),transparent 70%)',pointerEvents:'none'}}/>
+          <div style={{fontSize:14,color:'rgba(255,255,255,.4)',marginBottom:4,letterSpacing:2,textTransform:'uppercase'}}>{days[now.getDay()]} {now.getDate()} {months[now.getMonth()]} {now.getFullYear()}</div>
+          <div style={{fontSize:26,fontWeight:800,color:'#fff',marginBottom:2}}>{greeting}! {smiley}</div>
+          <div style={{fontSize:13,color:'rgba(255,255,255,.35)'}}>Ecco cosa hai per oggi</div>
+        </div>
 
-      {/* Stats Row */}
-      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:14}}>
-        {[
-          {n:todayEvents.length, l:'Oggi', c:'#FF6B6B'},
-          {n:activeReminders.length, l:'Promemoria', c:'#FFD93D'},
-          {n:pendingTodos.length, l:'To-Do', c:'#6BCB77'},
-          {n:totalPw, l:'Password', c:'#4D96FF'},
-        ].map(s => (
-          <div key={s.l} style={{background:'var(--card)',borderRadius:12,padding:'12px 6px',textAlign:'center',border:'1px solid var(--border)'}}>
-            <div style={{fontSize:22,fontWeight:800,color:s.c}}>{s.n}</div>
-            <div style={{fontSize:10,color:'var(--muted)',marginTop:2}}>{s.l}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Oggi */}
-      {todayEvents.length > 0 && (
-        <div style={card}>
-          <div style={sectionTitle}>{'\uD83D\uDCC5'} Oggi</div>
-          {todayEvents.map(ev => (
-            <div key={ev.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
-              <div style={{width:4,height:32,borderRadius:2,background:ev.color||'var(--accent)',flexShrink:0}}/>
-              <div>
-                <div style={{fontWeight:600,fontSize:14}}>{ev.title}</div>
-                {ev.time && <div style={{fontSize:12,color:'var(--muted)'}}>{ev.time}</div>}
-              </div>
+        {/* Quick Actions Grid */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:24}}>
+          {quickActions.map(q => (
+            <div key={q.label} onClick={q.action} style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.08)',borderRadius:16,padding:'18px 8px',textAlign:'center',cursor:'pointer',transition:'all .2s',backdropFilter:'blur(4px)'}}
+              onMouseDown={e=>e.currentTarget.style.transform='scale(.95)'}
+              onMouseUp={e=>e.currentTarget.style.transform='scale(1)'}
+              onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}>
+              <div style={{width:48,height:48,borderRadius:14,background:q.c,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 8px',fontSize:22,boxShadow:'0 4px 15px rgba(0,0,0,.2)'}}>{q.icon}</div>
+              <div style={{fontSize:11,fontWeight:600,color:'rgba(255,255,255,.7)'}}>{q.label}</div>
             </div>
           ))}
         </div>
-      )}
 
-      {/* Prossimi Eventi */}
-      {upcomingEvents.length > 0 && (
-        <div style={card}>
-          <div style={sectionTitle}>{'\u23F0'} Prossimi Eventi</div>
-          {upcomingEvents.map(ev => {
-            const diff = Math.ceil((new Date(ev.date) - now) / 86400000);
-            return (
-              <div key={ev.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
-                <div>
-                  <div style={{fontWeight:600,fontSize:14}}>{ev.title}</div>
-                  <div style={{fontSize:12,color:'var(--muted)'}}>{ev.date} {ev.time ? '\u2022 ' + ev.time : ''}</div>
+        {/* Oggi */}
+        {todayEv.length > 0 && (
+          <div style={{background:'rgba(255,107,107,.08)',border:'1px solid rgba(255,107,107,.15)',borderRadius:18,padding:'18px',marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:700,color:'#FF6B6B',marginBottom:10,textTransform:'uppercase',letterSpacing:.5}}>{'\uD83D\uDCC5'} Oggi</div>
+            {todayEv.map(ev => (
+              <div key={ev.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.05)'}}>
+                <div style={{width:4,height:32,borderRadius:2,background:ev.color||'#FF4D6D',flexShrink:0}}/>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:14,color:'#fff'}}>{ev.title}</div>
+                  {ev.time && <div style={{fontSize:12,color:'rgba(255,255,255,.4)'}}>{ev.time}</div>}
                 </div>
-                <span style={chip(diff <= 1 ? '#FF6B6B' : diff <= 3 ? '#FFD93D' : '#6BCB77')}>{diff === 0 ? 'Oggi' : diff === 1 ? 'Domani' : 'tra ' + diff + ' gg'}</span>
               </div>
-            );
-          })}
-          <div onClick={() => setTab('cal')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Calendario {'\u2192'}</div>
-        </div>
-      )}
-
-      {/* Promemoria Attivi */}
-      {activeReminders.length > 0 && (
-        <div style={card}>
-          <div style={sectionTitle}>{'\uD83D\uDD14'} Promemoria Attivi ({activeReminders.length})</div>
-          {activeReminders.slice(0,4).map(r => (
-            <div key={r.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontSize:18}}>{r.priority === 'high' ? '\u26A0\uFE0F' : '\uD83D\uDD14'}</div>
-              <div style={{flex:1}}>
-                <div style={{fontWeight:600,fontSize:14}}>{r.title}</div>
-                <div style={{fontSize:12,color:'var(--muted)'}}>{r.date} {r.time ? '\u2022 ' + r.time : ''}</div>
-              </div>
-              {r.repeat && r.repeat !== 'none' && <span style={chip('#9B59B6')}>{r.repeat === 'daily' ? 'Giornaliero' : r.repeat === 'weekdays' ? 'Festivi' : r.repeat}</span>}
-            </div>
-          ))}
-          <div onClick={() => setTab('reminders')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Gestisci Promemoria {'\u2192'}</div>
-        </div>
-      )}
-
-      {/* Completare */}
-      {pendingTodos.length > 0 && (
-        <div style={card}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-            <div style={sectionTitle}>{'\u2705'} To-Do ({pendingTodos.length} da fare)</div>
-            {doneTodos.length > 0 && <span style={{fontSize:11,color:'var(--green)',fontWeight:600}}>{doneTodos.length}/{todos.length} completati</span>}
+            ))}
           </div>
-          {pendingTodos.slice(0,4).map(t => (
-            <div key={t.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
-              <div style={{width:20,height:20,borderRadius:6,border:'2px solid var(--muted)',flexShrink:0}}/>
-              <span style={{fontSize:14}}>{t.title}</span>
-            </div>
-          ))}
-          <div onClick={() => setTab('todo')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Apri To-Do {'\u2192'}</div>
-        </div>
-      )}
+        )}
 
-      {/* Wallet */}
-      {wallet && wallet.transactions && wallet.transactions.length > 0 && (
-        <div style={card}>
-          <div style={sectionTitle}>{'\uD83D\uDCB0'} Wallet</div>
-          <div style={{fontSize:28,fontWeight:800,color: wallet.balance >= 0 ? 'var(--green)' : '#FF6B6B',marginBottom:6}}>
-            {'\u20AC'} {wallet.balance.toFixed(2)}
+        {/* Prossimi Eventi */}
+        {nextEv.length > 0 && (
+          <div style={{background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.07)',borderRadius:18,padding:'18px',marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:700,color:'rgba(255,255,255,.5)',marginBottom:10,textTransform:'uppercase',letterSpacing:.5}}>{'\u23F0'} Prossimi Eventi</div>
+            {nextEv.map(ev => {
+              const diff = Math.ceil((new Date(ev.date) - now) / 86400000);
+              return (
+                <div key={ev.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.05)'}}>
+                  <div>
+                    <div style={{fontWeight:600,fontSize:14,color:'#fff'}}>{ev.title}</div>
+                    <div style={{fontSize:12,color:'rgba(255,255,255,.35)'}}>{ev.date} {ev.time ? '\u2022 ' + ev.time : ''}</div>
+                  </div>
+                  <span style={chip(diff <= 1 ? '#FF6B6B' : diff <= 3 ? '#FFD93D' : '#6BCB77')}>{diff === 0 ? 'Oggi' : diff === 1 ? 'Domani' : 'tra ' + diff + ' gg'}</span>
+                </div>
+              );
+            })}
+            <div onClick={() => setTab('cal')} style={{textAlign:'center',padding:10,color:'rgba(255,255,255,.35)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Calendario {'\u2192'}</div>
           </div>
-          {wallet.transactions.slice(0,3).map(tx => (
-            <div key={tx.id} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid var(--border)',fontSize:13}}>
-              <span>{tx.title}</span>
-              <span style={{fontWeight:700,color:tx.type==='income'?'var(--green)':'#FF6B6B'}}>{tx.type==='income'?'+':'-'}{'\u20AC'}{tx.amount.toFixed(2)}</span>
-            </div>
-          ))}
-          <div onClick={() => setTab('wallet')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Wallet {'\u2192'}</div>
-        </div>
-      )}
+        )}
 
-      {/* Note Recenti */}
-      {recentNotes.length > 0 && (
-        <div style={card}>
-          <div style={sectionTitle}>{'\uD83D\uDCDD'} Note Recenti</div>
-          {recentNotes.map(n => (
-            <div key={n.id} style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
-              <div style={{fontWeight:600,fontSize:14}}>{n.title || 'Nota senza titolo'}</div>
-              <div style={{fontSize:12,color:'var(--muted)',marginTop:2,maxHeight:32,overflow:'hidden'}}>{(n.text||'').slice(0,80)}</div>
-            </div>
-          ))}
-          <div onClick={() => setTab('notes')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Note {'\u2192'}</div>
-        </div>
-      )}
-
-      {/* Compleanni */}
-      {upcomingBirthdays.length > 0 && (
-        <div style={card}>
-          <div style={sectionTitle}>{'\uD83C\uDF82'} Compleanni</div>
-          {upcomingBirthdays.map(b => {
-            const bd = new Date(now.getFullYear(), b.month-1, b.day);
-            if(bd < now) bd.setFullYear(bd.getFullYear()+1);
-            const diff = Math.ceil((bd - now) / 86400000);
-            return (
-              <div key={b.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
-                <span style={{fontSize:14,fontWeight:500}}>{b.name}</span>
-                <span style={chip('#FF69B4')}>{diff === 0 ? 'Oggi!' : diff === 1 ? 'Domani' : 'tra ' + diff + ' gg'}</span>
+        {/* Promemoria */}
+        {activeRem.length > 0 && (
+          <div style={{background:'rgba(255,217,61,.06)',border:'1px solid rgba(255,217,61,.12)',borderRadius:18,padding:'18px',marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:700,color:'#FFD93D',marginBottom:10,textTransform:'uppercase',letterSpacing:.5}}>{'\uD83D\uDD14'} Promemoria ({activeRem.length})</div>
+            {activeRem.slice(0,3).map(r => (
+              <div key={r.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.05)'}}>
+                <div style={{fontSize:16}}>{r.priority === 'high' ? '\u26A0\uFE0F' : '\uD83D\uDD14'}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:14,color:'#fff'}}>{r.title}</div>
+                  <div style={{fontSize:12,color:'rgba(255,255,255,.35)'}}>{r.time} {r.repeat && r.repeat !== 'none' ? '\u2022 ' + (r.repeat === 'daily' ? 'Giornaliero' : r.repeat === 'weekdays' ? 'Feriali' : r.repeat) : ''}</div>
+                </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+            ))}
+            <div onClick={() => setTab('reminders')} style={{textAlign:'center',padding:10,color:'rgba(255,255,255,.35)',fontWeight:600,cursor:'pointer',fontSize:13}}>Gestisci {'\u2192'}</div>
+          </div>
+        )}
 
-      {/* Empty State */}
-      {todayEvents.length === 0 && upcomingEvents.length === 0 && activeReminders.length === 0 && pendingTodos.length === 0 && recentNotes.length === 0 && (
-        <div style={{textAlign:'center',padding:'40px 20px',color:'var(--muted)'}}>
-          <div style={{fontSize:48,marginBottom:12}}>{'\uD83C\uDF1F'}</div>
-          <div style={{fontSize:16,fontWeight:600,marginBottom:6}}>Tutto quiete oggi!</div>
-          <div style={{fontSize:13}}>Aggiungi qualcosa con i bottoni qui sopra</div>
+        {/* To-Do */}
+        {pendTodo.length > 0 && (
+          <div style={{background:'rgba(107,203,119,.06)',border:'1px solid rgba(107,203,119,.12)',borderRadius:18,padding:'18px',marginBottom:14}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+              <div style={{fontSize:13,fontWeight:700,color:'#6BCB77',textTransform:'uppercase',letterSpacing:.5}}>{'\u2705'} To-Do</div>
+              {doneTodo.length > 0 && <span style={{fontSize:11,color:'rgba(255,255,255,.3)'}}>{doneTodo.length}/{todos.length} fatti</span>}
+            </div>
+            {pendTodo.slice(0,3).map(t => (
+              <div key={t.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.05)'}}>
+                <div style={{width:18,height:18,borderRadius:5,border:'2px solid rgba(255,255,255,.2)',flexShrink:0}}/>
+                <span style={{fontSize:14,color:'#fff'}}>{t.title}</span>
+              </div>
+            ))}
+            <div onClick={() => setTab('todo')} style={{textAlign:'center',padding:10,color:'rgba(255,255,255,.35)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi To-Do {'\u2192'}</div>
+          </div>
+        )}
+
+        {/* Wallet */}
+        {wallet && wallet.transactions && wallet.transactions.length > 0 && (
+          <div style={{background:'rgba(6,214,160,.06)',border:'1px solid rgba(6,214,160,.12)',borderRadius:18,padding:'18px',marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:700,color:'#06D6A0',marginBottom:8,textTransform:'uppercase',letterSpacing:.5}}>{'\uD83D\uDCB0'} Wallet</div>
+            <div style={{fontSize:28,fontWeight:800,color: wallet.balance >= 0 ? '#06D6A0' : '#FF6B6B',marginBottom:8}}>
+              {'\u20AC'} {wallet.balance.toFixed(2)}
+            </div>
+            {wallet.transactions.slice(0,2).map(tx => (
+              <div key={tx.id} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom:'1px solid rgba(255,255,255,.05)',fontSize:13}}>
+                <span style={{color:'rgba(255,255,255,.6)'}}>{tx.title}</span>
+                <span style={{fontWeight:700,color:tx.type==='income'?'#06D6A0':'#FF6B6B'}}>{tx.type==='income'?'+':'-'}{'\u20AC'}{tx.amount.toFixed(2)}</span>
+              </div>
+            ))}
+            <div onClick={() => setTab('wallet')} style={{textAlign:'center',padding:10,color:'rgba(255,255,255,.35)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Wallet {'\u2192'}</div>
+          </div>
+        )}
+
+        {/* Note Recenti */}
+        {recentN.length > 0 && (
+          <div style={{background:'rgba(102,126,234,.06)',border:'1px solid rgba(102,126,234,.12)',borderRadius:18,padding:'18px',marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:700,color:'#667eea',marginBottom:10,textTransform:'uppercase',letterSpacing:.5}}>{'\uD83D\uDCDD'} Note Recenti</div>
+            {recentN.map(n => (
+              <div key={n.id} onClick={()=>setNotesOpen(true)} style={{padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.05)',cursor:'pointer'}}>
+                <div style={{fontWeight:600,fontSize:14,color:'#fff'}}>{n.title || 'Nota senza titolo'}</div>
+                <div style={{fontSize:12,color:'rgba(255,255,255,.3)',marginTop:3,maxHeight:32,overflow:'hidden'}}>{(n.text||'').slice(0,80)}</div>
+              </div>
+            ))}
+            <div onClick={()=>setNotesOpen(true)} style={{textAlign:'center',padding:10,color:'rgba(255,255,255,.35)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Note {'\u2192'}</div>
+          </div>
+        )}
+
+        {/* Compleanni */}
+        {upBdays.length > 0 && (
+          <div style={{background:'rgba(255,107,157,.06)',border:'1px solid rgba(255,107,157,.12)',borderRadius:18,padding:'18px',marginBottom:14}}>
+            <div style={{fontSize:13,fontWeight:700,color:'#FF6B9D',marginBottom:10,textTransform:'uppercase',letterSpacing:.5}}>{'\uD83C\uDF82'} Compleanni</div>
+            {upBdays.map(b => {
+              const bd = new Date(now.getFullYear(), b.month-1, b.day);
+              if(bd < now) bd.setFullYear(bd.getFullYear()+1);
+              const diff = Math.ceil((bd - now) / 86400000);
+              return (
+                <div key={b.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.05)'}}>
+                  <span style={{fontSize:14,fontWeight:500,color:'#fff'}}>{b.name}</span>
+                  <span style={chip('#FF69B4')}>{diff === 0 ? 'Oggi!' : diff === 1 ? 'Domani' : 'tra ' + diff + ' gg'}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Empty */}
+        {todayEv.length === 0 && nextEv.length === 0 && activeRem.length === 0 && pendTodo.length === 0 && recentN.length === 0 && (
+          <div style={{textAlign:'center',padding:'40px 20px'}}>
+            <div style={{fontSize:48,marginBottom:12}}>{'\uD83C\uDF1F'}</div>
+            <div style={{fontSize:16,fontWeight:600,marginBottom:6,color:'#fff'}}>Tutto quiete oggi!</div>
+            <div style={{fontSize:13,color:'rgba(255,255,255,.35)'}}>Usa i bottoni qui sopra per iniziare</div>
+          </div>
+        )}
+
+        {/* Back to splash */}
+        <div onClick={()=>setEntered(false)} style={{textAlign:'center',padding:'20px 0',cursor:'pointer'}}>
+          <span style={{fontSize:13,color:'rgba(255,255,255,.25)'>{'\u2190'} Torna alla schermata iniziale</span>
         </div>
-      )}
+
+      </div>
     </div>
   );
 }
+
 
 
 // Mini Pomodoro Timer
@@ -26714,6 +26750,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
   const pwList = passwords;
   const {notifList,notifOpen,setNotifOpen,unread,markAllRead,addNotif} = useNotifications(events,birthdays);
   const [syncPending, setSyncPending] = useState(0);
+  const [notesOpen, setNotesOpen] = useState(false);
   
   // Listen for sync events
   useEffect(() => {
@@ -28838,8 +28875,8 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
           )}
           
           <div className="content">
-             {tab==='home'&&<DashboardHome toast={toast} setTab={setTab}/>}
-             {tab==='pw'&&<PwTab toast={toast} />}
+             {tab==='home'&&<DashboardHome toast={toast} setTab={setTab} setNotesOpen={setNotesOpen}/>}
+             {tab==='pw'&&<PwTab toast={toast} setNotesOpen={setNotesOpen}/>}
              {tab==='cal'&&<CalTab toast={toast}/>}
              {tab==='email'&&<EmailTab toast={toast} callAI={callAI}/>}
              {tab==='ai'&&<AITab toast={toast} onTabSwitch={setTab} apiKeys={apiKeys} callAI={callAI} user={user} setProv={setProv} prov={prov}/>}
@@ -28857,6 +28894,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
              {tab==='profile'&&<ProfileTab user={user} toast={toast}/>}
            </div>
         </div>
+        {notesOpen && <NotesPage onClose={()=>setNotesOpen(false)} toast={toast}/>}
         <div className={`notif-drawer${notifOpen?' open':''}`}>
           <div className="notif-drawer-head">
             <span>Notifiche</span>
