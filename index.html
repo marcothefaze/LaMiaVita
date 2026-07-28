@@ -9452,8 +9452,7 @@ function CalTab({toast}) {
       delEvent(editingEv.id);
       addEvent({...f, id:editingEv.id});
       toast('Evento aggiornato! ✅','var(--green)');
-    } else if
-    if(f.repeat==='none'){
+    } else if(f.repeat==='none'){
       addEvent(f);
       toast('Evento aggiunto!', 'var(--green)');
     } else {
