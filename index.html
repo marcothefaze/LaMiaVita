@@ -21268,114 +21268,6 @@ function WalletTab({toast}) {
 
 // - EXTRA TAB -
 
-function CreativeStudioComponent({toast, setView}) {
-    const [studioMode, setStudioMode] = useState('menu');
-    const [canvasSize, setCanvasSize] = useState(32);
-    const [pixels, setPixels] = useState({});
-    const [currentColor, setCurrentColor] = useState('#FF4D6D');
-    const [showColors, setShowColors] = useState(false);
-    
-    const COLORS = ['#FF4D6D','#FF6B9D','#F97316','#FBBF24','#06D6A0','#10B981','#4CC9F0','#06B6D4','#6366F1','#8B5CF6','#EC4899','#EF4444','#F59E0B','#22C55E','#3B82F6','#64748B','#000','#fff'];
-    
-    const paintPixel = (x, y) => {
-      setPixels(p => ({...p, [`${x},${y}`]: currentColor}));
-    };
-    
-    const clearCanvas = () => { setPixels({}); toast('Canvas pulito','var(--yellow)'); };
-    
-    const exportPixelArt = () => {
-      const size = canvasSize;
-      const canvas = document.createElement('canvas');
-      canvas.width = size; canvas.height = size;
-      const ctx = canvas.getContext('2d');
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          const color = pixels[`${x},${y}`];
-          if (color) { ctx.fillStyle = color; ctx.fillRect(x, y, 1, 1); }
-        }
-      }
-      const link = document.createElement('a');
-      link.download = `pixelart_${Date.now()}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
-      toast('Pixel art esportata! 🎨','var(--green)');
-    };
-    
-    if (studioMode === 'menu') {
-      return (
-        <div style={{padding:20}}>
-          <div className="sh" style={{marginBottom:16}}>
-            <button className="ib" onClick={() => setView('home')}>← Indietro</button>
-            <div style={{fontWeight:600}}>🎨 Creative Studio</div>
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:12}}>
-            {[
-              {id:'pixelart',icon:'👾',name:'Pixel Art',desc:'Editor pixel art',color:'#06D6A0'},
-              {id:'drawing',icon:'🖌️',name:'Disegno',desc:'Canvas libero',color:'#EC4899'},
-              {id:'music',icon:'🎵',name:'Beat Maker',desc:'Crea beat musicali',color:'#8B5CF6'},
-              {id:'writing',icon:'✍️',name:'Scrittura',desc:'Editor testi creativo',color:'#FBBF24'},
-            ].map(m => (
-              <div key={m.id} onClick={()=>setStudioMode(m.id)} style={{background:'var(--surface)',border:`2px solid ${m.color}30`,borderRadius:16,padding:20,cursor:'pointer',textAlign:'center',transition:'all .2s'}}>
-                <div style={{fontSize:'2.5rem',marginBottom:8}}>{m.icon}</div>
-                <div style={{fontWeight:700,fontSize:'.95rem',marginBottom:4}}>{m.name}</div>
-                <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{m.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-    
-    if (studioMode === 'pixelart') {
-      return (
-        <div style={{padding:'0 16px 100px'}}>
-          <div className="sh" style={{marginBottom:16}}>
-            <button className="ib" onClick={()=>setStudioMode('menu')}>← Indietro</button>
-            <div style={{fontWeight:600}}>👾 Pixel Art</div>
-          </div>
-          <div style={{display:'flex',gap:8,marginBottom:12,flexWrap:'wrap',alignItems:'center'}}>
-            <div style={{width:32,height:32,borderRadius:6,background:currentColor,border:'2px solid rgba(255,255,255,.2)'}} onClick={()=>setShowColors(!showColors)} title="Colore corrente"/>
-            <button className="btn bg bs" onClick={clearCanvas}>🗑️ Pulisci</button>
-            <button className="btn bt bs" onClick={exportPixelArt}>📤 Esporta</button>
-            <select className="field" value={canvasSize} onChange={e=>{setCanvasSize(parseInt(e.target.value));setPixels({});}} style={{width:'auto',fontSize:'.78rem',padding:'6px 10px'}}>
-              <option value={16}>16×16</option>
-              <option value={32}>32×32</option>
-              <option value={48}>48×48</option>
-            </select>
-          </div>
-          {showColors && (
-            <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:12,padding:10,background:'rgba(255,255,255,.03)',borderRadius:10}}>
-              {COLORS.map(c=>(
-                <div key={c} onClick={()=>{setCurrentColor(c);setShowColors(false);}} style={{width:28,height:28,borderRadius:6,background:c,border:currentColor===c?'3px solid #fff':'2px solid rgba(255,255,255,.1)',cursor:'pointer',transition:'all .2s',transform:currentColor===c?'scale(1.15)':'scale(1)'}}/>
-              ))}
-              <input type="color" value={currentColor} onChange={e=>{setCurrentColor(e.target.value);setShowColors(false);}} style={{width:28,height:28,borderRadius:6,border:'none',cursor:'pointer'}}/>
-            </div>
-          )}
-          <div style={{display:'grid',gridTemplateColumns:`repeat(${canvasSize},1fr)`,gap:0,borderRadius:8,overflow:'hidden',border:'2px solid rgba(255,255,255,.1)',background:'rgba(255,255,255,.02)',maxWidth:Math.min(500, window.innerWidth-40),margin:'0 auto',aspectRatio:'1'}}>
-            {[...Array(canvasSize*canvasSize)].map((_,i)=>{
-              const x=i%canvasSize, y=Math.floor(i/canvasSize);
-              const color = pixels[`${x},${y}`];
-              return <div key={i} onClick={()=>paintPixel(x,y)} style={{background:color||'rgba(255,255,255,.03)',cursor:'crosshair',transition:'background .05s'}} onMouseEnter={e=>{if(e.buttons===1)paintPixel(x,y);}}/>;
-            })}
-          </div>
-        </div>
-      );
-    }
-    
-    return (
-      <div style={{padding:20}}>
-        <div className="sh" style={{marginBottom:16}}>
-          <button className="ib" onClick={()=>setStudioMode('menu')}>← Indietro</button>
-          <div style={{fontWeight:600}}>🎨 Creative Studio</div>
-        </div>
-        <div style={{textAlign:'center',padding:'40px 0',color:'var(--text2)'}}>
-          <div style={{fontSize:'3rem',marginBottom:8}}>🚧</div>
-          <div style={{fontSize:'.88rem'}}>Modalità in arrivo</div>
-        </div>
-      </div>
-    );
-}
-
 function AIChatBuilderComponent({toast, setView}) {
     const [builderView, setBuilderView] = useState('menu');
     const [bots, setBots] = useState(()=>{
@@ -21578,12 +21470,6 @@ function ExtraTab({toast}) {
   const [spaceEvents, setSpaceEvents] = useState([]);
   const [spaceLoading, setSpaceLoading] = useState(false);
   
-  // Brainstorming states
-  const [brainstormTopic, setBrainstormTopic] = useState('');
-  const [brainstormResults, setBrainstormResults] = useState([]);
-  const [brainstormLoading, setBrainstormLoading] = useState(false);
-  const [brainstormMode, setBrainstormMode] = useState('ideas');
-  
   // Quiz states
   const [quizTopic, setQuizTopic] = useState('');
   const [quizQuestions, setQuizQuestions] = useState([]);
@@ -21592,14 +21478,6 @@ function ExtraTab({toast}) {
   const [quizFinished, setQuizFinished] = useState(false);
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizStarted, setQuizStarted] = useState(false);
-  
-  // Price Tracker states
-  const [trackedItems, setTrackedItems] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('lmv_price_tracker') || '[]'); }
-    catch { return []; }
-  });
-  const [priceForm, setPriceForm] = useState({name:'',targetPrice:'',currentPrice:'',url:'',category:'tech'});
-  const [priceMod, setPriceMod] = useState(false);
   
   // Weather state
   const [weather, setWeather] = useState(null);
@@ -22082,11 +21960,8 @@ function ExtraTab({toast}) {
     { id: 'radio', icon: '📻', title: 'Radio', desc: 'Stazioni streaming', color: '#10B981' },
     { id: 'maps', icon: '🗺️', title: 'Mappe', desc: 'Google Maps e ricerca luoghi', color: '#4285F4' },
     { id: 'space', icon: '🌌', title: 'Spazio', desc: 'Esploratore spaziale', color: '#6366F1' },
-    { id: 'brainstorm', icon: '💡', title: 'Brainstorming', desc: 'Generatore di idee AI', color: '#F97316' },
     { id: 'quiz', icon: '🧩', title: 'Quiz & Trivia', desc: 'Sfide e conoscenze', color: '#8B5CF6' },
     { id: 'pixelart', icon: '👾', title: 'Pixel Art', desc: 'Editor pixel art', color: '#06D6A0' },
-    { id: 'pricetracker', icon: '📊', title: 'Prezzo Tracker', desc: 'Monitora e confronta', color: '#FBBF24' },
-    { id: 'creativestudio', icon: '🎨', title: 'Creative Studio', desc: 'Suite creativa completa', color: '#FF6B9D' },
     { id: 'aichatbuilder', icon: '🤖', title: 'AI Chat Builder', desc: 'Crea chatbot personalizzati', color: '#06B6D4' },
     { id: 'weather', icon: '🌤️', title: 'Meteo', desc: 'Previsioni e condizioni', color: '#4CC9F0' },
   ];
@@ -22920,86 +22795,6 @@ function ExtraTab({toast}) {
   );
 
   // ── BRAINSTORMING ──
-  const runBrainstorm = async () => {
-    if (!brainstormTopic.trim()) { toast('Inserisci un argomento', 'var(--red)'); return; }
-    setBrainstormLoading(true);
-    setBrainstormResults([]);
-    try {
-      const modePrompts = {
-        ideas: 'Genera 10 idee creative e originali su:',
-        problems: 'Analizza questi problemi e suggerisci soluzioni per:',
-        names: 'Genera 15 nomi creativi e memorabili per:',
-        content: 'Suggerisci 10 idee di contenuto (video, post, articoli) su:',
-        business: 'Genera 5 modelli di business innovativi per:',
-      };
-      const sys = modePrompts[brainstormMode] || modePrompts.ideas;
-      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('groq_key') || '') },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          max_tokens: 800,
-          messages: [
-            { role: 'system', content: 'Sei un esperto brainstorming. Rispondi in italiano con una lista numerata. Sii creativo e specifico.' },
-            { role: 'user', content: sys + ' "' + brainstormTopic + '"' }
-          ]
-        })
-      });
-      const d = await r.json();
-      const text = d.choices?.[0]?.message?.content || '';
-      const items = text.split('\n').filter(l => l.trim() && /^\d+[\.\)\-]/.test(l.trim())).map(l => l.replace(/^\d+[\.\)\-]\s*/, '').trim());
-      if (items.length > 0) {
-        setBrainstormResults(items);
-        toast('Brainstorming completato! 💡', 'var(--green)');
-      } else {
-        // Fallback: show raw text lines
-        const rawLines = text.split('\n').filter(l => l.trim());
-        setBrainstormResults(rawLines);
-        toast('Brainstorming completato! 💡', 'var(--green)');
-      }
-    } catch(e) {
-      toast('Errore: ' + e.message, 'var(--red)');
-    }
-    setBrainstormLoading(false);
-  };
-
-  const renderBrainstorm = () => (
-    <div style={{padding:20}}>
-      <div className="sh" style={{marginBottom:16}}>
-        <button className="ib" onClick={() => setView('home')}>← Indietro</button>
-        <div style={{fontWeight:600}}>💡 Brainstorming AI</div>
-      </div>
-      
-      <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}}>
-        {[{key:'ideas',label:'💡 Idee'},{key:'problems',label:'🔧 Soluzioni'},{key:'names',label:'🏷️ Nomi'},{key:'content',label:'📝 Contenuti'},{key:'business',label:'💼 Business'}].map(m=>(
-          <button key={m.key} onClick={()=>setBrainstormMode(m.key)} style={{padding:'6px 14px',borderRadius:10,border:brainstormMode===m.key?'2px solid var(--accent)':'1px solid var(--border)',background:brainstormMode===m.key?'rgba(244,63,94,.15)':'rgba(255,255,255,.04)',color:brainstormMode===m.key?'var(--accent)':'var(--text2)',cursor:'pointer',fontSize:'.78rem',fontWeight:600}}>{m.label}</button>
-        ))}
-      </div>
-      
-      <div className="fl">
-        <label>Argomento</label>
-        <textarea className="field" rows={3} placeholder="Es. Un'app per meditare, un ristorante giapponese..." value={brainstormTopic} onChange={e=>setBrainstormTopic(e.target.value)} />
-      </div>
-      
-      <button className="btn br" style={{width:'100%',marginTop:8}} disabled={brainstormLoading||!brainstormTopic.trim()} onClick={runBrainstorm}>
-        {brainstormLoading ? '⏳ Generando...' : '💡 Genera Idee'}
-      </button>
-      
-      {brainstormResults.length > 0 && (
-        <div style={{marginTop:20}}>
-          <div style={{fontWeight:700,marginBottom:12,fontSize:'.95rem'}}>🎯 Risultati ({brainstormResults.length})</div>
-          {brainstormResults.map((item,i) => (
-            <div key={i} className="card" style={{padding:14,marginBottom:8,display:'flex',gap:10,alignItems:'flex-start'}}>
-              <div style={{width:28,height:28,borderRadius:8,background:'linear-gradient(135deg,var(--accent),var(--purple))',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:700,fontSize:'.78rem',flexShrink:0}}>{i+1}</div>
-              <div style={{fontSize:'.88rem',lineHeight:1.5}}>{item}</div>
-            </div>
-          ))}
-          <button className="btn bg bs" style={{marginTop:8}} onClick={()=>{navigator.clipboard?.writeText(brainstormResults.map((r,i)=>(i+1)+'. '+r).join('\n'));toast('Copiato!','var(--green)');}}>📋 Copia tutto</button>
-        </div>
-      )}
-    </div>
-  );
-
   // ── QUIZ & TRIVIA ──
   const generateExtraQuiz = async () => {
     if (!quizTopic.trim()) { toast('Inserisci un argomento', 'var(--red)'); return; }
@@ -23272,133 +23067,6 @@ function ExtraTab({toast}) {
     </div>
   );
 
-  // ── PRICE TRACKER ──
-  const saveTrackedItem = () => {
-    if (!priceForm.name.trim() || !priceForm.currentPrice) {
-      toast('Compila nome e prezzo', 'var(--red)');
-      return;
-    }
-    const newItem = {
-      id: Date.now(),
-      name: priceForm.name.trim(),
-      targetPrice: parseFloat(priceForm.targetPrice) || 0,
-      currentPrice: parseFloat(priceForm.currentPrice),
-      url: priceForm.url || '',
-      category: priceForm.category,
-      history: [{price: parseFloat(priceForm.currentPrice), date: new Date().toISOString()}],
-      createdAt: new Date().toISOString()
-    };
-    const updated = [...trackedItems, newItem];
-    setTrackedItems(updated);
-    localStorage.setItem('lmv_price_tracker', JSON.stringify(updated));
-    setPriceMod(false);
-    setPriceForm({name:'',targetPrice:'',currentPrice:'',url:'',category:'tech'});
-    toast('Prodotto aggiunto al tracker! 📊', 'var(--green)');
-  };
-
-  const deleteTrackedItem = (id) => {
-    const updated = trackedItems.filter(t => t.id !== id);
-    setTrackedItems(updated);
-    localStorage.setItem('lmv_price_tracker', JSON.stringify(updated));
-    toast('Rimosso dal tracker', 'var(--red)');
-  };
-
-  const updatePrice = (id, newPrice) => {
-    const price = parseFloat(newPrice);
-    if (isNaN(price) || price <= 0) return;
-    const updated = trackedItems.map(t => {
-      if (t.id === id) {
-        const newHistory = [...t.history, {price, date: new Date().toISOString()}];
-        const belowTarget = t.targetPrice > 0 && price <= t.targetPrice;
-        if (belowTarget) toast(`🎉 ${t.name} sotto il prezzo target! €${price.toFixed(2)}`, 'var(--green)');
-        return {...t, currentPrice: price, history: newHistory};
-      }
-      return t;
-    });
-    setTrackedItems(updated);
-    localStorage.setItem('lmv_price_tracker', JSON.stringify(updated));
-  };
-
-  const PRICE_CATEGORIES = [
-    {key:'tech',label:'💻 Tech',color:'#4CC9F0'},
-    {key:'gaming',label:'🎮 Gaming',color:'#F97316'},
-    {key:'fashion',label:'👕 Moda',color:'#EC4899'},
-    {key:'home',label:'🏠 Casa',color:'#06D6A0'},
-    {key:'other',label:'📌 Altro',color:'#6B7494'},
-  ];
-
-  const renderPriceTracker = () => (
-    <div style={{padding:20}}>
-      <div className="sh" style={{marginBottom:16}}>
-        <button className="ib" onClick={() => setView('home')}>← Indietro</button>
-        <div style={{fontWeight:600}}>📊 Prezzo Tracker</div>
-      </div>
-      
-      <button className="btn" style={{width:'100%',background:'linear-gradient(135deg,rgba(251,191,36,.2),rgba(249,115,22,.15))',color:'#fff',border:'1px solid rgba(251,191,36,.3)',marginBottom:16}} onClick={()=>setPriceMod(true)}>
-        + Aggiungi Prodotto
-      </button>
-      
-      {trackedItems.length === 0 && (
-        <div style={{textAlign:'center',padding:'40px 0',color:'var(--text2)'}}>
-          <div style={{fontSize:'3rem',marginBottom:8}}>📊</div>
-          <div style={{fontSize:'.88rem'}}>Nessun prodotto monitorato</div>
-        </div>
-      )}
-      
-      {trackedItems.map(t => {
-        const catInfo = PRICE_CATEGORIES.find(c => c.key === t.category) || PRICE_CATEGORIES[PRICE_CATEGORIES.length-1];
-        const lowest = Math.min(...t.history.map(h => h.price));
-        const highest = Math.max(...t.history.map(h => h.price));
-        const belowTarget = t.targetPrice > 0 && t.currentPrice <= t.targetPrice;
-        return (
-          <div key={t.id} className="card" style={{marginBottom:12,borderLeft:`3px solid ${catInfo.color}`}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-              <div>
-                <div style={{fontWeight:700,fontSize:'.95rem'}}>{t.name}</div>
-                <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{catInfo.label}</div>
-              </div>
-              <div style={{textAlign:'right'}}>
-                <div style={{fontWeight:700,fontSize:'1.1rem',color:belowTarget?'var(--green)':'var(--text)'}}>€{t.currentPrice.toFixed(2)}</div>
-                {t.targetPrice > 0 && <div style={{fontSize:'.68rem',color:'var(--text2)'}}>Target: €{t.targetPrice.toFixed(2)}</div>}
-              </div>
-            </div>
-            <div style={{display:'flex',gap:8,fontSize:'.72rem',color:'var(--text2)',marginBottom:8}}>
-              <span>Min: <strong style={{color:'var(--green)'}}>€{lowest.toFixed(2)}</strong></span>
-              <span>Max: <strong style={{color:'var(--red)'}}>€{highest.toFixed(2)}</strong></span>
-              <span>Aggiornamenti: {t.history.length}</span>
-            </div>
-            {t.url && <div style={{fontSize:'.72rem',color:'var(--blue)',marginBottom:8}}><a href={t.url} target="_blank" style={{color:'var(--blue)'}}>🔗 Link prodotto</a></div>}
-            <div style={{display:'flex',gap:6}}>
-              <input className="field" type="number" step="0.01" placeholder="Nuovo prezzo..." style={{flex:1,fontSize:'.78rem',padding:'6px 10px'}} onKeyDown={e=>{if(e.key==='Enter'){updatePrice(t.id,e.target.value);e.target.value='';}}} />
-              <button className="btn bg bs" onClick={()=>deleteTrackedItem(t.id)} style={{fontSize:'.72rem'}}>🗑️</button>
-            </div>
-          </div>
-        );
-      })}
-      
-      {priceMod && (
-        <div className="modal-overlay" onClick={()=>{setPriceMod(false);setPriceForm({name:'',targetPrice:'',currentPrice:'',url:'',category:'tech'});}}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:400}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>📊 Aggiungi Prodotto</h3>
-              <button className="ib" onClick={()=>{setPriceMod(false);setPriceForm({name:'',targetPrice:'',currentPrice:'',url:'',category:'tech'});}}>✕</button>
-            </div>
-            <div className="fl"><label>Nome prodotto</label><input className="field" value={priceForm.name} onChange={e=>setPriceForm(p=>({...p,name:e.target.value}))}/></div>
-            <div className="fl"><label>Prezzo attuale (€)</label><input className="field" type="number" step="0.01" value={priceForm.currentPrice} onChange={e=>setPriceForm(p=>({...p,currentPrice:e.target.value}))}/></div>
-            <div className="fl"><label>Prezzo target (€) - opzionale</label><input className="field" type="number" step="0.01" value={priceForm.targetPrice} onChange={e=>setPriceForm(p=>({...p,targetPrice:e.target.value}))}/></div>
-            <div className="fl"><label>URL prodotto - opzionale</label><input className="field" value={priceForm.url} onChange={e=>setPriceForm(p=>({...p,url:e.target.value}))}/></div>
-            <div className="fl"><label>Categoria</label>
-              <select className="field" value={priceForm.category} onChange={e=>setPriceForm(p=>({...p,category:e.target.value}))}>
-                {PRICE_CATEGORIES.map(c=><option key={c.key} value={c.key}>{c.label}</option>)}
-              </select>
-            </div>
-            <button className="btn bt" style={{width:'100%',marginTop:8}} onClick={addTrackedItem}>💾 Salva</button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <div>
       {view === 'home' && renderHome()}
@@ -23412,11 +23080,8 @@ function ExtraTab({toast}) {
       {view === 'maps' && renderMaps()}
       {view === 'space' && renderSpace()}
       {view === 'weather' && renderWeather()}
-      {view === 'brainstorm' && renderBrainstorm()}
       {view === 'quiz' && renderQuiz()}
       {view === 'pixelart' && renderPixelArt()}
-      {view === 'pricetracker' && renderPriceTracker()}
-      {view === 'creativestudio' && <CreativeStudioComponent toast={toast} setView={setView}/>}
       {view === 'aichatbuilder' && <AIChatBuilderComponent toast={toast} setView={setView}/>}
     </div>
   );
@@ -25736,84 +25401,6 @@ function DashboardHome({toast, setTab, setNotesOpen}) {
   }).sort((a,b) => (a.month+'-'+String(a.day).padStart(2,'0')).localeCompare(b.month+'-'+String(b.day).padStart(2,'0'))).slice(0,3);
   const totPw = (passwords||[]).length;
 
-  const [entered, setEntered] = useState(false);
-
-  if(!entered) {
-    return (
-      <div style={{height:'100vh',width:'100vw',background:'linear-gradient(160deg,#0a0a1a 0%,#1a1040 30%,#0d1b3e 60%,#0a0a1a 100%)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px',position:'fixed',inset:0,zIndex:9999,overflow:'hidden'}}>
-        {/* Animated orbs */}
-        <div style={{position:'absolute',top:'-15%',right:'-10%',width:400,height:400,borderRadius:'50%',background:'radial-gradient(circle,rgba(255,77,109,.12),transparent 65%)',pointerEvents:'none',animation:'pulse 6s ease-in-out infinite'}}/>
-        <div style={{position:'absolute',bottom:'-10%',left:'-10%',width:350,height:350,borderRadius:'50%',background:'radial-gradient(circle,rgba(6,214,160,.1),transparent 65%)',pointerEvents:'none',animation:'pulse 8s ease-in-out infinite 2s'}}/>
-        <div style={{position:'absolute',top:'40%',left:'-5%',width:250,height:250,borderRadius:'50%',background:'radial-gradient(circle,rgba(102,126,234,.08),transparent 65%)',pointerEvents:'none',animation:'pulse 7s ease-in-out infinite 1s'}}/>
-        <div style={{position:'absolute',bottom:'20%',right:'-5%',width:200,height:200,borderRadius:'50%',background:'radial-gradient(circle,rgba(168,85,247,.08),transparent 65%)',pointerEvents:'none',animation:'pulse 5s ease-in-out infinite 3s'}}/>
-
-        {/* Floating particles */}
-        <style>{`
-          @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-          @keyframes pulse{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
-          @keyframes fadeInUp{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
-          @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-          @keyframes glow{0%,100%{box-shadow:0 0 30px rgba(255,77,109,.3),0 0 60px rgba(255,77,109,.15)}50%{box-shadow:0 0 50px rgba(255,77,109,.5),0 0 80px rgba(255,77,109,.25)}}
-        `}</style>
-        {[...Array(6)].map((_,i) => (
-          <div key={i} style={{position:'absolute',width:4,height:4,borderRadius:'50%',background:'rgba(255,255,255,.15)',top:15+Math.random()*70+'%',left:10+Math.random()*80+'%',animation:'float '+(3+Math.random()*3)+'s ease-in-out infinite '+i*.7+'s',pointerEvents:'none'}}/>
-        ))}
-
-        {/* Logo */}
-        <div style={{animation:'fadeInUp .8s ease-out',textAlign:'center',marginBottom:8}}>
-          <div style={{position:'relative',display:'inline-block'}}>
-            <img 
-              src="https://i.ibb.co/6JYFJ2hQ/un-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg" 
-              width="110" height="110" 
-              style={{borderRadius:28,objectFit:'cover',border:'3px solid rgba(255,255,255,.1)',boxShadow:'0 12px 48px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.05)',animation:'glow 4s ease-in-out infinite'}} 
-              alt="LaMiaVita"
-            />
-            <div style={{position:'absolute',bottom:-4,right:-4,background:'linear-gradient(135deg,#FF4D6D,#FF6B9D)',borderRadius:10,padding:'3px 8px',fontSize:9,fontWeight:800,color:'#fff',boxShadow:'0 2px 12px rgba(255,77,109,.5)'}}>v2.4</div>
-          </div>
-        </div>
-
-        {/* App Name */}
-        <div style={{animation:'fadeInUp .8s ease-out .15s both',textAlign:'center',marginBottom:4}}>
-          <div style={{fontSize:36,fontWeight:900,letterSpacing:-1,background:'linear-gradient(135deg,#fff 0%,#e2e8f0 50%,#94a3b8 100%)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',lineHeight:1.1}}>LaMiaVita</div>
-        </div>
-        <div style={{animation:'fadeInUp .8s ease-out .25s both',fontSize:13,color:'rgba(255,255,255,.3)',marginBottom:32,letterSpacing:1}}>La tua vita, organizzata</div>
-
-        {/* Date */}
-        <div style={{animation:'fadeInUp .8s ease-out .3s both',fontSize:13,color:'rgba(255,255,255,.35)',marginBottom:6,letterSpacing:2,textTransform:'uppercase',fontWeight:500}}>{days[now.getDay()]} {now.getDate()} {months[now.getMonth()]} {now.getFullYear()}</div>
-        <div style={{animation:'fadeInUp .8s ease-out .35s both',fontSize:28,fontWeight:700,color:'#fff',marginBottom:24}}>{greeting} {smiley}</div>
-
-        {/* Quick stats */}
-        <div style={{animation:'fadeInUp .8s ease-out .4s both',display:'flex',gap:20,marginBottom:36}}>
-          {[
-            {n:todayEv.length, l:'eventi', c:'#FF6B6B'},
-            {n:activeRem.length, l:'promemoria', c:'#FFD93D'},
-            {n:pendTodo.length, l:'to-do', c:'#6BCB77'},
-            {n:(notes||[]).length, l:'note', c:'#667eea'},
-          ].map(s => (
-            <div key={s.l} style={{textAlign:'center'}}>
-              <div style={{fontSize:26,fontWeight:800,color:s.c,lineHeight:1}}>{s.n}</div>
-              <div style={{fontSize:11,color:'rgba(255,255,255,.3)',marginTop:4}}>{s.l}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Enter button */}
-        <button onClick={()=>setEntered(true)} style={{animation:'fadeInUp .8s ease-out .5s both',background:'linear-gradient(135deg,#FF4D6D 0%,#FF6B9D 50%,#FF8FAE 100%)',color:'#fff',border:'none',borderRadius:50,padding:'18px 56px',fontSize:17,fontWeight:700,cursor:'pointer',boxShadow:'0 8px 32px rgba(255,77,109,.35)',transition:'all .25s',letterSpacing:.5,position:'relative',overflow:'hidden'}}
-          onMouseDown={e=>e.currentTarget.style.transform='scale(.96)'}
-          onMouseUp={e=>e.currentTarget.style.transform='scale(1)'}
-          onMouseLeave={e=>e.currentTarget.style.transform='scale(1)'}
-        >
-          <span style={{position:'relative',zIndex:1}}>Entra nell'app {'\u2192'}</span>
-        </button>
-
-        {/* Bottom info */}
-        <div style={{animation:'fadeInUp .8s ease-out .6s both',position:'absolute',bottom:40,left:0,right:0,textAlign:'center',fontSize:11,color:'rgba(255,255,255,.2)'}}>
-          {(passwords||[]).length} password {'\u2022'} {(events||[]).length} eventi {'\u2022'} {'\u20AC'}{(wallet?.balance||0).toFixed(0)}
-        </div>
-      </div>
-    );
-  }
-
   const quickActions = [
     {icon:'\uD83D\uDCDD', label:'Note', action:()=>setNotesOpen(true), c:'linear-gradient(135deg,#667eea,#764ba2)'},
     {icon:'\u2705', label:'To-Do', action:()=>setTab('todo'), c:'linear-gradient(135deg,#6BCB77,#2ECC71)'},
@@ -25981,11 +25568,6 @@ function DashboardHome({toast, setTab, setNotesOpen}) {
           </div>
         )}
 
-        {/* Back to splash */}
-        <div onClick={()=>setEntered(false)} style={{textAlign:'center',padding:'20px 0',cursor:'pointer'}}>
-          <span style={{fontSize:13,color:'rgba(255,255,255,.25)'}}>{'\u2190'} Torna alla schermata iniziale</span>
-        </div>
-
       </div>
     </div>
   );
@@ -25993,145 +25575,6 @@ function DashboardHome({toast, setTab, setNotesOpen}) {
 
 
 
-// Mini Pomodoro Timer
-function MiniPomTimer() {
-  const [miniPomRunning, setMiniPomRunning] = useState(false);
-  const [miniPomSecs, setMiniPomSecs] = useState(25*60);
-  const [miniPomMode, setMiniPomMode] = useState('work');
-  const [miniPomDurations, setMiniPomDurations] = useState(()=>{
-    try{return JSON.parse(localStorage.getItem('mini_pom_durations')||'null')||{work:25,short:5,long:15};}
-    catch(e){return {work:25,short:5,long:15};}
-  });
-  const miniPomRef = useRef(null);
-  const [showMiniPom, setShowMiniPom] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [tempDurations, setTempDurations] = useState(miniPomDurations);
-  
-  const sendNotification = (title, body) => {
-    playSound('notification');
-    try{
-      if(Notification.permission==='granted'){
-        new Notification(title,{
-          body,
-          icon: 'https://i.ibb.co/6JYFJ2hQ/un-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg',
-          tag: 'pomodoro-mini',
-          requireInteraction: true,
-          vibrate: [300,100,300,100,300],
-          silent: false
-        });
-      }
-    }catch(e){}
-  };
-  
-  const miniToggle = () => {
-    playSound('timer');
-    setMiniPomRunning(r=>!r);
-  };
-  
-  const miniReset = () => {
-    setMiniPomRunning(false);
-    const dur = miniPomDurations[miniPomMode]*60;
-    setMiniPomSecs(dur);
-  };
-  
-  const setMiniPomModeAndReset = (m) => {
-    playSound('click');
-    setMiniPomMode(m);
-    setMiniPomRunning(false);
-    setMiniPomSecs(miniPomDurations[m]*60);
-  };
-  
-  const saveDurations = () => {
-    setMiniPomDurations(tempDurations);
-    localStorage.setItem('mini_pom_durations', JSON.stringify(tempDurations));
-    setMiniPomSecs(tempDurations[miniPomMode]*60);
-    setShowSettings(false);
-    playSound('save');
-  };
-  
-  useEffect(()=>{
-    if(miniPomRunning){
-      const intervalId = setInterval(()=>{
-        setMiniPomSecs(s=>{
-          if(s<=1){
-            clearInterval(intervalId);
-            setTimeout(()=>{
-              setMiniPomRunning(false);
-              playSound('success');
-              sendNotification(
-                miniPomMode==='work'?'Pausa!':'Torna a studiare!',
-                miniPomMode==='work'?'Ottimo lavoro! Fai una pausa.':'Il tempo di studio è finito.'
-              );
-              const nextMode = miniPomMode==='work'?'short':'work';
-              setMiniPomMode(nextMode);
-              setMiniPomSecs(miniPomDurations[nextMode]*60);
-            },100);
-            return 0;
-          }
-          return s-1;
-        });
-      },1000);
-      miniPomRef.current = intervalId;
-    } else if(miniPomRef.current){
-      clearInterval(miniPomRef.current);
-    }
-    return()=>{if(miniPomRef.current)clearInterval(miniPomRef.current);};
-  },[miniPomRunning,miniPomMode,miniPomDurations]);
-  
-  const mins = String(Math.floor(miniPomSecs/60)).padStart(2,'0');
-  const secs = String(miniPomSecs%60).padStart(2,'0');
-  const colors = {work:'#FF4D6D',short:'#06D6A0',long:'#4CC9F0'};
-  const color = colors[miniPomMode];
-  
-  if(showSettings){
-    return (
-      <div style={{display:'flex',alignItems:'center',gap:8,padding:'4px 10px',background:'rgba(20,20,30,.98)',borderRadius:12,border:'1px solid rgba(255,255,255,.1)',marginLeft:8,boxShadow:'0 4px 20px rgba(0,0,0,.5)'}}>
-        <div style={{fontSize:'.65rem',fontWeight:700,color:'var(--text2)',marginRight:4}}>MIN</div>
-        {[['work','S'],['short','P'],['long','L']].map(([m,l])=>(
-          <div key={m} style={{display:'flex',alignItems:'center',gap:3}}>
-            <span style={{fontSize:'.55rem',color:colors[m]}}>{l}</span>
-            <input 
-              type="number" 
-              min="1" max="120" 
-              value={tempDurations[m]}
-              onChange={e=>setTempDurations(d=>({...d,[m]:Math.max(1,Math.min(120,parseInt(e.target.value)||1))}))}
-              style={{width:32,background:'rgba(255,255,255,.1)',border:'1px solid rgba(255,255,255,.15)',borderRadius:4,color:'#fff',fontSize:'.65rem',padding:'2px 4px',textAlign:'center'}}
-            />
-          </div>
-        ))}
-        <div onClick={saveDurations} style={{cursor:'pointer',color:'var(--green)',fontSize:'.7rem',fontWeight:700,padding:'2px 6px',background:'rgba(6,214,160,.2)',borderRadius:4}}>OK</div>
-        <div onClick={()=>{setShowSettings(false);setTempDurations(miniPomDurations);}} style={{cursor:'pointer',color:'var(--text2)',fontSize:'.7rem',padding:'2px 4px'}}>x</div>
-      </div>
-    );
-  }
-  
-  if(!showMiniPom){
-    return (
-      <div onClick={()=>setShowMiniPom(true)} style={{display:'flex',alignItems:'center',gap:6,padding:'4px 10px',background:miniPomRunning?color+'22':'rgba(255,255,255,.05)',borderRadius:20,border:'1px solid '+color+'44',cursor:'pointer',marginLeft:12,transition:'all .2s'}}>
-        <div style={{width:8,height:8,borderRadius:'50%',background:color,boxShadow:'0 0 6px '+color,animation:miniPomRunning?'pulse-glow 1.5s infinite':'none'}}/>
-        <span style={{fontSize:'.75rem',fontWeight:700,color,fontFamily:'Inter,sans-serif'}}>{mins}:{secs}</span>
-      </div>
-    );
-  }
-  
-  return (
-    <div style={{display:'flex',alignItems:'center',gap:8,padding:'4px 10px',background:'rgba(20,20,30,.95)',borderRadius:12,border:'1px solid rgba(255,255,255,.1)',marginLeft:8,boxShadow:'0 4px 20px rgba(0,0,0,.4)'}}>
-      <div style={{display:'flex',gap:4}}>
-        {['work','short','long'].map(m=>(
-          <div key={m} onClick={()=>setMiniPomModeAndReset(m)} style={{padding:'2px 6px',borderRadius:6,background:miniPomMode===m?colors[m]:'transparent',color:miniPomMode===m?'#080B14':colors[m],fontSize:'.6rem',fontWeight:700,cursor:'pointer',transition:'all .2s'}}>
-            {m==='work'?'S':m==='short'?'P':'L'}
-          </div>
-        ))}
-      </div>
-      <div onClick={miniToggle} style={{cursor:'pointer',padding:'2px 6px',background:color+'22',borderRadius:6}}>
-        <span style={{fontSize:'.8rem',fontWeight:700,color,fontFamily:'Inter,sans-serif'}}>{mins}:{secs}</span>
-      </div>
-      <div onClick={miniReset} style={{cursor:'pointer',color:'var(--text2)',fontSize:'.7rem',padding:'2px'}} title="Reset">↺</div>
-      <div onClick={()=>{setShowSettings(true);setTempDurations(miniPomDurations);}} style={{cursor:'pointer',color:'var(--text2)',fontSize:'.7rem',padding:'2px'}} title="Imposta minuti">⚙</div>
-      <div onClick={()=>setShowMiniPom(false)} style={{cursor:'pointer',color:'var(--text2)',fontSize:'.7rem',padding:'2px 4px'}}>×</div>
-    </div>
-  );
-}
 
 function useNotifications(events, birthdays) {
   const [notifList, setNotifList] = useState([]);
@@ -27062,63 +26505,16 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
   const gpomReset = () => { if(window._gpom) window._gpom.reset(); };
   const gpomClose = () => { if(window._gpom) { window._gpom.running = false; window._gpom.notify(); } };
 
-  // Standalone Pomodoro Widget - works independently
-  const [miniPomOpen, setMiniPomOpen] = useState(false);
-  const [miniPomMode, setMiniPomMode] = useState('work');
-  const [miniPomRunning, setMiniPomRunning] = useState(false);
-  const [miniPomSecs, setMiniPomSecs] = useState(25*60);
-  const [miniPomDurations, setMiniPomDurations] = useState(()=>{try{return JSON.parse(localStorage.getItem('mini_pom_durations')||'null')||{work:25,short:5,long:15};}catch(e){return {work:25,short:5,long:15};}});
-  const miniPomColors = {work:'#FF4D6D',short:'#06D6A0',long:'#4CC9F0'};
-  const miniPomLabels = {work:'Studio',short:'Pausa corta',long:'Pausa lunga'};
-  
-  const miniPomRef = useRef(null);
-  useEffect(()=>{
-    if(miniPomRunning){
-      miniPomRef.current = setInterval(()=>{
-        setMiniPomSecs(s=>{
-          if(s<=1){
-            clearInterval(miniPomRef.current);
-            setMiniPomRunning(false);
-            playSound('alarm');
-            try{if(Notification.permission==='granted')new Notification(miniPomMode==='work'?'Pausa!':'Torna a studiare!');}catch(e){}
-            const cycles = parseInt(localStorage.getItem('pom_cycles')||'0')+(miniPomMode==='work'?1:0);
-            localStorage.setItem('pom_cycles',String(cycles));
-            if(miniPomMode==='work'){const s=logStudySession('work',miniPomDurations.work);if(s&&addEvent)addEvent({id:s.id,title:'📖 Studio ('+s.duration+'m)',date:s.date,time:s.completedAt,color:'#10B981',fromStudy:true});}
-            else logStudySession('break',miniPomDurations.short||5);
-            const next = miniPomMode==='work'?(cycles)%4===0?'long':'short':'work';
-            setMiniPomMode(next);
-            return miniPomDurations[next]*60;
-          }
-          return s-1;
-        });
-      },1000);
-    } else clearInterval(miniPomRef.current);
-    return()=>{if(miniPomRef.current)clearInterval(miniPomRef.current);};
-  },[miniPomRunning,miniPomMode]);
-
-  const miniPomToggle = () => { setMiniPomRunning(r=>!r); };
-  const miniPomChangeMode = (m) => { setMiniPomMode(m); setMiniPomSecs(miniPomDurations[m]*60); setMiniPomRunning(false); };
-  
   // Focus Mode
   const [focusModeOpen, setFocusModeOpen] = useState(false);
   const [focusSecs, setFocusSecs] = useState(()=>{try{const d=JSON.parse(localStorage.getItem('focus_durations')||'null');return d?.work?d.work*60:25*60;}catch(e){return 25*60;}});
   const [focusRunning, setFocusRunning] = useState(false);
   const [focusMode, setFocusMode] = useState('work'); // work, short, long
   const [focusSessions, setFocusSessions] = useState(() => parseInt(localStorage.getItem('focus_sessions') || '0'));
-  const [focusStreak, setFocusStreak] = useState(() => parseInt(localStorage.getItem('focus_streak') || '0'));
   const [focusDurations, setFocusDurations] = useState(()=>{try{return JSON.parse(localStorage.getItem('focus_durations')||'null')||{work:25,short:5,long:15};}catch(e){return {work:25,short:5,long:15};}});
-  const [focusTempDurations, setFocusTempDurations] = useState(focusDurations);
-  const [focusShowSettings, setFocusShowSettings] = useState(false);
-  const [focusEditingTime, setFocusEditingTime] = useState(false);
-  const [focusEditInput, setFocusEditInput] = useState('');
-  const [focusShowChat, setFocusShowChat] = useState(false);
-  const [focusChatMsgs, setFocusChatMsgs] = useState([{role:'bot',text:'Ciao! Sono qui per aiutarti durante lo studio. Chiedimi qualsiasi cosa! 📚'}]);
-  const [focusChatInp, setFocusChatInp] = useState('');
-  const [focusChatBusy, setFocusChatBusy] = useState(false);
   const focusTimerRef = useRef(null);
   
   const focusColors = {work:'#FF4D6D',short:'#06D6A0',long:'#4CC9F0'};
-  const focusLabels = {work:'Studio',short:'Pausa',long:'Lunga pausa'};
   
   useEffect(() => {
     if(focusRunning){
@@ -27158,12 +26554,6 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
   }, [focusRunning, focusMode, focusDurations]);
   
   const focusToggle = () => setFocusRunning(r => !r);
-  const focusSaveDurations = () => {
-    setFocusDurations(focusTempDurations);
-    localStorage.setItem('focus_durations', JSON.stringify(focusTempDurations));
-    setFocusSecs(focusTempDurations[focusMode]*60);
-    setFocusShowSettings(false);
-  };
   const focusReset = () => { setFocusRunning(false); setFocusSecs(focusDurations[focusMode]*60); };
   const focusSkip = () => {
     setFocusRunning(false);
@@ -27171,28 +26561,6 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
     const next = order[focusMode]||'work';
     setFocusMode(next);
     setFocusSecs(focusDurations[next]*60);
-  };
-  
-  const focusSendChat = async () => {
-    if(!focusChatInp.trim() || focusChatBusy) return;
-    const userMsg = {role:'user',text:focusChatInp};
-    setFocusChatMsgs(m=>[...m,userMsg]);
-    const inp = focusChatInp;
-    setFocusChatInp('');
-    setFocusChatBusy(true);
-    try {
-      const today = new Date().toLocaleDateString('it-IT');
-      const resp = await callAI([
-        {role:'system',content:`Sei un tutor studente amichevole. Aiuti durante una sessione di focus/studio. Si breve e pratico. Oggi è ${today}.`},
-        ...focusChatMsgs,
-        userMsg
-      ], apiKeys, prov);
-      const botMsg = {role:'bot',text:resp};
-      setFocusChatMsgs(m=>[...m,botMsg]);
-    } catch(e) {
-      setFocusChatMsgs(m=>[...m,{role:'bot',text:'Scusa, errore. Riprova.'}]);
-    }
-    setFocusChatBusy(false);
   };
 
   const TABS=[
@@ -28602,9 +27970,8 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
   const bg = BG_CONFIG[tab] || BG_CONFIG.pw;
 
   return (
-      <div className="app" style={tab==='home'?{overflow:'hidden'}:{}}>
-        {tab!=='home'&&(<>
-        <div className="noise-overlay"/>
+      <div className="app">
+                <div className="noise-overlay"/>
         <div className="grid-overlay"/>
         <div className="section-bg" key={tab}>
           <div className="orb-a" style={{width:480,height:480,background:bg.a,cssText:bg.ap,...Object.fromEntries(bg.ap.split(';').filter(Boolean).map(s=>[s.split(':')[0].trim(),s.split(':')[1].trim()]))}}/>
@@ -28658,9 +28025,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
             </div>
           </div>
         </div>
-        </>)}
-        <div className="main" style={tab==='home'?{width:'100%',maxWidth:'100%',margin:0,padding:0}:undefined}>
-          {tab!=='home'&&(
+        <div className="main">
           <div className="topbar">
             <div style={{display:'flex',alignItems:'center',gap:8}}>
               <div className="mobile-menu-btn" onClick={()=>setMobileMenuOpen(true)}>
@@ -28753,171 +28118,39 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
                 )}
               </div>
             </div>
-          )}
-          
-          {/* Standalone Mini Pomodoro Widget */}
-          {miniPomOpen&&(
-            <div style={{position:'fixed',top:56,left:12,right:12,zIndex:1500,maxWidth:400,margin:'0 auto'}}>
-              <div className="card" style={{padding:'16px 20px',boxShadow:'0 8px 32px rgba(0,0,0,.4)'}}>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
-                  <div style={{fontWeight:700,fontSize:'.95rem'}}>🍅 Pomodoro</div>
-                  <div style={{display:'flex',gap:8}}>
-                    <div className="ib" onClick={()=>setMiniPomOpen(false)}>✕</div>
-                  </div>
-                </div>
-                <div style={{display:'flex',gap:6,marginBottom:12}}>
-                  {[['work','Studio'],['short','Pausa'],['long','Lunga']].map(([m,l])=>(
-                    <button key={m} className={'btn bs'+(miniPomMode===m?' br':' bg')} onClick={()=>miniPomChangeMode(m)} style={miniPomMode===m?{background:miniPomColors[m],color:'#fff'}:{}}>{l}</button>
-                  ))}
-                </div>
-                <div style={{textAlign:'center',marginBottom:12}}>
-                  <div style={{fontSize:'2.5rem',fontWeight:800,color:miniPomColors[miniPomMode],fontFamily:'monospace'}}>
-                    {String(Math.floor(miniPomSecs/60)).padStart(2,'0')}:{String(miniPomSecs%60).padStart(2,'0')}
-                  </div>
-                  <div style={{fontSize:'.75rem',color:'var(--text2)',marginTop:4}}>{miniPomLabels[miniPomMode]}</div>
-                </div>
-                <div style={{display:'flex',gap:8,justifyContent:'center'}}>
-                  <button className="btn bs" onClick={()=>{setMiniPomRunning(false);setMiniPomSecs(miniPomDurations[miniPomMode]*60);}}>Reset</button>
-                  <button className="btn" style={{background:miniPomColors[miniPomMode],color:'#fff',minWidth:100}} onClick={miniPomToggle}>
-                    {miniPomRunning?'Pausa ⏸':'Avvia ▶'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-          
+          )})}
           {/* Focus Mode Modal */}
           {focusModeOpen && (
-            <div style={{position:'fixed',inset:0,background:'rgba(5,5,10,.95)',zIndex:99999,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:20}}>
-              {/* Header */}
-              <div style={{position:'absolute',top:20,left:20,right:20,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <div style={{fontSize:'1.1rem',fontWeight:700,display:'flex',alignItems:'center',gap:8}}>{focusShowSettings?'⚙':focusRunning?'🎯':'🎯'} {focusShowSettings?'Personalizza timer':'Focus Mode'}</div>
-                <div style={{display:'flex',gap:8}}>
-                  <button className="btn bg bs" onClick={()=>{if(focusShowSettings){setFocusShowSettings(false);setFocusTempDurations(focusDurations);}else{setFocusShowSettings(true);setFocusTempDurations(focusDurations);}}} style={{fontSize:'.75rem',padding:'6px 12px',background:focusShowSettings?'rgba(255,77,109,.2)':'rgba(255,255,255,.08)',border:'1px solid '+(focusShowSettings?'rgba(255,77,109,.3)':'rgba(255,255,255,.1)')}}>
-                    {focusShowSettings?'← Chiudi':'⚙ Personalizza tempi'}
-                  </button>
-                  <button className={`btn ${focusShowChat?'br':'bg'} bs`} onClick={()=>setFocusShowChat(s=>!s)} style={{fontSize:'.75rem'}}>
-                    💬 AI {focusShowChat?'ON':'OFF'}
-                  </button>
-                  <div className="ib" onClick={()=>{setFocusModeOpen(false);setFocusRunning(false);}} style={{fontSize:'1.2rem',color:'#fff'}}>✕</div>
-                </div>
-              </div>
-              
-              {focusShowSettings ? (
-                /* Settings View */
-                <div style={{textAlign:'center',marginTop:60}}>
-                  <div style={{fontWeight:700,marginBottom:20,fontSize:'1.1rem'}}>⏱ Personalizza durate (minuti)</div>
-                  <div style={{display:'flex',gap:16,justifyContent:'center',flexWrap:'wrap',marginBottom:24}}>
-                    {[['work','Studio','#FF4D6D'],['short','Pausa','#06D6A0'],['long','Pausa lunga','#4CC9F0']].map(([m,l,c])=>(
-                      <div key={m} style={{textAlign:'center',padding:'16px 20px',background:'rgba(255,255,255,.04)',borderRadius:16,border:'1px solid '+c+'30',minWidth:140}}>
-                        <div style={{fontSize:'.8rem',fontWeight:600,color:c,marginBottom:8}}>{l}</div>
-                        <input type="number" min="1" max="180" value={focusTempDurations[m]}
-                          onChange={e=>setFocusTempDurations(d=>({...d,[m]:Math.max(1,Math.min(180,parseInt(e.target.value)||1))}))}
-                          style={{width:64,background:'rgba(255,255,255,.08)',border:'1px solid '+c+'40',borderRadius:10,color:'#fff',fontSize:'1.4rem',fontWeight:800,textAlign:'center',padding:'8px 12px',outline:'none'}}/>
-                        <div style={{fontSize:'.7rem',color:'var(--text2)',marginTop:6}}>minuti</div>
-                      </div>
-                    ))}
-                  </div>
-                  <button className="btn bt" onClick={focusSaveDurations} style={{padding:'12px 40px',fontSize:'1rem'}}>✅ Salva e applica</button>
-                </div>
-              ) : (
-                <>
-              {/* Timer — click to edit */}
-              <div style={{textAlign:'center',marginBottom:20,marginTop:40}}>
-                {focusEditingTime ? (
-                  <div>
-                    <input type="number" min="1" max="999" value={focusEditInput}
-                      onChange={e=>setFocusEditInput(e.target.value)}
-                      onKeyDown={e=>{if(e.key==='Enter'){const m=parseInt(focusEditInput)||1;setFocusRunning(false);setFocusSecs(m*60);setFocusEditingTime(false);}}}
-                      onBlur={()=>{if(focusEditInput){const m=parseInt(focusEditInput)||1;setFocusRunning(false);setFocusSecs(m*60);}setFocusEditingTime(false);}}
-                      autoFocus
-                      style={{width:120,background:'rgba(255,255,255,.08)',border:'1px solid '+focusColors[focusMode]+'40',borderRadius:14,color:'#fff',fontSize:'4rem',fontWeight:900,fontFamily:'monospace',textAlign:'center',padding:'8px 12px',outline:'none'}}/>
-                    <div style={{fontSize:'.8rem',color:'rgba(255,255,255,.4)',marginTop:8}}>minuti · premi Invio per confermare</div>
-                  </div>
-                ) : (
-                  <div>
-                    <div onClick={()=>{if(!focusRunning){setFocusEditInput(String(Math.ceil(focusSecs/60)));setFocusEditingTime(true);}}} style={{fontSize:'5rem',fontWeight:900,fontFamily:'monospace',color:focusColors[focusMode],textShadow:'0 0 40px '+focusColors[focusMode]+'66',cursor:focusRunning?'default':'pointer',transition:'opacity .2s',userSelect:'none'}}
-                      title={focusRunning?'Metti in pausa per personalizzare':'Clicca per personalizzare i minuti'}>
-                      {String(Math.floor(focusSecs/60)).padStart(2,'0')}:{String(focusSecs%60).padStart(2,'0')}
-                    </div>
-                    <div style={{fontSize:'.9rem',color:'rgba(255,255,255,.6)',marginTop:8}}>{focusLabels[focusMode]}</div>
-                    {!focusRunning && <div style={{fontSize:'.65rem',color:'rgba(255,255,255,.3)',marginTop:4}}>⏱ clicca per cambiare durata</div>}
-                  </div>
-                )}
-              </div>
-              
-              {/* Progress bar */}
-              <div style={{width:'100%',maxWidth:400,height:8,background:'rgba(255,255,255,.1)',borderRadius:4,marginBottom:30,overflow:'hidden'}}>
-                <div style={{width:(1-focusSecs/(focusDurations[focusMode]*60))*100+'%',height:'100%',background:focusColors[focusMode],transition:'width 1s linear'}}/>
-              </div>
-              
-              {/* Mode selector */}
-              <div style={{display:'flex',gap:8,marginBottom:24,justifyContent:'center'}}>
+            <div style={{position:'fixed',inset:0,background:'rgba(5,5,10,.97)',zIndex:99999,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:20}}>
+              <div className="ib" onClick={()=>{setFocusModeOpen(false);setFocusRunning(false);}} style={{position:'absolute',top:20,right:20,fontSize:'1.2rem',color:'#fff',zIndex:10}}>{'\u2715'}</div>
+              <div style={{display:'flex',gap:6,marginBottom:32}}>
                 {[['work','Studio','#FF4D6D'],['short','Pausa','#06D6A0'],['long','Lunga','#4CC9F0']].map(([m,l,c])=>(
-                  <button key={m} className="btn bs" onClick={()=>{setFocusRunning(false);setFocusMode(m);setFocusSecs(focusDurations[m]*60);}} style={focusMode===m?{background:c,color:'#fff',border:'1px solid '+c,fontSize:'.7rem',padding:'4px 10px'}:{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.1)',color:'rgba(255,255,255,.7)',fontSize:'.7rem',padding:'4px 10px'}}>{l}</button>
+                  <button key={m} onClick={()=>{setFocusRunning(false);setFocusMode(m);setFocusSecs(focusDurations[m]*60);}} style={{padding:'6px 16px',borderRadius:20,border:'none',background:focusMode===m?c:'rgba(255,255,255,.08)',color:focusMode===m?'#fff':'rgba(255,255,255,.5)',fontSize:'.75rem',fontWeight:600,cursor:'pointer',transition:'.2s'}}>
+                    {l}
+                  </button>
                 ))}
               </div>
-              
-              {/* Quick presets */}
-              {!focusRunning && (
-                <div style={{display:'flex',gap:6,marginBottom:20,justifyContent:'center',flexWrap:'wrap'}}>
-                  {[5,10,15,20,25,30,45,60,90,120].map(m => (
-                    <button key={m} className="btn bs" onClick={()=>{setFocusRunning(false);setFocusSecs(m*60);}} style={{background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.08)',color:'var(--text2)',fontSize:'.65rem',padding:'3px 8px',borderRadius:6}}>
-                      {m>=60 ? Math.floor(m/60)+'h'+(m%60>0?m%60+'m':'') : m+'m'}
-                    </button>
-                  ))}
-                </div>
-              )}
-              
-              {/* Controls */}
-              <div style={{display:'flex',gap:12,marginBottom:30}}>
-                <button className="btn bg" onClick={focusReset} style={{padding:'10px 20px'}}>🔄 Reset</button>
-                <button className="btn" onClick={focusToggle} style={{background:focusColors[focusMode],color:'#fff',minWidth:120,padding:'12px 30px',fontSize:'1rem'}}>
-                  {focusRunning ? '⏸ Pausa' : '▶ Avvia'}
-                </button>
-                <button className="btn bg" onClick={focusSkip} style={{padding:'10px 20px'}}>⏭ Skip</button>
+              <div style={{fontSize:'6rem',fontWeight:900,fontFamily:'monospace',color:focusColors[focusMode],textShadow:'0 0 60px '+focusColors[focusMode]+'44',lineHeight:1,marginBottom:8,letterSpacing:4}}>
+                {String(Math.floor(focusSecs/60)).padStart(2,'0')}:{String(focusSecs%60).padStart(2,'0')}
               </div>
-              
-              {/* Stats */}
-              <div style={{display:'flex',gap:20,marginBottom:30}}>
-                <div style={{textAlign:'center'}}>
-                  <div style={{fontSize:'1.5rem',fontWeight:700}}>{focusSessions}</div>
-                  <div style={{fontSize:'.7rem',color:'rgba(255,255,255,.5)'}}>Sessioni oggi</div>
-                </div>
-                <div style={{textAlign:'center'}}>
-                  <div style={{fontSize:'1.5rem',fontWeight:700}}>{focusSessions*focusDurations.work}</div>
-                  <div style={{fontSize:'.7rem',color:'rgba(255,255,255,.5)'}}>Minuti focus</div>
-                </div>
-                  <div style={{textAlign:'center'}}>
-                    <div style={{fontSize:'1.5rem',fontWeight:700,color:focusColors[focusMode]}}><span>{focusDurations[focusMode]}m</span></div>
-                    <div style={{fontSize:'.7rem',color:'rgba(255,255,255,.5)'}}>{focusLabels[focusMode]}</div>
-                  </div>
+              <div style={{width:240,height:4,background:'rgba(255,255,255,.08)',borderRadius:2,marginBottom:36,overflow:'hidden'}}>
+                <div style={{width:(1-focusSecs/(focusDurations[focusMode]*60))*100+'%',height:'100%',background:focusColors[focusMode],transition:'width 1s linear',borderRadius:2}}/>
               </div>
-              
-              {/* Exit button */}
-              <button className="btn bg" onClick={()=>{setFocusModeOpen(false);setFocusRunning(false);}} style={{padding:'10px 30px',marginTop:10}}>
-                🚪 Esci dalla Focus Mode
-              </button>
-              </>
-              )}
-              
-              {/* AI Chat */}
-              {focusShowChat && (
-                <div style={{position:'absolute',bottom:20,left:20,right:20,maxWidth:500,margin:'0 auto',background:'rgba(255,255,255,.05)',borderRadius:16,padding:16,maxHeight:300,display:'flex',flexDirection:'column'}}>
-                  <div style={{flex:1,overflowY:'auto',marginBottom:12}}>
-                    {focusChatMsgs.map((m,i)=>(
-                      <div key={i} style={{textAlign:m.role==='user'?'right':'left',marginBottom:8}}>
-                        <span style={{display:'inline-block',padding:'8px 12px',borderRadius:12,background:m.role==='user'?'rgba(244,63,94,.3)':'rgba(139,92,246,.2)',fontSize:'.85rem'}}>{m.text}</span>
-                      </div>
-                    ))}
-                    {focusChatBusy && <div style={{textAlign:'center',color:'rgba(255,255,255,.5)',fontSize:'.85rem'}}>Sto pensando...</div>}
-                  </div>
-                  <div style={{display:'flex',gap:8}}>
-                    <input className="field" placeholder="Chiedi all'AI..." value={focusChatInp} onChange={e=>setFocusChatInp(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')focusSendChat();}} style={{flex:1,fontSize:'.85rem'}}/>
-                    <button className="btn br" onClick={focusSendChat} disabled={!focusChatInp.trim()}>📤</button>
-                  </div>
+              <div style={{display:'flex',gap:16,alignItems:'center',marginBottom:36}}>
+                <div onClick={focusReset} style={{width:44,height:44,borderRadius:'50%',background:'rgba(255,255,255,.06)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:'.9rem',transition:'.2s'}} title="Reset">
+                  {'\u21BA'}
                 </div>
-              )}
+                <div onClick={focusToggle} style={{width:72,height:72,borderRadius:'50%',background:focusColors[focusMode],display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:'1.6rem',boxShadow:'0 0 40px '+focusColors[focusMode]+'55',transition:'.2s'}}>
+                  {focusRunning ? '\u23F8' : '\u25B6'}
+                </div>
+                <div onClick={focusSkip} style={{width:44,height:44,borderRadius:'50%',background:'rgba(255,255,255,.06)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',fontSize:'.9rem',transition:'.2s'}} title="Avanti">
+                  {'\u23ED'}
+                </div>
+              </div>
+              <div style={{display:'flex',gap:24,fontSize:'.78rem',color:'rgba(255,255,255,.4)'}}>
+                <span>{focusSessions} sessioni</span>
+                <span>{focusSessions*focusDurations.work}m totali</span>
+              </div>
             </div>
           )}
           
