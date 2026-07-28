@@ -18524,204 +18524,181 @@ function MemoryGame({onBack, toast}) {
 }
 
 // ── 2048 COMPONENT ──
-function Game2048({onBack, toast}) {
-  const [grid, setGrid] = useState(() => {
-    const g = Array(4).fill(null).map(() => Array(4).fill(0));
-    return addRandomTile(addRandomTile(g));
-  });
-  const [score, setScore] = useState(0);
-  const [bestScore, setBestScore] = useState(() => parseInt(localStorage.getItem('lmv_2048_best') || '0'));
-  const [gameOver, setGameOver] = useState(false);
-  const [won, setWon] = useState(false);
-  const [mergedCells, setMergedCells] = useState([]);
-  const touchStart = useRef({x:0,y:0});
-  
-  function addRandomTile(g) {
-    const empty = [];
-    for (let r=0;r<4;r++) for(let c=0;c<4;c++) if(!g[r][c]) empty.push([r,c]);
-    if (empty.length === 0) return g;
-    const [r,c] = empty[Math.floor(Math.random()*empty.length)];
-    const ng = g.map(row=>[...row]);
-    ng[r][c] = Math.random() < 0.9 ? 2 : 4;
-    return ng;
-  }
-  
-  const slideRow = (row) => {
-    let arr = row.filter(v => v);
-    const merged = [];
-    for (let i = 0; i < arr.length - 1; i++) {
-      if (arr[i] === arr[i+1]) { arr[i] *= 2; merged.push(i); arr.splice(i+1, 1); }
-    }
-    while (arr.length < 4) arr.push(0);
-    return {row: arr, merged};
+function Game2048({onBack,toast}) {
+  const mkEmpty=()=>Array(4).fill(null).map(()=>Array(4).fill(0));
+  const addTile=(g)=>{
+    const e=[];for(let r=0;r<4;r++)for(let c=0;c<4;c++)if(!g[r][c])e.push([r,c]);
+    if(!e.length)return{grid:g,tile:null};
+    const[r,c]=e[Math.floor(Math.random()*e.length)];
+    const ng=g.map(row=>[...row]);ng[r][c]=Math.random()<.9?2:4;
+    return{grid:ng,tile:[r,c]};
   };
-  
-  const canMove = (g) => {
-    for (let r=0;r<4;r++) for(let c=0;c<4;c++) {
-      if (!g[r][c]) return true;
-      if (c<3 && g[r][c]===g[r][c+1]) return true;
-      if (r<3 && g[r][c]===g[r+1][c]) return true;
-    }
-    return false;
+  const initGrid=()=>{let g=mkEmpty();g=addTile(g).grid;g=addTile(g).grid;return g;};
+
+  const [grid,setGrid]=useState(initGrid);
+  const [score,setScore]=useState(0);
+  const [best,setBest]=useState(()=>parseInt(localStorage.getItem('lmv_2048_best')||'0'));
+  const [over,setOver]=useState(false);
+  const [won,setWon]=useState(false);
+  const [keepGoing,setKeepGoing]=useState(false);
+  const [popups,setPopups]=useState([]);
+  const [merged,setMerged]=useState([]);
+  const [newTilePos,setNewTilePos]=useState(null);
+  const [shake,setShake]=useState(false);
+  const touchRef=useRef({x:0,y:0});
+  const animRef=useRef(0);
+  const stateRef=useRef({grid,score,best,over,won,keepGoing});
+  useEffect(()=>{stateRef.current={grid,score,best,over,won,keepGoing};},[grid,score,best,over,won,keepGoing]);
+
+  const slideRow=(row)=>{
+    let f=row.filter(v=>v);const m=[];
+    for(let i=0;i<f.length-1;i++)if(f[i]===f[i+1]){f[i]*=2;m.push(i);f.splice(i+1,1);}
+    while(f.length<4)f.push(0);return{row:f,m};
   };
-  
-  const hasWon = (g) => g.flat().some(v => v >= 2048);
-  
-  const move = (dir) => {
-    if (gameOver) return;
-    let newGrid = grid.map(r => [...r]);
-    let moved = false;
-    const allMerged = [];
-    
-    if (dir === 'left') {
-      for(let r=0;r<4;r++) {
-        const result = slideRow(newGrid[r]);
-        if (result.row.join(',') !== newGrid[r].join(',')) moved = true;
-        newGrid[r] = result.row;
-        result.merged.forEach(c => allMerged.push([r,c]));
-      }
-    } else if (dir === 'right') {
-      for(let r=0;r<4;r++) {
-        const reversed = [...newGrid[r]].reverse();
-        const result = slideRow(reversed);
-        const newRow = result.row.reverse();
-        if (newRow.join(',') !== newGrid[r].join(',')) moved = true;
-        newGrid[r] = newRow;
-        result.merged.forEach(c => allMerged.push([r, 3-c]));
-      }
-    } else if (dir === 'up') {
-      for(let c=0;c<4;c++) {
-        let col = [grid[0][c],grid[1][c],grid[2][c],grid[3][c]];
-        const result = slideRow(col);
-        if (result.row.join(',') !== col.join(',')) moved = true;
-        for(let r=0;r<4;r++) newGrid[r][c] = result.row[r];
-        result.merged.forEach(r => allMerged.push([r,c]));
-      }
-    } else if (dir === 'down') {
-      for(let c=0;c<4;c++) {
-        let col = [grid[3][c],grid[2][c],grid[1][c],grid[0][c]];
-        const result = slideRow(col);
-        const newCol = result.row.reverse();
-        if (newCol.join(',') !== col.join(',')) moved = true;
-        for(let r=0;r<4;r++) newGrid[r][c] = newCol[r];
-        result.merged.forEach(r => allMerged.push([3-r,c]));
-      }
-    }
-    
-    if (!moved) return;
-    
-    newGrid = addRandomTile(newGrid);
-    setGrid(newGrid);
-    setMergedCells(allMerged);
-    setTimeout(() => setMergedCells([]), 300);
-    
-    if (hasWon(newGrid) && !won) {
-      setWon(true);
-      toast('🎉 Hai raggiunto 2048!','var(--green)');
-    }
-    if (!canMove(newGrid)) {
-      setGameOver(true);
-      toast('Game Over!','var(--red)');
-    }
+  const canMove=(g)=>{
+    for(let r=0;r<4;r++)for(let c=0;c<4;c++){
+      if(!g[r][c])return true;if(c<3&&g[r][c]===g[r][c+1])return true;
+      if(r<3&&g[r][c]===g[r+1][c])return true;
+    }return false;
   };
-  
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.key === 'ArrowLeft') { e.preventDefault(); move('left'); }
-      else if (e.key === 'ArrowRight') { e.preventDefault(); move('right'); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); move('up'); }
-      else if (e.key === 'ArrowDown') { e.preventDefault(); move('down'); }
+  const rotCW=(g)=>{const n=mkEmpty();for(let r=0;r<4;r++)for(let c=0;c<4;c++)n[c][3-r]=g[r][c];return n;};
+
+  const doMove=useCallback((dir)=>{
+    const s=stateRef.current;
+    if(s.over||(s.won&&!s.keepGoing))return;
+    let g=s.grid.map(r=>[...r]);let moved=false;const allM=[];
+    const rots=dir==='left'?1:dir==='right'?3:dir==='up'?2:0;
+    let rg=g;for(let i=0;i<rots;i++)rg=rotCW(rg);
+    for(let r=0;r<4;r++){
+      const{row,m}=slideRow(rg[r]);
+      if(row.join(',')!==rg[r].join(','))moved=true;
+      rg[r]=row;m.forEach(c=>allM.push([r,c]));
+    }
+    for(let i=0;i<(4-rots)%4;i++)rg=rotCW(rg);
+    if(!moved){setShake(true);setTimeout(()=>setShake(false),300);return;}
+    const remapped=allM.map(([r,c])=>{let p=[r,c];for(let i=0;i<rots;i++){const[pr,pc]=p;p=[pc,3-pr];}return p;});
+    const res=addTile(rg);const ng=res.grid;
+    let pts=0;remapped.forEach(([r,c])=>pts+=ng[r][c]);
+    setGrid(ng);
+    setScore(prev=>{const ns=prev+pts;localStorage.setItem('lmv_2048_best',String(Math.max(s.best,ns)));return ns;});
+    setMerged(remapped);setNewTilePos(res.tile);
+    const pid=animRef.current++;setPopups(p=>[...p,{id:pid,val:pts}]);
+    setTimeout(()=>setPopups(p=>p.filter(x=>x.id!==pid)),800);
+    setTimeout(()=>{setMerged([]);setNewTilePos(null);},300);
+    if(ng.flat().some(v=>v>=2048)&&!s.won&&!s.keepGoing){setWon(true);toast('2048 Raggiunto!','var(--green)');}
+    if(!canMove(ng)){setOver(true);toast('Game Over!','var(--red)');}
+  },[toast]);
+
+  useEffect(()=>{
+    const h=(e)=>{
+      const keys={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down'};
+      if(keys[e.key]){e.preventDefault();doMove(keys[e.key]);}
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  });
-  
-  const handleTouchStart = (e) => {
-    touchStart.current = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+    window.addEventListener('keydown',h);return()=>window.removeEventListener('keydown',h);
+  },[doMove]);
+
+  const onTS=(e)=>{touchRef.current={x:e.touches[0].clientX,y:e.touches[0].clientY};};
+  const onTE=(e)=>{
+    const dx=e.changedTouches[0].clientX-touchRef.current.x;
+    const dy=e.changedTouches[0].clientY-touchRef.current.y;
+    if(Math.abs(dx)<20&&Math.abs(dy)<20)return;
+    doMove(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'));
   };
-  const handleTouchEnd = (e) => {
-    const dx = e.changedTouches[0].clientX - touchStart.current.x;
-    const dy = e.changedTouches[0].clientY - touchStart.current.y;
-    if (Math.abs(dx) < 30 && Math.abs(dy) < 30) return;
-    if (Math.abs(dx) > Math.abs(dy)) { move(dx > 0 ? 'right' : 'left'); }
-    else { move(dy > 0 ? 'down' : 'up'); }
+
+  const reset=()=>{setGrid(initGrid());setScore(0);setOver(false);setWon(false);setKeepGoing(false);setMerged([]);setNewTilePos(null);setPopups([]);};
+
+  const S=Math.min(82,(window.innerWidth-52)/4);
+  const G=10;const R=14;
+  const tileColors={
+    2:{bg:'linear-gradient(135deg,#2d2d72,#2d5a88)',sh:'rgba(45,45,114,.5)'},
+    4:{bg:'linear-gradient(135deg,#2d5a88,#2d889e)',sh:'rgba(45,90,136,.5)'},
+    8:{bg:'linear-gradient(135deg,#f2994a,#f2c94c)',sh:'rgba(242,153,74,.5)'},
+    16:{bg:'linear-gradient(135deg,#eb5757,#f2994a)',sh:'rgba(235,87,87,.5)'},
+    32:{bg:'linear-gradient(135deg,#eb5757,#e53e3e)',sh:'rgba(235,87,87,.6)'},
+    64:{bg:'linear-gradient(135deg,#e53e3e,#c53030)',sh:'rgba(229,62,62,.6)'},
+    128:{bg:'linear-gradient(135deg,#f6d365,#fda085)',sh:'rgba(246,211,101,.5)'},
+    256:{bg:'linear-gradient(135deg,#fda085,#f6d365)',sh:'rgba(253,160,133,.5)'},
+    512:{bg:'linear-gradient(135deg,#a18cd1,#fbc2eb)',sh:'rgba(161,140,209,.5)'},
+    1024:{bg:'linear-gradient(135deg,#fbc2eb,#a6c1ee)',sh:'rgba(251,194,235,.5)'},
+    2048:{bg:'linear-gradient(135deg,#f6d365,#fda085,#f5576c)',sh:'rgba(246,211,101,.6)'},
+    4096:{bg:'linear-gradient(135deg,#667eea,#764ba2)',sh:'rgba(102,126,234,.6)'},
+    8192:{bg:'linear-gradient(135deg,#f093fb,#f5576c)',sh:'rgba(240,147,251,.6)'}
   };
-  
-  const resetGame = () => {
-    const g = Array(4).fill(null).map(() => Array(4).fill(0));
-    setGrid(addRandomTile(addRandomTile(g)));
-    setScore(0); setGameOver(false); setWon(false); setMergedCells([]);
+  const defColor={bg:'linear-gradient(135deg,#ff0844,#ffb199)',sh:'rgba(255,8,68,.5)'};
+
+  const mkTileStyle=(v,r,c)=>{
+    const isM=merged.some(([mr,mc])=>mr===r&&mc===c);
+    const isNew=newTilePos&&newTilePos[0]===r&&newTilePos[1]===c;
+    const tc=tileColors[v]||defColor;
+    const fs=v>=1024?S*.28:v>=128?S*.32:v>=16?S*.36:S*.42;
+    return{
+      position:'absolute',left:c*(S+G)+G,top:r*(S+G)+G,width:S,height:S,
+      display:'flex',alignItems:'center',justifyContent:'center',borderRadius:R,
+      background:tc.bg,color:'#fff',fontWeight:900,fontSize:fs,letterSpacing:-1,
+      transition:isNew?'transform .12s cubic-bezier(.34,1.56,.64,1)':isM?'transform .2s cubic-bezier(.34,1.56,.64,1)':'none',
+      transform:isNew?'scale(0)':isM?'scale(1.12)':'scale(1)',
+      boxShadow:v?`0 4px 16px ${tc.sh},inset 0 1px 0 rgba(255,255,255,.15)`:'none',
+      textShadow:v?'0 2px 4px rgba(0,0,0,.3)':'none',
+      zIndex:isM?2:1,opacity:v?1:0,userSelect:'none',WebkitTapHighlightColor:'transparent'
+    };
   };
-  
-  const cellSize = Math.min(80, (window.innerWidth - 64) / 4);
-  const colors = {0:'rgba(255,255,255,.06)',2:'#667eea',4:'#764ba2',8:'#f093fb',16:'#f5576c',32:'#4facfe',64:'#00f2fe',128:'#43e97b',256:'#38f9d7',512:'#fa709a',1024:'#fee140',2048:'#f7971e',4096:'#ff0844',8192:'#ffb199'};
-  const textColor = (v) => v <= 4 ? '#fff' : '#fff';
-  
-  return (
-    <div style={{padding:'0 16px 100px'}}>
+
+  const ArrowBtn=({dir,icon,area})=>(
+    <button onClick={()=>doMove(dir)} style={{gridArea:area,width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:12,border:'1px solid rgba(255,255,255,.08)',background:'rgba(255,255,255,.06)',color:'var(--text2)',fontSize:'1.1rem',cursor:'pointer',transition:'background .15s',WebkitTapHighlightColor:'transparent',touchAction:'manipulation'}}
+      onMouseDown={e=>e.currentTarget.style.background='rgba(255,255,255,.12)'}
+      onMouseUp={e=>e.currentTarget.style.background='rgba(255,255,255,.06)'}
+      onMouseLeave={e=>e.currentTarget.style.background='rgba(255,255,255,.06)'}
+    >{icon}</button>
+  );
+
+  return(
+    <div style={{padding:'0 16px 100px',userSelect:'none'}}>
       <div className="sh" style={{marginBottom:16}}>
-        <button className="ib" onClick={onBack}>← Indietro</button>
-        <div style={{fontWeight:600}}>🔢 2048</div>
+        <button className="ib" onClick={onBack}>{'\u2190'} Indietro</button>
+        <div style={{fontWeight:600}}>2048</div>
       </div>
-      
-      <div style={{display:'flex',justifyContent:'center',gap:12,marginBottom:16}}>
-        <div style={{padding:'8px 18px',borderRadius:12,background:'rgba(102,126,234,.15)',border:'1px solid rgba(102,126,234,.3)',textAlign:'center'}}>
-          <div style={{fontSize:'.6rem',color:'var(--text3)'}}>Punteggio</div>
-          <div style={{fontSize:'1.3rem',fontWeight:800,color:'#667eea'}}>{score}</div>
+      <div style={{display:'flex',gap:10,marginBottom:16}}>
+        <div style={{flex:1,padding:'12px 14px',borderRadius:14,background:'linear-gradient(135deg,rgba(102,126,234,.15),rgba(118,75,162,.15))',border:'1px solid rgba(102,126,234,.25)',textAlign:'center'}}>
+          <div style={{fontSize:'.55rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}}>Punteggio</div>
+          <div style={{fontSize:'1.5rem',fontWeight:900,color:'#667eea',marginTop:2}}>{score}</div>
         </div>
-        <div style={{padding:'8px 18px',borderRadius:12,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.08)',textAlign:'center'}}>
-          <div style={{fontSize:'.6rem',color:'var(--text3)'}}>Record</div>
-          <div style={{fontSize:'1.3rem',fontWeight:800,color:'var(--yellow)'}}>{Math.max(bestScore, score)}</div>
+        <div style={{flex:1,padding:'12px 14px',borderRadius:14,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.08)',textAlign:'center'}}>
+          <div style={{fontSize:'.55rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:1}}>Record</div>
+          <div style={{fontSize:'1.5rem',fontWeight:900,color:'var(--yellow)',marginTop:2}}>{Math.max(best,score)}</div>
         </div>
       </div>
-      
-      {gameOver && (
-        <div style={{textAlign:'center',padding:16,marginBottom:16,borderRadius:16,background:'rgba(255,77,109,.1)',border:'1px solid rgba(255,77,109,.3)'}}>
-          <div style={{fontSize:'1.8rem',marginBottom:4}}>💀 Game Over!</div>
-          <div style={{fontSize:'.85rem',color:'var(--text2)'}}>Punteggio finale: <strong>{score}</strong></div>
-        </div>
-      )}
-      {won && !gameOver && (
-        <div style={{textAlign:'center',padding:16,marginBottom:16,borderRadius:16,background:'rgba(6,214,160,.1)',border:'1px solid rgba(6,214,160,.3)'}}>
-          <div style={{fontSize:'1.8rem',marginBottom:4}}>🎉 2048 Raggiunto!</div>
-          <button className="btn bg" onClick={()=>setWon(false)} style={{marginTop:8,fontSize:'.8rem'}}>Continua a giocare</button>
+      {over&&(
+        <div style={{textAlign:'center',padding:18,marginBottom:16,borderRadius:18,background:'linear-gradient(135deg,rgba(255,77,109,.12),rgba(235,87,87,.12))',border:'1px solid rgba(255,77,109,.3)'}}>
+          <div style={{fontSize:'1.8rem',marginBottom:6}}>Game Over!</div>
+          <div style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:12}}>Punteggio: <strong style={{color:'#fff'}}>{score}</strong></div>
+          <button className="btn br" onClick={reset} style={{fontSize:'.82rem'}}>Ricomincia</button>
         </div>
       )}
-      
-      <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} style={{display:'grid',gridTemplateColumns:`repeat(4,${cellSize}px)`,gap:8,background:'rgba(255,255,255,.04)',borderRadius:16,padding:10,maxWidth:cellSize*4+20,margin:'0 auto',marginBottom:20,border:'1px solid rgba(255,255,255,.06)'}}>
-        {grid.flat().map((v,i) => {
-          const r = Math.floor(i/4), c = i%4;
-          const isMerged = mergedCells.some(([mr,mc]) => mr===r && mc===c);
-          return (
-            <div key={i} style={{
-              width:cellSize,height:cellSize,
-              display:'flex',alignItems:'center',justifyContent:'center',
-              borderRadius:12,
-              background:colors[v]||'linear-gradient(135deg,#ff0844,#ffb199)',
-              color:textColor(v),fontWeight:800,
-              fontSize:v>=1024?cellSize*0.3:v>=128?cellSize*0.35:cellSize*0.4,
-              transition:'all .15s cubic-bezier(.4,0,.2,1)',
-              transform:isMerged?'scale(1.1)':'scale(1)',
-              boxShadow:v?`0 4px 12px ${colors[v]}40`:'none',
-              textShadow:v?'0 1px 3px rgba(0,0,0,.3)':'none'
-            }}>{v||''}</div>
-          );
-        })}
+      {won&&!over&&!keepGoing&&(
+        <div style={{textAlign:'center',padding:18,marginBottom:16,borderRadius:18,background:'linear-gradient(135deg,rgba(6,214,160,.12),rgba(56,249,215,.12))',border:'1px solid rgba(6,214,160,.3)'}}>
+          <div style={{fontSize:'1.8rem',marginBottom:6}}>2048 Raggiunto!</div>
+          <div style={{display:'flex',gap:8,justifyContent:'center'}}>
+            <button className="btn bg" onClick={()=>setKeepGoing(true)} style={{fontSize:'.82rem'}}>Continua</button>
+            <button className="btn br" onClick={reset} style={{fontSize:'.82rem'}}>Nuova Partita</button>
+          </div>
+        </div>
+      )}
+      <div onTouchStart={onTS} onTouchEnd={onTE} style={{position:'relative',width:4*S+5*G,height:4*S+5*G,margin:'0 auto 16px',borderRadius:18,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.06)',overflow:'hidden',transition:shake?'transform .08s ease':undefined,transform:shake?'translateX(-4px)':undefined}}>
+        {grid.map((row,r)=>row.map((v,c)=>v?<div key={`${r}-${c}-${v}`} style={mkTileStyle(v,r,c)}>{v}</div>:null))}
+        {popups.map(p=>(
+          <div key={p.id} style={{position:'absolute',left:'50%',top:'30%',transform:'translateX(-50%)',fontSize:'1.1rem',fontWeight:900,color:'#f6d365',textShadow:'0 2px 8px rgba(246,211,101,.6)',pointerEvents:'none',animation:'scoreFloat .8s ease forwards',zIndex:10}}>
+            +{p.val}
+          </div>
+        ))}
+        <style>{`@keyframes scoreFloat{0%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-60px)}}`}</style>
       </div>
-      
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,64px)',gap:6,justifyContent:'center',marginBottom:16}}>
-        <div/><button className="btn bg bs" onClick={()=>move('up')} style={{fontSize:'1.2rem',padding:'12px'}}>⬆️</button><div/>
-        <button className="btn bg bs" onClick={()=>move('left')} style={{fontSize:'1.2rem',padding:'12px'}}>⬅️</button>
-        <button className="btn bg bs" onClick={()=>move('down')} style={{fontSize:'1.2rem',padding:'12px'}}>⬇️</button>
-        <button className="btn bg bs" onClick={()=>move('right')} style={{fontSize:'1.2rem',padding:'12px'}}>➡️</button>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gridTemplateRows:'repeat(2,44px)',gridTemplateAreas:"'. up .' 'left down right'",gap:6,maxWidth:240,margin:'0 auto 16px'}}>
+        <ArrowBtn dir="up" icon={'\u25B2'} area="up"/><ArrowBtn dir="left" icon={'\u25C0'} area="left"/><ArrowBtn dir="down" icon={'\u25BC'} area="down"/><ArrowBtn dir="right" icon={'\u25B6'} area="right"/>
       </div>
-      
       <div style={{display:'flex',gap:8,justifyContent:'center'}}>
-        <button className="btn bg" onClick={resetGame} style={{fontSize:'.85rem'}}>🔄 Ricomincia</button>
+        <button className="btn bg" onClick={reset} style={{fontSize:'.82rem'}}>Nuova Partita</button>
       </div>
-      <div style={{textAlign:'center',marginTop:10,fontSize:'.7rem',color:'var(--text3)'}}>
-        Swipa o usa le frecce per muovere
-      </div>
+      <div style={{textAlign:'center',marginTop:10,fontSize:'.68rem',color:'var(--text3)'}}>Swipe o frecce / WASD</div>
     </div>
   );
 }
@@ -25385,7 +25362,7 @@ function SettingsTab({toast}) {
 
       <div className="set-section">
         <div className="set-title">info App</div>
-        <div className="set-row"><div className="set-label">Versione</div><div style={{fontSize:'.85rem',color:'var(--text2)',fontWeight:600}}>LaMiaVita v2.3</div></div>
+        <div className="set-row"><div className="set-label">Versione</div><div style={{fontSize:'.85rem',color:'var(--text2)',fontWeight:600}}>LaMiaVita v2.4</div></div>
         <div className="set-row"><div className="set-label">Database</div><div style={{fontSize:'.85rem',color:'var(--green)',fontWeight:600}}>Firebase Firestore</div></div>
         <div className="set-row"><div className="set-label">AI</div><div style={{fontSize:'.85rem',color:'var(--text2)',fontWeight:600}}>Groq llama-3.1</div></div>
         <div className="set-row">
