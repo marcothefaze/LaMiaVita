@@ -17043,6 +17043,7 @@ function SnakeGame({onBack, level, onWin, toast}) {
   const dirRef = useRef(dir);
   dirRef.current = dir;
   const canvasRef = useRef(null);
+  const touchRef = useRef({x:0,y:0});
   
   const speed = Math.max(60, 180 - level * 15);
   const boardSize = Math.min(520, window.innerWidth - 40);
@@ -17061,7 +17062,6 @@ function SnakeGame({onBack, level, onWin, toast}) {
     pulseRef.current += 0.05;
     const pulse = Math.sin(pulseRef.current) * 0.3 + 0.7;
     
-    // Rich background gradient
     const bgGrad = ctx.createLinearGradient(0, 0, boardSize, boardSize);
     bgGrad.addColorStop(0, '#0a0f1a');
     bgGrad.addColorStop(0.5, '#0d1520');
@@ -17069,7 +17069,6 @@ function SnakeGame({onBack, level, onWin, toast}) {
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, boardSize, boardSize);
     
-    // Grid pattern - subtle cyan dots instead of lines
     ctx.fillStyle = 'rgba(6, 214, 160, 0.08)';
     for (let i = 0; i < gridSize; i++) {
       for (let j = 0; j < gridSize; j++) {
@@ -17077,7 +17076,6 @@ function SnakeGame({onBack, level, onWin, toast}) {
       }
     }
     
-    // Draw connecting segments between snake parts
     if (snake.length > 1) {
       for (let i = 0; i < snake.length - 1; i++) {
         const cur = snake[i], next = snake[i+1];
@@ -17095,29 +17093,17 @@ function SnakeGame({onBack, level, onWin, toast}) {
       }
     }
     
-    // Draw snake with gradient effect - connecting segments
     snake.forEach((seg, idx) => {
       const t = idx / snake.length;
       const isHead = idx === 0;
-      
-      // Color gradient from head (bright) to tail (darker)
       const r = isHead ? 6 : Math.round(6 + t * 20);
       const g = isHead ? 214 : Math.round(214 - t * 40);
       const b = isHead ? 160 : Math.round(160 - t * 30);
       
-      if (isHead) {
-        ctx.shadowColor = 'rgba(6, 214, 160, 0.9)';
-        ctx.shadowBlur = 25;
-      } else if (idx < 3) {
-        ctx.shadowColor = 'rgba(6, 214, 160, 0.3)';
-        ctx.shadowBlur = 12;
-      }
+      if (isHead) { ctx.shadowColor = 'rgba(6, 214, 160, 0.9)'; ctx.shadowBlur = 25; }
+      else if (idx < 3) { ctx.shadowColor = 'rgba(6, 214, 160, 0.3)'; ctx.shadowBlur = 12; }
       
-      // Main body segment
-      const grad = ctx.createRadialGradient(
-        seg.x*cs+cs/2, seg.y*cs+cs/2, 0,
-        seg.x*cs+cs/2, seg.y*cs+cs/2, cs/2
-      );
+      const grad = ctx.createRadialGradient(seg.x*cs+cs/2, seg.y*cs+cs/2, 0, seg.x*cs+cs/2, seg.y*cs+cs/2, cs/2);
       grad.addColorStop(0, `rgba(${r+30},${g+30},${b+30},1)`);
       grad.addColorStop(0.7, `rgba(${r},${g},${b},1)`);
       grad.addColorStop(1, `rgba(${r-20},${g-20},${b-20},1)`);
@@ -17133,7 +17119,6 @@ function SnakeGame({onBack, level, onWin, toast}) {
       ctx.fill();
       ctx.shadowBlur = 0;
       
-      // Connecting bridge to next segment
       if (idx < snake.length - 1) {
         const next = snake[idx+1];
         const dx = next.x - seg.x, dy = next.y - seg.y;
@@ -17145,22 +17130,18 @@ function SnakeGame({onBack, level, onWin, toast}) {
         else ctx.fillRect(seg.x*cs+cs*0.25, by, bridgeH, bridgeW);
       }
       
-      // Head details
       if (isHead) {
         const cx = seg.x*cs+cs/2, cy = seg.y*cs+cs/2;
-        // Draw tongue when moving
         const tongueLen = cs * 0.5;
         const dir = dirRef.current;
         const tx = cx + dir.x * tongueLen;
         const ty = cy + dir.y * tongueLen;
         ctx.strokeStyle = 'rgba(255,77,109,0.8)';
         ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(cx+dir.x*cs*0.4, cy+dir.y*cs*0.4);
-        ctx.lineTo(tx, ty); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx+dir.x*cs*0.4, cy+dir.y*cs*0.4); ctx.lineTo(tx, ty); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx+dir.y*3, ty+dir.x*3); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx-dir.y*3, ty-dir.x*3); ctx.stroke();
         
-        // Eyes
         ctx.fillStyle = '#fff';
         const eyeSize = cs*0.18, eyeOffset = cs*0.28;
         let ex1,ey1,ex2,ey2;
@@ -17168,8 +17149,7 @@ function SnakeGame({onBack, level, onWin, toast}) {
         else if (dir.x===-1) { ex1=cx-eyeOffset*0.4; ey1=cy-eyeOffset*0.8; ex2=cx-eyeOffset*0.4; ey2=cy+eyeOffset*0.8; }
         else if (dir.y===-1) { ex1=cx-eyeOffset*0.8; ey1=cy-eyeOffset*0.4; ex2=cx+eyeOffset*0.8; ey2=cy-eyeOffset*0.4; }
         else { ex1=cx-eyeOffset*0.8; ey1=cy+eyeOffset*0.4; ex2=cx+eyeOffset*0.8; ey2=cy+eyeOffset*0.4; }
-        ctx.shadowColor = 'rgba(255,255,255,0.5)';
-        ctx.shadowBlur = 8;
+        ctx.shadowColor = 'rgba(255,255,255,0.5)'; ctx.shadowBlur = 8;
         ctx.beginPath(); ctx.arc(ex1,ey1,eyeSize,0,Math.PI*2); ctx.fill();
         ctx.beginPath(); ctx.arc(ex2,ey2,eyeSize,0,Math.PI*2); ctx.fill();
         ctx.shadowBlur = 0;
@@ -17179,7 +17159,6 @@ function SnakeGame({onBack, level, onWin, toast}) {
       }
     });
     
-    // Draw particles
     const parts = particlesRef.current;
     for (let i = parts.length - 1; i >= 0; i--) {
       const p = parts[i];
@@ -17191,7 +17170,6 @@ function SnakeGame({onBack, level, onWin, toast}) {
     }
     ctx.globalAlpha = 1;
     
-    // Score popups
     const pops = scorePopupsRef.current;
     for (let i = pops.length - 1; i >= 0; i--) {
       const pop = pops[i];
@@ -17205,24 +17183,18 @@ function SnakeGame({onBack, level, onWin, toast}) {
     }
     ctx.globalAlpha = 1;
     
-    // Food
     const foodSize = cs * 0.42 * pulse;
     ctx.shadowColor = 'rgba(255, 77, 109, 0.9)';
     ctx.shadowBlur = 30;
-    const foodGrad = ctx.createRadialGradient(
-      food.x*cs+cs/2, food.y*cs+cs/2, 0,
-      food.x*cs+cs/2, food.y*cs+cs/2, cs*0.5
-    );
+    const foodGrad = ctx.createRadialGradient(food.x*cs+cs/2, food.y*cs+cs/2, 0, food.x*cs+cs/2, food.y*cs+cs/2, cs*0.5);
     foodGrad.addColorStop(0, '#ff6b8a');
     foodGrad.addColorStop(0.5, '#FF4D6D');
     foodGrad.addColorStop(1, '#cc3d55');
     ctx.fillStyle = foodGrad;
     ctx.beginPath(); ctx.arc(food.x*cs+cs/2, food.y*cs+cs/2, foodSize, 0, Math.PI*2); ctx.fill();
     ctx.shadowBlur = 0;
-    // Food shine
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.beginPath(); ctx.arc(food.x*cs+cs*0.35, food.y*cs+cs*0.35, cs*0.1, 0, Math.PI*2); ctx.fill();
-    // Inner ring glow
     ctx.strokeStyle = `rgba(255,255,255,${0.2*pulse})`;
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.arc(food.x*cs+cs/2, food.y*cs+cs/2, cs*0.38, 0, Math.PI*2); ctx.stroke();
@@ -17281,34 +17253,77 @@ function SnakeGame({onBack, level, onWin, toast}) {
   
   const resetGame = () => { setSnake([{x:10,y:10}]); setFood({x:15,y:10}); setDir({x:1,y:0}); setScore(0); setRunning(true); setGameOver(false); };
   
+  const setDirSafe = (d) => {
+    const cur = dirRef.current;
+    if (d.x !== 0 && d.x === -cur.x) return;
+    if (d.y !== 0 && d.y === -cur.y) return;
+    setDir(d);
+  };
+
+  const onTS = (e) => { touchRef.current = {x: e.touches[0].clientX, y: e.touches[0].clientY}; };
+  const onTE = (e) => {
+    const dx = e.changedTouches[0].clientX - touchRef.current.x;
+    const dy = e.changedTouches[0].clientY - touchRef.current.y;
+    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
+    if (Math.abs(dx) > Math.abs(dy)) setDirSafe({x: dx > 0 ? 1 : -1, y: 0});
+    else setDirSafe({x: 0, y: dy > 0 ? 1 : -1});
+  };
+
+  const ArrowBtn = ({d, icon, area}) => (
+    <button onClick={() => setDirSafe(d)} style={{gridArea:area,width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:14,border:'1px solid rgba(6,214,160,.15)',background:'rgba(6,214,160,.08)',color:'#06D6A0',fontSize:'1.2rem',cursor:'pointer',transition:'all .12s',WebkitTapHighlightColor:'transparent',touchAction:'manipulation'}}
+      onMouseDown={e => e.currentTarget.style.background='rgba(6,214,160,.2)'}
+      onMouseUp={e => e.currentTarget.style.background='rgba(6,214,160,.08)'}
+      onMouseLeave={e => e.currentTarget.style.background='rgba(6,214,160,.08)'}
+    >{icon}</button>
+  );
+
   return (
-    <div style={{padding:'0 16px 100px'}}>
-      <div className="sh" style={{marginBottom:16}}>
-        <button className="ib" onClick={onBack}>← Indietro</button>
-        <div style={{fontWeight:600}}>🐍 Snake - Livello {level}</div>
+    <div style={{padding:'0 16px 100px',userSelect:'none'}}>
+      <div className="sh" style={{marginBottom:14}}>
+        <button className="ib" onClick={onBack}>{'\u2190'} Indietro</button>
+        <div style={{fontWeight:600}}>Snake \u2022 Lvl {level}</div>
       </div>
-      <div style={{display:'flex',justifyContent:'center',gap:24,marginBottom:16,fontSize:'.85rem'}}>
-        <span>Punteggio: <strong style={{color:'var(--accent)',fontSize:'1.1rem'}}>{score}</strong></span>
-        <span>Record: <strong style={{color:'var(--yellow)'}}>{highScore}</strong></span>
-      </div>
-      <div style={{borderRadius:20,overflow:'hidden',margin:'0 auto',boxShadow:'0 16px 60px rgba(0,0,0,0.6), 0 0 0 3px rgba(6,214,160,0.15), 0 0 40px rgba(6,214,160,0.1), inset 0 1px 0 rgba(255,255,255,0.08)',border:'2px solid rgba(6,214,160,0.2)'}}>
-        <canvas ref={canvasRef} width={boardSize} height={boardSize} style={{display:'block',width:boardSize,height:boardSize}} />
-      </div>
-      {gameOver && (
-        <div style={{textAlign:'center',marginTop:16,padding:16,background:'rgba(255,77,109,.1)',borderRadius:12,border:'1px solid rgba(255,77,109,.2)'}}>
-          <div style={{fontSize:'1.2rem',fontWeight:700,color:'var(--red)',marginBottom:8}}>💀 Game Over!</div>
-          <div style={{fontSize:'.9rem',color:'var(--text2)'}}>Punteggio: {score}</div>
+
+      <div style={{display:'flex',justifyContent:'center',gap:10,marginBottom:14}}>
+        <div style={{padding:'8px 18px',borderRadius:12,background:'rgba(6,214,160,.1)',border:'1px solid rgba(6,214,160,.2)',textAlign:'center'}}>
+          <div style={{fontSize:'.55rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:.5}}>Punteggio</div>
+          <div style={{fontSize:'1.4rem',fontWeight:900,color:'#06D6A0',marginTop:2}}>{score}</div>
         </div>
-      )}
-      <div style={{display:'flex',gap:8,justifyContent:'center',marginTop:16}}>
-        <button className="btn br" onClick={()=>setRunning(!running)} style={{minWidth:120,fontSize:'.9rem'}}>{running?'⏸ Pausa':'▶ Avvia'}</button>
-        <button className="btn bg" onClick={resetGame} style={{fontSize:'.9rem'}}>🔄 Ricomincia</button>
+        <div style={{padding:'8px 18px',borderRadius:12,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.08)',textAlign:'center'}}>
+          <div style={{fontSize:'.55rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:.5}}>Record</div>
+          <div style={{fontSize:'1.4rem',fontWeight:900,color:'var(--yellow)',marginTop:2}}>{highScore}</div>
+        </div>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(3,72px)',gap:8,justifyContent:'center',marginTop:20}}>
-        <div/><button className="btn bg bs" onClick={()=>{if(dirRef.current.y!==1)setDir({x:0,y:-1})}} style={{fontSize:'1.4rem',padding:'14px',borderRadius:14}}>⬆️</button><div/>
-        <button className="btn bg bs" onClick={()=>{if(dirRef.current.x!==1)setDir({x:-1,y:0})}} style={{fontSize:'1.4rem',padding:'14px',borderRadius:14}}>⬅️</button>
-        <button className="btn bg bs" onClick={()=>{if(dirRef.current.y!==-1)setDir({x:0,y:1})}} style={{fontSize:'1.4rem',padding:'14px',borderRadius:14}}>⬇️</button>
-        <button className="btn bg bs" onClick={()=>{if(dirRef.current.x!==-1)setDir({x:1,y:0})}} style={{fontSize:'1.4rem',padding:'14px',borderRadius:14}}>➡️</button>
+
+      <div onTouchStart={onTS} onTouchEnd={onTE} style={{borderRadius:20,overflow:'hidden',margin:'0 auto 14px',boxShadow:'0 16px 60px rgba(0,0,0,0.6), 0 0 0 3px rgba(6,214,160,0.15), 0 0 40px rgba(6,214,160,0.1)',border:'2px solid rgba(6,214,160,0.2)',position:'relative'}}>
+        <canvas ref={canvasRef} width={boardSize} height={boardSize} style={{display:'block',width:boardSize,height:boardSize}} />
+        {gameOver && (
+          <div style={{position:'absolute',inset:0,background:'rgba(0,0,0,.7)',backdropFilter:'blur(4px)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',borderRadius:20}}>
+            <div style={{fontSize:'2rem',marginBottom:6}}>Game Over</div>
+            <div style={{fontSize:'1rem',color:'var(--text2)',marginBottom:4}}>Punteggio: <strong style={{color:'#06D6A0'}}>{score}</strong></div>
+            {score >= highScore && score > 0 && <div style={{fontSize:'.8rem',color:'var(--yellow)',marginBottom:12}}>Nuovo record!</div>}
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={resetGame} style={{padding:'10px 24px',borderRadius:12,border:'1px solid rgba(6,214,160,.4)',background:'rgba(6,214,160,.15)',color:'#06D6A0',fontWeight:700,fontSize:'.85rem',cursor:'pointer'}}>Rigioca</button>
+              <button onClick={onBack} style={{padding:'10px 24px',borderRadius:12,border:'1px solid rgba(255,255,255,.1)',background:'rgba(255,255,255,.06)',color:'var(--text2)',fontWeight:600,fontSize:'.85rem',cursor:'pointer'}}>Menu</button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div style={{display:'flex',gap:8,justifyContent:'center',marginBottom:14}}>
+        <button onClick={() => setRunning(!running)} style={{padding:'8px 22px',borderRadius:12,border:`1px solid ${running?'rgba(251,191,36,.3)':'rgba(6,214,160,.3)'}`,background:running?'rgba(251,191,36,.1)':'rgba(6,214,160,.1)',color:running?'#FBBF24':'#06D6A0',fontWeight:700,fontSize:'.82rem',cursor:'pointer',transition:'all .15s'}}>
+          {running ? 'Pausa' : 'Avvia'}
+        </button>
+        <button onClick={resetGame} style={{padding:'8px 22px',borderRadius:12,border:'1px solid rgba(255,255,255,.08)',background:'rgba(255,255,255,.06)',color:'var(--text2)',fontWeight:600,fontSize:'.82rem',cursor:'pointer'}}>
+          Ricomincia
+        </button>
+      </div>
+
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gridTemplateRows:'repeat(2,52px)',gridTemplateAreas:"'. up .' 'left down right'",gap:6,maxWidth:220,margin:'0 auto'}}>
+        <ArrowBtn d={{x:0,y:-1}} icon={'\u25B2'} area="up"/>
+        <ArrowBtn d={{x:-1,y:0}} icon={'\u25C0'} area="left"/>
+        <ArrowBtn d={{x:0,y:1}} icon={'\u25BC'} area="down"/>
+        <ArrowBtn d={{x:1,y:0}} icon={'\u25B6'} area="right"/>
       </div>
     </div>
   );
