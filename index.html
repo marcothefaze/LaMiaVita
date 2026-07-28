@@ -9326,6 +9326,8 @@ function CalTab({toast}) {
   const [showDayView,setShowDayView]=useState(false);
   const [mod,setMod]=useState(false);
   const [bdMod,setBdMod]=useState(false);
+  const [editMod,setEditMod]=useState(false);
+  const [editingEv,setEditingEv]=useState(null);
   const [showUpcoming, setShowUpcoming] = useState(false);
   const [showUpcomingBdays, setShowUpcomingBdays] = useState(false);
   const [gcalConnected, setGcalConnected] = useState(() => localStorage.getItem('lmv_gcal_connected') === 'true');
@@ -9439,8 +9441,18 @@ function CalTab({toast}) {
 
   const up=[...events].sort((a,b)=>new Date(a.date)-new Date(b.date)).filter(e=>e.date>=ts).slice(0,10);
 
+  const openEdit=(ev)=>{
+    setF({title:ev.title,date:ev.date,time:ev.time||'',color:ev.color||'#FF4D6D',repeat:ev.repeat||'none',endDate:ev.endDate||''});
+    setEditingEv(ev);
+    setMod(true);
+  };
   const add=()=>{
     if(!f.title||!f.date){toast('Inserisci titolo e data','var(--red)');return;}
+    if(editingEv){
+      delEvent(editingEv.id);
+      addEvent({...f, id:editingEv.id});
+      toast('Evento aggiornato! ✅','var(--green)');
+    } else if
     if(f.repeat==='none'){
       addEvent(f);
       toast('Evento aggiunto!', 'var(--green)');
@@ -9464,7 +9476,7 @@ function CalTab({toast}) {
       eventsToAdd.forEach(ev => addEvent(ev));
       toast(count + ' eventi ricorrenti aggiunti! 🔁', 'var(--green)');
     }
-    setMod(false);
+    setMod(false);setEditMod(false);setEditingEv(null);
     setF({title:'',date:ts,time:'',color:'#FF4D6D',repeat:'none',endDate:''});
   };
   const addBd=()=>{
@@ -9588,7 +9600,7 @@ function CalTab({toast}) {
                           <div style={{flex:1}}>
                             <div style={{fontWeight:600,fontSize:'.82rem'}}>{e.title}</div>
                           </div>
-                          <div className="ib" style={{color:'var(--red)',fontSize:'.7rem'}} onClick={()=>{delEvent(e.id);toast('Eliminato','var(--red)');}}>x</div>
+                          <div className="ib" style={{color:'#FFB347',fontSize:'.7rem',marginRight:2}} onClick={()=>openEdit(e)}>✏️</div><div className="ib" style={{color:'var(--red)',fontSize:'.7rem'}} onClick={()=>{delEvent(e.id);toast('Eliminato','var(--red)');}}>x</div>
                         </div>
                       ))}
                       {hourEvents.map(e => (
@@ -9598,7 +9610,7 @@ function CalTab({toast}) {
                           <div style={{flex:1}}>
                             <div style={{fontWeight:600,fontSize:'.82rem'}}>{e.title}</div>
                           </div>
-                          <div className="ib" style={{color:'var(--red)',fontSize:'.7rem'}} onClick={()=>{delEvent(e.id);toast('Eliminato','var(--red)');}}>x</div>
+                          <div className="ib" style={{color:'#FFB347',fontSize:'.7rem',marginRight:2}} onClick={()=>openEdit(e)}>✏️</div><div className="ib" style={{color:'var(--red)',fontSize:'.7rem'}} onClick={()=>{delEvent(e.id);toast('Eliminato','var(--red)');}}>x</div>
                         </div>
                       ))}
                       {!hourEvents.length && h > 0 && untypedEvents.length === 0 && selEvents.length === 0 && <div style={{fontSize:'.7rem',color:'var(--text2)',opacity:0.5}}>-</div>}
@@ -9617,6 +9629,7 @@ function CalTab({toast}) {
                     <div style={{fontWeight:600,fontSize:'.85rem'}}>{e.title}</div>
                     {e.time && <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{e.time}</div>}
                   </div>
+                  <div className="ib" style={{color:'#FFB347',fontSize:'.72rem',marginRight:4}} onClick={()=>openEdit(e)}>✏️</div>
                   <div className="ib" style={{color:'var(--red)',fontSize:'.75rem'}} onClick={()=>{delEvent(e.id);toast('Eliminato','var(--red)');}}>x</div>
                 </div>
               ))}
@@ -9652,7 +9665,7 @@ function CalTab({toast}) {
                          <div style={{fontSize:'.78rem',color:'var(--text2)'}}>{parseInt(parts[2])} {MS[parseInt(parts[1])-1]}{e.time?' alle '+e.time:''}</div>
                          {daysUntil&&<div style={{fontSize:'.72rem',fontWeight:600,color:e.color,marginTop:4}}>{daysUntil}</div>}
                        </div>
-                       <div className="ib" style={{color:'var(--red)',cursor:'pointer',zIndex:1,position:'relative',flexShrink:0}} onClick={(ev)=>{ev.stopPropagation();delEvent(e.id);toast('Eliminato','var(--red)');}}>🗑️</div>
+                       <div className="ib" style={{color:'#FFB347',cursor:'pointer',zIndex:1,position:'relative',flexShrink:0,marginRight:6}} onClick={(ev)=>{ev.stopPropagation();openEdit(e);}}>✏️</div><div className="ib" style={{color:'var(--red)',cursor:'pointer',zIndex:1,position:'relative',flexShrink:0}} onClick={(ev)=>{ev.stopPropagation();delEvent(e.id);toast('Eliminato','var(--red)');}}>🗑️</div>
                      </div>
                    </div>
                  );
@@ -9709,7 +9722,7 @@ function CalTab({toast}) {
           </div>
         </div>
       </Modal>
-      <Modal open={mod} onClose={()=>setMod(false)} title="📅 Nuovo Evento" footer={<><button className="btn bg" onClick={()=>setMod(false)}>Annulla</button><button className="btn bt" onClick={add}>Salva</button></>}>
+      <Modal open={mod||editMod} onClose={()=>{setMod(false);setEditMod(false);setEditingEv(null);}} title={editingEv ? '✏️ Modifica Evento' : '📅 Nuovo Evento'} footer={<><button className="btn bg" onClick={()=>{setMod(false);setEditMod(false);setEditingEv(null);}}>Annulla</button><button className="btn bt" onClick={add}>{editingEv ? 'Aggiorna' : 'Salva'}</button></>}>
         <div className="fl"><label>Titolo</label><input className="field" placeholder="Esame, Riunione..." value={f.title} onChange={e=>setF(x=>({...x,title:e.target.value}))}/></div>
         <div className="fl"><label>Data</label><input className="field" type="date" value={f.date} onChange={e=>setF(x=>({...x,date:e.target.value}))}/></div>
         <div className="fl"><label>Ora</label><input className="field" type="time" value={f.time} onChange={e=>setF(x=>({...x,time:e.target.value}))}/></div>
@@ -19150,19 +19163,20 @@ function CreateModal({type,onClose,onSave,toast}) {
 
 // - REMINDERS TAB -
 function RemindersTab({toast}) {
-  const {addEvent, events, reminders, addReminder, delReminder, toggleReminder, updateReminder} = useContext(DataCtx);
+  const {addEvent, reminders, addReminder, delReminder, updateReminder} = useContext(DataCtx);
   const [mod, setMod] = useState(false);
+  const [editMod, setEditMod] = useState(false);
+  const [editingRem, setEditingRem] = useState(null);
   const [snoozeMod, setSnoozeMod] = useState(false);
   const [activeSnooze, setActiveSnooze] = useState(null);
   const [notifPerm, setNotifPerm] = useState(Notification.permission);
   const [f, setF] = useState({title:'',note:'',date:'',time:'',repeat:'once',addCal:false,priority:'normal'});
-  const [showReminderToast, setShowReminderToast] = useState(null);
 
   const requestPerm = async() => {
     const p = await Notification.requestPermission();
     setNotifPerm(p);
-    if(p==='granted') toast('Notifiche attivate! 🔔','var(--green)');
-    else toast('Notifiche non autorizzate','var(--red)');
+    if(p==='granted') toast('Notifiche attivate! \uD83D\uDD14','var(--green)');
+    else toast('Non autorizzate','var(--red)');
   };
 
   useEffect(()=>{
@@ -19172,10 +19186,11 @@ function RemindersTab({toast}) {
       const todayStr = now.toISOString().split('T')[0];
       const nowTime = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
       const nowSec = now.getSeconds();
-      
       reminders.forEach(rem=>{
-        if(rem.fired && rem.repeat!=='daily') return;
-        const matchDate = rem.repeat==='daily' || rem.date===todayStr;
+        if(rem.fired && rem.repeat!=='daily' && rem.repeat!=='weekdays') return;
+        const isWeekday = rem.repeat==='weekdays';
+        const dow = now.getDay();
+        const matchDate = rem.repeat==='daily' || (isWeekday && dow>=1 && dow<=5) || rem.date===todayStr;
         const key = rem.id+'-'+nowTime;
         if(matchDate && rem.time===nowTime && !lastShown.has(key)){
           lastShown.add(key);
@@ -19189,7 +19204,7 @@ function RemindersTab({toast}) {
                 requireInteraction: rem.priority==='high',
                 vibrate: rem.priority==='high' ? [200,100,200] : [100]
               });
-              notif.onclick = () => { window.focus(); setSnoozeMod(false); };
+              notif.onclick = () => window.focus();
             }catch(e){}
           }
           if(rem.repeat==='once'){
@@ -19197,7 +19212,6 @@ function RemindersTab({toast}) {
           }
         }
       });
-      
       if(nowSec < 5) lastShown.clear();
     };
     const interval = setInterval(check, 10000);
@@ -19208,80 +19222,70 @@ function RemindersTab({toast}) {
   const snooze = (rem, mins) => {
     const snoozedUntil = new Date(Date.now() + mins * 60000);
     const snoozedTime = String(snoozedUntil.getHours()).padStart(2,'0')+':'+String(snoozedUntil.getMinutes()).padStart(2,'0');
-    saveReminders(reminders.map(r=>r.id===rem.id?{...r,fired:false,snoozedUntil:snoozedUntil.toISOString(),snoozedTime}:r));
+    updateReminder(rem.id, {fired:false, snoozedUntil:snoozedUntil.toISOString(), snoozedTime});
     setSnoozeMod(false);
     setActiveSnooze(null);
-    toast('Snooze ' + mins + ' min! ⏰','var(--blue)');
+    toast('Snooze ' + mins + ' min! \u23F0','var(--blue)');
     playSound('click');
   };
 
-    const add = () => {
-      if(!f.title.trim()){toast('Inserisci il titolo','var(--red)');return;}
-      let finalTime = f.time;
-      let finalDate = f.date;
-      if (!finalTime) {
-        const now = new Date();
-        finalTime = now.toTimeString().slice(0,5); // HH:mm
-      }
-      if (!finalDate) {
-        const today = new Date();
-        finalDate = today.toISOString().split('T')[0]; // YYYY-MM-DD
-      }
-      if(f.repeat==='once'&&!finalDate){toast('Inserisci la data','var(--red)');return;}
-      if(!finalTime){toast('Inserisci l\'orario','var(--red)');return;}
-      const remData = {title:f.title, note:f.note, date:finalDate, time:finalTime, repeat:f.repeat, priority:f.priority};
-      if(f.addCal && finalDate && addEvent) {
-        addEvent({
-          id:Date.now()+1,
-          title:'[Promemoria] '+f.title.trim(),
-          date:finalDate,
-          time:finalTime,
-          color:'#FFD166',
-          fromReminder:true
-        });
+  const openAdd = () => {
+    setF({title:'',note:'',date:new Date().toISOString().split('T')[0],time:'',repeat:'once',addCal:false,priority:'normal'});
+    setEditingRem(null);
+    setEditMod(false);
+    setMod(true);
+  };
+
+  const openEdit = (rem) => {
+    setF({title:rem.title, note:rem.note||'', date:rem.date||'', time:rem.time||'', repeat:rem.repeat||'once', addCal:false, priority:rem.priority||'normal'});
+    setEditingRem(rem);
+    setEditMod(true);
+  };
+
+  const save = () => {
+    if(!f.title.trim()){toast('Inserisci il titolo','var(--red)');return;}
+    let finalTime = f.time || new Date().toTimeString().slice(0,5);
+    let finalDate = f.date || new Date().toISOString().split('T')[0];
+    if(f.repeat==='once'&&!finalDate){toast('Inserisci la data','var(--red)');return;}
+    const remData = {title:f.title, note:f.note, date:finalDate, time:finalTime, repeat:f.repeat, priority:f.priority};
+    if(editingRem) {
+      updateReminder(editingRem.id, remData);
+      toast('Promemoria aggiornato! \u2705','var(--green)');
+    } else {
+      if(f.addCal && addEvent) {
+        addEvent({id:Date.now()+1, title:'[Promemoria] '+f.title.trim(), date:finalDate, time:finalTime, color:'#FFD166', fromReminder:true});
       }
       addReminder(remData);
-      setMod(false);
-      setF({title:'',note:'',date:'',time:'',repeat:'once',addCal:false,priority:'normal'});
-      toast(f.addCal?'Promemoria aggiunto e calendariato!':'Promemoria aggiunto!','var(--yellow)');
-      playSound('save');
-    };
-
-  const del = (id) => {
-    delReminder(id);
-    toast('Eliminato','var(--red)');
-    playSound('click');
+      toast(f.addCal?'Aggiunto e calendariato!':'Aggiunto! \u2705','var(--green)');
+    }
+    playSound('save');
+    setMod(false);
+    setEditMod(false);
+    setEditingRem(null);
+    setF({title:'',note:'',date:'',time:'',repeat:'once',addCal:false,priority:'normal'});
   };
 
-  const today = new Date().toISOString().split('T')[0];
-  const active = reminders.filter(r=>!r.fired||(r.repeat==='daily'));
-  const done   = reminders.filter(r=>r.fired&&r.repeat==='once');
+  const del = (id) => { delReminder(id); toast('Eliminato','var(--red)'); playSound('click'); };
 
+  const today = new Date().toISOString().split('T')[0];
+  const active = reminders.filter(r=>!r.fired||(r.repeat==='daily')||(r.repeat==='weekdays'));
+  const done = reminders.filter(r=>r.fired&&r.repeat==='once');
   const REPEAT_LABEL = {once:'Una volta',daily:'Ogni giorno',weekdays:'Giorni feriali'};
+
+  const card = {background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:16,marginBottom:10,display:'flex',gap:14,alignItems:'flex-start',transition:'all .2s'};
+  const actionBtn = (color) => ({color,fontSize:'1.1rem',background:color+'15',border:'none',borderRadius:10,padding:'8px',cursor:'pointer',flexShrink:0});
 
   return (
     <div className="fi2">
-      {showReminderToast&&(
-        <div style={{position:'fixed',top:70,left:12,right:12,zIndex:9999,background:'linear-gradient(135deg,#FF4D6D,#FF6B9D)',borderRadius:14,padding:'16px 20px',boxShadow:'0 8px 32px rgba(255,77,109,.4)',animation:'slideDown .3s ease',maxWidth:500,margin:'0 auto'}}>
-          <div style={{display:'flex',alignItems:'center',gap:12}}>
-            <div style={{fontSize:'2rem'}}>⏰</div>
-            <div style={{flex:1}}>
-              <div style={{fontWeight:700,fontSize:'1rem',marginBottom:4}}>{showReminderToast.title}</div>
-              {showReminderToast.note&&<div style={{fontSize:'.85rem',opacity:.9}}>{showReminderToast.note}</div>}
-            </div>
-            <button onClick={()=>setShowReminderToast(null)} style={{background:'rgba(255,255,255,.2)',border:'none',borderRadius:8,padding:'6px 10px',cursor:'pointer',color:'#fff',fontWeight:700}}>OK</button>
-          </div>
-        </div>
-      )}
       <div className="sh">
-        <div className="sht">⏰ <em>Promemoria</em></div>
-        <button className="btn by bs" onClick={()=>{setF(x=>({...x,date:new Date().toISOString().split('T')[0]}));setMod(true);}}>+ Nuovo</button>
+        <div className="sht">{'\u23F0'} <em>Promemoria</em></div>
+        <button className="btn by bs" onClick={openAdd}>+ Nuovo</button>
       </div>
 
       {notifPerm!=='granted'&&(
         <div style={{background:'linear-gradient(135deg,rgba(255,209,102,.1),rgba(255,140,66,.05))',border:'1px solid rgba(255,209,102,.3)',borderRadius:16,padding:'16px 18px',marginBottom:16}}>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
-            <div style={{fontSize:'2rem'}}>🔔</div>
+            <div style={{fontSize:'2rem'}}>{'\uD83D\uDD14'}</div>
             <div style={{flex:1}}>
               <div style={{fontWeight:700,marginBottom:3}}>Attiva le notifiche</div>
               <div style={{fontSize:'.82rem',color:'var(--text2)'}}>Per ricevere i promemoria anche in background</div>
@@ -19293,12 +19297,11 @@ function RemindersTab({toast}) {
 
       {notifPerm==='granted'&&(
         <div style={{background:'rgba(6,214,160,.1)',border:'1px solid rgba(6,214,160,.25)',borderRadius:12,padding:'12px 16px',marginBottom:14,display:'flex',alignItems:'center',gap:10}}>
-          <span style={{fontSize:'1.2rem'}}>🔔</span>
+          <span style={{fontSize:'1.2rem'}}>{'\uD83D\uDD14'}</span>
           <span style={{fontSize:'.85rem',color:'var(--green)'}}>Notifiche attive</span>
         </div>
       )}
 
-      {/* Stats */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:16}}>
         <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:14,padding:'14px',textAlign:'center'}}>
           <div style={{fontSize:'1.8rem',fontWeight:700,color:'var(--yellow)'}}>{active.length}</div>
@@ -19314,26 +19317,30 @@ function RemindersTab({toast}) {
         </div>
       </div>
 
-      {active.length===0&&<Empty icon="⏰" text="Nessun promemoria" sub='Clicca "+ Nuovo" per aggiungerne uno'/>}
+      {active.length===0&&<Empty icon={'\u23F0'} text="Nessun promemoria" sub='Clicca "+ Nuovo" per aggiungerne uno'/>}
 
       {active.length>0&&<>
         <div style={{fontWeight:700,marginBottom:12,fontSize:'.9rem',display:'flex',alignItems:'center',gap:8}}>
-          <span>📌</span> Attivi
+          <span>{'\uD83D\uDCCC'}</span> Attivi
         </div>
         {active.map(rem=>(
-          <div key={rem.id} style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:16,marginBottom:10,display:'flex',gap:14,alignItems:'flex-start',transition:'all .2s'}}>
-            <div style={{width:48,height:48,borderRadius:14,background:'linear-gradient(135deg,rgba(255,209,102,.2),rgba(255,140,66,.1))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',flexShrink:0}}>⏰</div>
+          <div key={rem.id} style={card}>
+            <div style={{width:48,height:48,borderRadius:14,background:rem.priority==='high'?'linear-gradient(135deg,rgba(255,77,109,.2),rgba(255,107,107,.1))':'linear-gradient(135deg,rgba(255,209,102,.2),rgba(255,140,66,.1))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',flexShrink:0}}>
+              {rem.priority==='high' ? '\u26A0\uFE0F' : '\u23F0'}
+            </div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontWeight:700,fontSize:'1rem',marginBottom:4}}>{rem.title}</div>
               {rem.note&&<div style={{fontSize:'.82rem',color:'var(--text2)',marginBottom:6}}>{rem.note}</div>}
               <div style={{display:'flex',gap:12,flexWrap:'wrap',fontSize:'.78rem'}}>
-                <span style={{color:'var(--yellow)',display:'flex',alignItems:'center',gap:4}}>🕐 {rem.time}</span>
-                {rem.repeat==='once'&&<span style={{color:'var(--blue)',display:'flex',alignItems:'center',gap:4}}>📅 {rem.date}</span>}
-                <span style={{color:'var(--text2)',display:'flex',alignItems:'center',gap:4}}>🔁 {REPEAT_LABEL[rem.repeat]||rem.repeat}</span>
+                <span style={{color:'var(--yellow)',display:'flex',alignItems:'center',gap:4}}>{'\uD83D\uDD50'} {rem.time}</span>
+                {rem.repeat==='once'&&<span style={{color:'var(--blue)',display:'flex',alignItems:'center',gap:4}}>{'\uD83D\uDCC5'} {rem.date}</span>}
+                <span style={{color:'var(--text2)',display:'flex',alignItems:'center',gap:4}}>{'\uD83D\uDD01'} {REPEAT_LABEL[rem.repeat]||rem.repeat}</span>
               </div>
             </div>
-            <div style={{display:'flex',flexDirection:'column',gap:8}}>
-              <button className="ib" style={{color:'var(--red)',fontSize:'1.2rem',background:'rgba(255,77,109,.1)',border:'none',borderRadius:10,padding:'8px'}} onClick={()=>del(rem.id)}>🗑️</button>
+            <div style={{display:'flex',flexDirection:'column',gap:6}}>
+              <button style={actionBtn('var(--blue)')} title="Snooze" onClick={()=>{setActiveSnooze(rem);setSnoozeMod(true);}}>{'\u23F0'}</button>
+              <button style={actionBtn('#FFB347')} title="Modifica" onClick={()=>openEdit(rem)}>{'\u270F\uFE0F'}</button>
+              <button style={actionBtn('var(--red)')} title="Elimina" onClick={()=>del(rem.id)}>{'\uD83D\uDDD1\uFE0F'}</button>
             </div>
           </div>
         ))}
@@ -19341,95 +19348,94 @@ function RemindersTab({toast}) {
 
       {done.length>0&&<>
         <div style={{fontWeight:700,margin:'20px 0 12px',fontSize:'.9rem',display:'flex',alignItems:'center',gap:8,color:'var(--text2)'}}>
-          <span>✅</span> Completati
+          <span>{'\u2705'}</span> Completati
         </div>
         {done.map(rem=>(
           <div key={rem.id} style={{background:'rgba(255,255,255,.02)',border:'1px solid rgba(255,255,255,.05)',borderRadius:16,padding:16,marginBottom:10,display:'flex',gap:14,alignItems:'flex-start',opacity:.7}}>
-            <div style={{width:48,height:48,borderRadius:14,background:'rgba(6,214,160,.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',flexShrink:0}}>✅</div>
+            <div style={{width:48,height:48,borderRadius:14,background:'rgba(6,214,160,.15)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',flexShrink:0}}>{'\u2705'}</div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontWeight:600,fontSize:'.9rem',color:'var(--text2)',textDecoration:'line-through'}}>{rem.title}</div>
               <div style={{fontSize:'.76rem',color:'var(--text2)',marginTop:4}}>Era alle {rem.time} del {rem.date}</div>
             </div>
-            <button className="ib" style={{color:'var(--red)',fontSize:'1.2rem',background:'rgba(255,77,109,.1)',border:'none',borderRadius:10,padding:'8px'}} onClick={()=>del(rem.id)}>🗑️</button>
+            <button style={actionBtn('var(--red)')} onClick={()=>del(rem.id)}>{'\uD83D\uDDD1\uFE0F'}</button>
           </div>
         ))}
       </>}
 
-      {/* Bottom Sheet - AGGIUNGI PROMEMORIA */}
-      {mod && (
+      {(mod||editMod) && (
         <>
-        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:2000,backdropFilter:'blur(4px)'}} onClick={()=>setMod(false)}/>
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:2000,backdropFilter:'blur(4px)'}} onClick={()=>{setMod(false);setEditMod(false);setEditingRem(null);}}/>
         <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--surface)',borderRadius:'24px 24px 0 0',padding:'24px 20px',paddingBottom:'max(24px, env(safe-area-inset-bottom))',zIndex:2001,animation:'slideUp .3s ease',maxHeight:'85vh',overflowY:'auto'}}>
-          {/* Handle */}
           <div style={{width:40,height:4,background:'rgba(255,255,255,.2)',borderRadius:2,margin:'0 auto 20px'}}/>
-          
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
             <div style={{fontWeight:700,fontSize:'1.15rem',display:'flex',alignItems:'center',gap:10}}>
-              <span style={{fontSize:'1.5rem'}}>⏰</span> Nuovo Promemoria
+              <span style={{fontSize:'1.5rem'}}>{editingRem ? '\u270F\uFE0F' : '\u23F0'}</span> {editingRem ? 'Modifica Promemoria' : 'Nuovo Promemoria'}
             </div>
-            <button onClick={()=>setMod(false)} style={{background:'rgba(255,77,109,.15)',border:'none',borderRadius:10,width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'var(--red)',fontSize:'1rem'}}>✕</button>
+            <button onClick={()=>{setMod(false);setEditMod(false);setEditingRem(null);}} style={{background:'rgba(255,77,109,.15)',border:'none',borderRadius:10,width:36,height:36,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'var(--red)',fontSize:'1rem'}}>{'\u2715'}</button>
           </div>
-          
+
           <div style={{marginBottom:16}}>
             <label style={{display:'block',fontSize:'.85rem',fontWeight:600,marginBottom:8,color:'var(--text2)'}}>Titolo *</label>
             <input className="field" placeholder="Es. Pillola, Palestra..." value={f.title} onChange={e=>setF(x=>({...x,title:e.target.value}))} style={{width:'100%',fontSize:'1rem',padding:'14px 16px'}}/>
           </div>
-          
+
           <div style={{marginBottom:16}}>
             <label style={{display:'block',fontSize:'.85rem',fontWeight:600,marginBottom:8,color:'var(--text2)'}}>Nota (opzionale)</label>
             <input className="field" placeholder="Dettagli..." value={f.note} onChange={e=>setF(x=>({...x,note:e.target.value}))} style={{width:'100%',fontSize:'1rem',padding:'14px 16px'}}/>
           </div>
-          
+
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
             <div>
               <label style={{display:'block',fontSize:'.85rem',fontWeight:600,marginBottom:8,color:'var(--text2)'}}>Ripetizione</label>
               <select className="field" value={f.repeat} onChange={e=>setF(x=>({...x,repeat:e.target.value}))} style={{width:'100%',padding:'14px 12px'}}>
-                <option value="once">📅 Una volta</option>
-                <option value="daily">🔁 Ogni giorno</option>
+                <option value="once">{'\uD83D\uDCC5'} Una volta</option>
+                <option value="daily">{'\uD83D\uDD01'} Ogni giorno</option>
+                <option value="weekdays">{'\uD83D\uDCBC'} Giorni feriali</option>
               </select>
             </div>
             <div>
-              <label style={{display:'block',fontSize:'.85rem',fontWeight:600,marginBottom:8,color:'var(--text2)'}}>Priorità</label>
+              <label style={{display:'block',fontSize:'.85rem',fontWeight:600,marginBottom:8,color:'var(--text2)'}}>Priorit{'\u00E0'}</label>
               <select className="field" value={f.priority} onChange={e=>setF(x=>({...x,priority:e.target.value}))} style={{width:'100%',padding:'14px 12px'}}>
-                <option value="normal">🟡 Normale</option>
-                <option value="high">🔴 Alta</option>
+                <option value="normal">{'\uD83D\uDFE1'} Normale</option>
+                <option value="high">{'\uD83D\uDD34'} Alta</option>
               </select>
             </div>
           </div>
-          
+
           {f.repeat==='once'&&(
             <div style={{marginBottom:16}}>
               <label style={{display:'block',fontSize:'.85rem',fontWeight:600,marginBottom:8,color:'var(--text2)'}}>Data *</label>
               <input className="field" type="date" value={f.date} min={today} onChange={e=>setF(x=>({...x,date:e.target.value}))} style={{width:'100%',padding:'14px 16px'}}/>
             </div>
           )}
-          
+
           <div style={{marginBottom:16}}>
             <label style={{display:'block',fontSize:'.85rem',fontWeight:600,marginBottom:8,color:'var(--text2)'}}>Orario *</label>
             <input className="field" type="time" value={f.time} onChange={e=>setF(x=>({...x,time:e.target.value}))} style={{width:'100%',padding:'14px 16px'}}/>
           </div>
-          
-          <label style={{display:'flex',alignItems:'center',gap:12,cursor:'pointer',marginBottom:24,padding:'12px 16px',background:'rgba(255,255,255,.03)',borderRadius:12,border:'1px solid var(--border)'}}>
-            <input type="checkbox" checked={f.addCal} onChange={e=>setF(x=>({...x,addCal:e.target.checked}))} style={{accentColor:'var(--yellow)',width:22,height:22}}/>
-            <span style={{fontSize:'.9rem'}}>Aggiungi anche al Calendario</span>
-          </label>
-          
+
+          {!editingRem&&(
+            <label style={{display:'flex',alignItems:'center',gap:12,cursor:'pointer',marginBottom:24,padding:'12px 16px',background:'rgba(255,255,255,.03)',borderRadius:12,border:'1px solid var(--border)'}}>
+              <input type="checkbox" checked={f.addCal} onChange={e=>setF(x=>({...x,addCal:e.target.checked}))} style={{accentColor:'var(--yellow)',width:22,height:22}}/>
+              <span style={{fontSize:'.9rem'}}>Aggiungi anche al Calendario</span>
+            </label>
+          )}
+
           <div style={{display:'flex',gap:12}}>
-            <button className="btn bg" onClick={()=>setMod(false)} style={{flex:1,padding:'16px'}}>Annulla</button>
-            <button className="btn by" onClick={add} style={{flex:2,padding:'16px',fontWeight:700}}>💾 Salva Promemoria</button>
+            <button className="btn bg" onClick={()=>{setMod(false);setEditMod(false);setEditingRem(null);}} style={{flex:1,padding:'16px'}}>Annulla</button>
+            <button className="btn by" onClick={save} style={{flex:2,padding:'16px',fontWeight:700}}>{editingRem ? '\uD83D\uDCBE Salva Modifiche' : '\uD83D\uDCBE Salva Promemoria'}</button>
           </div>
         </div>
         </>
       )}
-      
-      {/* Snooze Bottom Sheet */}
+
       {snoozeMod && (
         <>
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:2000}} onClick={()=>{setSnoozeMod(false);setActiveSnooze(null);}}/>
         <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--surface)',borderRadius:'24px 24px 0 0',padding:'24px 20px',paddingBottom:'max(24px, env(safe-area-inset-bottom))',zIndex:2001,animation:'slideUp .3s ease'}}>
           <div style={{width:40,height:4,background:'rgba(255,255,255,.2)',borderRadius:2,margin:'0 auto 16px'}}/>
           <div style={{textAlign:'center',marginBottom:20}}>
-            <div style={{fontSize:'3rem',marginBottom:12}}>💤</div>
+            <div style={{fontSize:'3rem',marginBottom:12}}>{'\uD83D\uDCA4'}</div>
             <div style={{fontWeight:700,fontSize:'1.1rem',marginBottom:4}}>Snooze</div>
             <div style={{fontSize:'.9rem',color:'var(--text2)'}}>{activeSnooze?.title}</div>
           </div>
@@ -19442,240 +19448,10 @@ function RemindersTab({toast}) {
         </div>
         </>
       )}
-
-      {/* AI Feature Modals */}
-      {aiPdfTable.show && (
-        <div className="modal-overlay" onClick={()=>setAiPdfTable(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:600}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>📊 Estrazione Tabelle PDF</h3>
-              <button className="ib" onClick={()=>setAiPdfTable(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <p style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:12}}>Carica un PDF per estrarre le tabelle di dati.</p>
-            <input type="file" accept=".pdf" onChange={e=>e.target.files[0] && extractPdfTable(e.target.files[0])} style={{marginBottom:12}}/>
-            {aiPdfTable.loading && <div style={{textAlign:'center',padding:20}}>⏳ Estrazione in corso...</div>}
-            {aiPdfTable.result && <pre style={{background:'var(--surface)',padding:12,borderRadius:8,overflow:'auto',maxHeight:300,fontSize:'.8rem',whiteSpace:'pre-wrap'}}>{aiPdfTable.result}</pre>}
-          </div>
-        </div>
-      )}
-      
-      {aiCodeHelper.show && (
-        <div className="modal-overlay" onClick={()=>setAiCodeHelper(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:600}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>💻 Assistente Codice</h3>
-              <button className="ib" onClick={()=>setAiCodeHelper(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <select className="cinp" value={aiCodeHelper.lang} onChange={e=>setAiCodeHelper(p=>({...p,lang:e.target.value}))} style={{marginBottom:8,width:'100%'}}>
-              <option value="javascript">JavaScript</option>
-              <option value="python">Python</option>
-              <option value="java">Java</option>
-              <option value="cpp">C++</option>
-              <option value="html">HTML/CSS</option>
-              <option value="sql">SQL</option>
-            </select>
-            <textarea className="cinp" rows={6} placeholder="Inserisci il codice..." value={aiCodeHelper.code} onChange={e=>setAiCodeHelper(p=>({...p,code:e.target.value}))} style={{marginBottom:8,width:'100%',fontFamily:'monospace'}}/>
-            <button className="btn br" onClick={runCodeHelper} disabled={aiCodeHelper.loading} style={{width:'100%'}}>
-              {aiCodeHelper.loading?'⏳':'🚀'} Analizza Codice
-            </button>
-            {aiCodeHelper.result && <div style={{marginTop:12,background:'var(--surface)',padding:12,borderRadius:8,maxHeight:250,overflow:'auto',fontSize:'.85rem',whiteSpace:'pre-wrap'}}>{aiCodeHelper.result}</div>}
-          </div>
-        </div>
-      )}
-      
-      {aiMathSolver.show && (
-        <div className="modal-overlay" onClick={()=>setAiMathSolver(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:600}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>🔢 Risolutore Matematico</h3>
-              <button className="ib" onClick={()=>setAiMathSolver(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <textarea className="cinp" rows={3} placeholder="Inserisci il problema matematico..." value={aiMathSolver.problem} onChange={e=>setAiMathSolver(p=>({...p,problem:e.target.value}))} style={{marginBottom:8,width:'100%'}}/>
-            <button className="btn br" onClick={solveMath} disabled={aiMathSolver.loading} style={{width:'100%'}}>
-              {aiMathSolver.loading?'⏳':'🔢'} Risolvi
-            </button>
-            {aiMathSolver.result && <div style={{marginTop:12,background:'var(--surface)',padding:12,borderRadius:8,maxHeight:300,overflow:'auto',fontSize:'.85rem',whiteSpace:'pre-wrap'}}>{aiMathSolver.result}</div>}
-          </div>
-        </div>
-      )}
-      
-      {aiBatchOps.show && (
-        <div className="modal-overlay" onClick={()=>setAiBatchOps(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:600}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>📦 Operazioni Batch</h3>
-              <button className="ib" onClick={()=>setAiBatchOps(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <p style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:8}}>Inserisci un elemento per riga:</p>
-            <textarea className="cinp" rows={4} placeholder="Elemento 1&#10;Elemento 2&#10;Elemento 3" value={aiBatchOps.items.join('\n')} onChange={e=>setAiBatchOps(p=>({...p,items:e.target.value.split('\n').filter(x=>x.trim())}))} style={{marginBottom:8,width:'100%'}}/>
-            <input className="cinp" placeholder="Operazione da eseguire (es. 'Traduci in inglese', 'Estrai i nomi')" value={aiBatchOps.operation} onChange={e=>setAiBatchOps(p=>({...p,operation:e.target.value}))} style={{marginBottom:8,width:'100%'}}/>
-            <button className="btn br" onClick={runBatchOp} disabled={aiBatchOps.loading || !aiBatchOps.items.length} style={{width:'100%'}}>
-              {aiBatchOps.loading?'⏳':'⚡'} Esegui
-            </button>
-            {aiBatchOps.result && <div style={{marginTop:12,background:'var(--surface)',padding:12,borderRadius:8,maxHeight:250,overflow:'auto',fontSize:'.85rem',whiteSpace:'pre-wrap'}}>{aiBatchOps.result}</div>}
-          </div>
-        </div>
-      )}
-      
-      {aiCompareMode.show && (
-        <div className="modal-overlay" onClick={()=>setAiCompareMode(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:600}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>⚖️ Modalità Confronto</h3>
-              <button className="ib" onClick={()=>setAiCompareMode(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <p style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:8}}>Aggiungi elementi da confrontare (uno per riga):</p>
-            <textarea className="cinp" rows={4} placeholder="Elemento A&#10;Elemento B" value={aiCompareMode.items.join('\n')} onChange={e=>setAiCompareMode(p=>({...p,items:e.target.value.split('\n').filter(x=>x.trim())}))} style={{marginBottom:8,width:'100%'}}/>
-            <button className="btn br" onClick={runComparison} disabled={aiCompareMode.loading || aiCompareMode.items.length<2} style={{width:'100%'}}>
-              {aiCompareMode.loading?'⏳':'⚖️'} Confronta
-            </button>
-            {aiCompareMode.result && <div style={{marginTop:12,background:'var(--surface)',padding:12,borderRadius:8,maxHeight:300,overflow:'auto',fontSize:'.85rem',whiteSpace:'pre-wrap'}}>{aiCompareMode.result}</div>}
-          </div>
-        </div>
-      )}
-      
-      {aiDebateMode.show && (
-        <div className="modal-overlay" onClick={()=>setAiDebateMode(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:650}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>🎭 Dibattito AI</h3>
-              <button className="ib" onClick={()=>setAiDebateMode(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <input className="cinp" placeholder="Argomento del dibattito..." value={aiDebateMode.topic} onChange={e=>setAiDebateMode(p=>({...p,topic:e.target.value}))} style={{marginBottom:8,width:'100%'}}/>
-            <div style={{display:'flex',gap:8}}>
-              <button className="btn br" onClick={startDebate} disabled={aiDebateMode.loading || !aiDebateMode.topic.trim()} style={{flex:1}}>
-                {aiDebateMode.loading?'⏳':'🎭'} Groq AI
-              </button>
-              <button className="btn bg" onClick={async () => {
-                if(!aiDebateMode.topic.trim()) return;
-                setAiDebateMode(p=>({...p, loading:true, positions:[], round:0, secondary:'deepseek'}));
-                try {
-                  const filesCtx = studyFiles.length > 0 ? '\n\n[MATERIALE DI RIFERIMENTO]:\n' + studyFiles.map(f => `--- ${f.name} ---\n${f.content.slice(0, 3000)}`).join('\n\n').slice(0, 12000) : '';
-                  const r = await proxyFetch('https://api.deepseek.com/v1/chat/completions', {
-                    method:'POST',
-                    headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('deepseek_key') || '')},
-                    body:(JSON.stringify({model:'deepseek-chat',max_tokens:1500,messages:[{role:'system',content:'Sei un assistente di dibattiti equilibrato. Fornisci prospettive diverse su qualsiasi argomento, basandoti sul materiale fornito.'},{role:'user',content:'Dibattito su: '+aiDebateMode.topic+filesCtx+'\n\nPresenta 2 posizioni contrastanti con almeno 3 argomentazioni ciascuna, basandoti sul materiale se disponibile.'}]}))
-                  });
-                  const d = await r.json();
-                  setAiDebateMode(p=>({...p, loading:false, positions:d.choices?.[0]?.message?.content?.split('\n\n')||[], round:1}));
-                } catch(e) {
-                  setAiDebateMode(p=>({...p, loading:false, result:'Errore Deepseek: '+e.message}));
-                }
-              }} disabled={aiDebateMode.loading || !aiDebateMode.topic.trim()}>
-                🔍 DeepSeek
-              </button>
-              <button className="btn bg" onClick={async () => {
-                if(!aiDebateMode.topic.trim()) return;
-                setAiDebateMode(p=>({...p, loading:true, positions:[], round:0, secondary:'grok'}));
-                try {
-                  const filesCtx = studyFiles.length > 0 ? '\n\n[MATERIALE DI RIFERIMENTO]:\n' + studyFiles.map(f => `--- ${f.name} ---\n${f.content.slice(0, 3000)}`).join('\n\n').slice(0, 12000) : '';
-                  const r = await proxyFetch('https://api.x.ai/v1/chat/completions', {
-                    method:'POST',
-                    headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('grok_key') || '')},
-                    body:(JSON.stringify({model:'grok-2-1212',max_tokens:1500,messages:[{role:'system',content:'Sei un assistente di dibattiti equilibrato. Fornisci prospettive diverse su qualsiasi argomento, basandoti sul materiale fornito.'},{role:'user',content:'Dibattito su: '+aiDebateMode.topic+filesCtx+'\n\nPresenta 2 posizioni contrastanti con almeno 3 argomentazioni ciascuna, basandoti sul materiale se disponibile.'}]}))
-                  });
-                  const d = await r.json();
-                  setAiDebateMode(p=>({...p, loading:false, positions:d.choices?.[0]?.message?.content?.split('\n\n')||[], round:1}));
-                } catch(e) {
-                  setAiDebateMode(p=>({...p, loading:false, result:'Errore Grok: '+e.message}));
-                }
-              }} disabled={aiDebateMode.loading || !aiDebateMode.topic.trim()}>
-                🌟 Grok
-              </button>
-            </div>
-            {aiDebateMode.positions.length>0 && (
-              <div style={{marginTop:12,background:'var(--surface)',padding:12,borderRadius:8,maxHeight:350,overflow:'auto',fontSize:'.85rem',whiteSpace:'pre-wrap',borderLeft:'3px solid '+(aiDebateMode.secondary==='grok'?'#FF6B6B':aiDebateMode.secondary==='deepseek'?'#00BFFF':'#9146FF')}}>
-                {(aiDebateMode.secondary==='grok' || aiDebateMode.secondary==='deepseek') && <div style={{fontSize:'.7rem',color:aiDebateMode.secondary==='grok'?'#FF6B6B':'#00BFFF',marginBottom:8}}>🔍 {aiDebateMode.secondary==='grok'?'Grok (xAI)':'DeepSeek'}</div>}
-                {aiDebateMode.positions.join('\n\n')}
-              </div>
-            )}
-            {aiDebateMode.result && (
-              <div style={{marginTop:12,background:'rgba(255,77,109,.1)',padding:12,borderRadius:8,fontSize:'.85rem',color:'var(--red)'}}>{aiDebateMode.result}</div>
-            )}
-          </div>
-        </div>
-      )}
-      
-      {aiDiagramSolver.show && (
-        <div className="modal-overlay" onClick={()=>setAiDiagramSolver(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:600}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>📈 Risolutore Diagrammi</h3>
-              <button className="ib" onClick={()=>setAiDiagramSolver(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <p style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:8}}>Carica un diagramma (grafico, schema, flow chart):</p>
-            <input type="file" accept="image/*" onChange={e=>e.target.files[0] && solveDiagram(e.target.files[0])} style={{marginBottom:12}}/>
-            {aiDiagramSolver.loading && <div style={{textAlign:'center',padding:20}}>⏳ Analisi in corso...</div>}
-            {aiDiagramSolver.result && <div style={{marginTop:12,background:'var(--surface)',padding:12,borderRadius:8,maxHeight:300,overflow:'auto',fontSize:'.85rem',whiteSpace:'pre-wrap'}}>{aiDiagramSolver.result}</div>}
-          </div>
-        </div>
-      )}
-      
-      {aiProgressiveDash.show && (
-        <div className="modal-overlay" onClick={()=>setAiProgressiveDash(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:500}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>📉 Dashboard Progressiva</h3>
-              <button className="ib" onClick={()=>setAiProgressiveDash(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:12,marginBottom:16}}>
-              <div style={{background:'var(--surface)',padding:16,borderRadius:12,textAlign:'center'}}>
-                <div style={{fontSize:'2rem',fontWeight:700}}>{aiProgressiveDash.data.events}</div>
-                <div style={{fontSize:'.75rem',color:'var(--text2)'}}>📅 Eventi</div>
-              </div>
-              <div style={{background:'var(--surface)',padding:16,borderRadius:12,textAlign:'center'}}>
-                <div style={{fontSize:'2rem',fontWeight:700}}>{aiProgressiveDash.data.notes}</div>
-                <div style={{fontSize:'.75rem',color:'var(--text2)'}}>📝 Note</div>
-              </div>
-              <div style={{background:'var(--surface)',padding:16,borderRadius:12,textAlign:'center'}}>
-                <div style={{fontSize:'2rem',fontWeight:700}}>{aiProgressiveDash.data.passwords}</div>
-                <div style={{fontSize:'.75rem',color:'var(--text2)'}}>🔐 Password</div>
-              </div>
-              <div style={{background:'var(--surface)',padding:16,borderRadius:12,textAlign:'center'}}>
-                <div style={{fontSize:'2rem',fontWeight:700}}>{aiProgressiveDash.data.birthdays}</div>
-                <div style={{fontSize:'.75rem',color:'var(--text2)'}}>🎂 Compleanni</div>
-              </div>
-            </div>
-            {aiProgressiveDash.insights.length>0 && (
-              <div style={{background:'rgba(139,92,246,.1)',padding:12,borderRadius:8}}>
-                <div style={{fontSize:'.8rem',fontWeight:600,marginBottom:8}}>💡 Insights</div>
-                {aiProgressiveDash.insights.map((insight,i)=><div key={i} style={{fontSize:'.85rem',marginBottom:4}}>{insight}</div>)}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-      
-      {aiLeaderboard.show && (
-        <div className="modal-overlay" onClick={()=>setAiLeaderboard(p=>({...p,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:400}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-              <h3 style={{margin:0}}>🏆 Classifica</h3>
-              <button className="ib" onClick={()=>setAiLeaderboard(p=>({...p,show:false}))}>✕</button>
-            </div>
-            <div style={{display:'flex',justifyContent:'center',gap:8,marginBottom:16}}>
-              {['week','month','all'].map(period=>(
-                <button key={period} className={`btn ${aiLeaderboard.timePeriod===period?'br':'bg'} bs`} onClick={()=>setAiLeaderboard(p=>({...p,timePeriod:period}))} style={{padding:'8px 16px'}}>
-                  {period==='week'? '7gg' : period==='month'? '30gg' : 'Tutto'}
-                </button>
-              ))}
-            </div>
-            {aiLeaderboard.scores.map((item,i)=>(
-              <div key={i} style={{display:'flex',alignItems:'center',gap:12,padding:'12px',background:i===0?'rgba(251,191,36,.1)':i===1?'rgba(192,192,192,.1)':i===2?'rgba(205,127,50,.1)':'var(--surface)',borderRadius:10,marginBottom:8,border:i<3?'1px solid rgba(251,191,36,.3)':'none'}}>
-                <div style={{fontSize:'1.3rem',fontWeight:700,width:30}}>{i+1}</div>
-                <div style={{fontSize:'1.5rem'}}>{item.icon}</div>
-                <div style={{flex:1}}>
-                  <div style={{fontWeight:600}}>{item.user}</div>
-                </div>
-                <div style={{fontWeight:700,color:'var(--accent)'}}>{item.score}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+
 
 // - AI PLUS TAB -
 function AIPlusTab({user, toast, events, notes, todos}) {
@@ -25942,1857 +25718,203 @@ function SlidesEditor({doc, onSave}) {
 
 
 
-function UniDashboard({onClose, addNote, toast}) {
-  const {addEvent, delEvent, events} = useContext(DataCtx);
-  const [view, setView] = useState('pomodoro');
+function DashboardHome({toast, setTab}) {
+  const {events, reminders, todos, notes, wallet, birthdays, passwords} = useContext(DataCtx);
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const days = ['Domenica','Luned\u00EC','Marted\u00EC','Mercoled\u00EC','Gioved\u00EC','Venerd\u00EC','Sabato'];
+  const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  const greeting = now.getHours() < 12 ? 'Buongiorno' : now.getHours() < 18 ? 'Buonasera' : 'Buonanotte';
+  const todayEvents = (events||[]).filter(e => e.date === today);
+  const upcomingEvents = (events||[]).filter(e => e.date > today).sort((a,b) => a.date.localeCompare(b.date)).slice(0,3);
+  const activeReminders = (reminders||[]).filter(r => !r.done);
+  const pendingTodos = (todos||[]).filter(t => !t.done);
+  const doneTodos = (todos||[]).filter(t => t.done);
+  const recentNotes = (notes||[]).slice(0,3);
+  const upcomingBirthdays = (birthdays||[]).filter(b => {
+    const bday = b.month + '-' + String(b.day).padStart(2,'0');
+    return bday >= today.slice(5);
+  }).sort((a,b) => (a.month+'-'+String(a.day).padStart(2,'0')).localeCompare(b.month+'-'+String(b.day).padStart(2,'0'))).slice(0,3);
+  const totalPw = (passwords||[]).length;
 
-  // Studia AI Features State
-  const [studiaPdfTable, setStudiaPdfTable] = useState({show:false, result:null, loading:false});
-  const [studiaCodeHelper, setStudiaCodeHelper] = useState({show:false, code:'', lang:'javascript', result:'', loading:false});
-  const [studiaMathSolver, setStudiaMathSolver] = useState({show:false, problem:'', result:'', loading:false});
-  const [studiaBatchOps, setStudiaBatchOps] = useState({show:false, items:[], operation:'', result:'', loading:false});
-  const [studiaCompareMode, setStudiaCompareMode] = useState({show:false, items:[], result:'', loading:false});
-  const [studiaDebateMode, setStudiaDebateMode] = useState({show:false, topic:'', positions:[], loading:false, round:0});
-  const [studiaDiagramSolver, setStudiaDiagramSolver] = useState({show:false, image:null, result:'', loading:false});
-  const [studiaProgressiveDash, setStudiaProgressiveDash] = useState({show:false, data:{}, insights:[]});
-  const [studiaLeaderboard, setStudiaLeaderboard] = useState({show:false, scores:[], timePeriod:'week'});
+  const quickActions = [
+    {icon:'\uD83D\uDCDD', label:'Nota', tab:'notes'},
+    {icon:'\u2705', label:'To-Do', tab:'todo'},
+    {icon:'\uD83D\uDCC5', label:'Evento', tab:'cal'},
+    {icon:'\uD83D\uDD14', label:'Promemoria', tab:'reminders'},
+    {icon:'\uD83D\uDCB0', label:'Wallet', tab:'wallet'},
+    {icon:'\uD83D\uDD10', label:'Password', tab:'pw'},
+  ];
 
-  // ── POMODORO ──
-  const [pomDurations, setPomDurations] = useState(()=>{
-    try{return JSON.parse(localStorage.getItem('pom_durations')||'null')||{work:25,short:5,long:15};}
-    catch(e){return {work:25,short:5,long:15};}
-  });
-  const [pomMode, setPomMode] = useState('work');
-  const [pomRunning, setPomRunning] = useState(false);
-  const [pomSecs, setPomSecs] = useState(() => {
-    try{return JSON.parse(localStorage.getItem('pom_durations')||'null')?.work*60||25*60;}
-    catch(e){return 25*60;}
-  });
-  const [pomCycles, setPomCycles] = useState(()=>{
-    try{return parseInt(localStorage.getItem('pom_cycles')||'0');}
-    catch(e){return 0;}
-  });
-  const [editingPom, setEditingPom] = useState(false);
-  const POM_DURATIONS = {work:pomDurations.work*60, short:pomDurations.short*60, long:pomDurations.long*60};
-  const savePomDurations = (d) => {setPomDurations(d);localStorage.setItem('pom_durations',JSON.stringify(d));};
-  const pomRef = useRef(null);
-  const pomDurationsRef = useRef(pomDurations);
-  pomDurationsRef.current = pomDurations;
-  useEffect(()=>{
-    if(pomRunning){
-      const intervalId = setInterval(()=>{
-        setPomSecs(s=>{
-          if(s<=1){
-            clearInterval(intervalId);
-            setTimeout(()=>{
-              setPomRunning(false);
-              playSound('alarm');
-              if(localStorage.getItem('lmv_notifsound')!=='off'){
-                try{
-                  if(Notification.permission==='granted'){
-                    new Notification(pomMode==='work'?'🍅 Studio finito!':'📚 Pausa finita!',{
-                      body: pomMode==='work'?'Ottimo lavoro! Fai una pausa.' : 'Torna a studiare!',
-                      icon: 'https://i.ibb.co/6JYFJ2hQ/un-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg',
-                      tag: 'pomodoro-dashboard',
-                      requireInteraction: true,
-                      vibrate: [300,100,300,100,300],
-                      silent: false
-                    });
-                  }
-                }catch(e){}
-              }
-              const nextMode = pomMode==='work'?'short':'work';
-              const nextDur = pomDurationsRef.current[nextMode]*60;
-              setPomCycles(c=>{
-                const newCount = pomMode==='work'?c+1:c;
-                localStorage.setItem('pom_cycles', newCount.toString());
-                if(pomMode==='work'){const s=logStudySession('work',pomDurationsRef.current.work);if(s)addEvent({id:s.id,title:'📖 Studio ('+s.duration+'m)',date:s.date,time:s.completedAt,color:'#10B981',fromStudy:true});}
-                return newCount;
-              });
-              if(pomMode!=='work') logStudySession('break',pomDurationsRef.current.short||5);
-              setPomMode(nextMode);
-              setPomSecs(nextDur);
-            },100);
-            return 0;
-          }
-          return s-1;
-        });
-      },1000);
-      pomRef.current = intervalId;
-    } else if(pomRef.current){
-      clearInterval(pomRef.current);
-    }
-    return()=>{if(pomRef.current)clearInterval(pomRef.current);};
-  },[pomRunning,pomMode]);
-
-  
-  // Subscribe to global pomodoro changes (from topbar) - dashboard owns the timer
-  useEffect(()=>{
-    if(!window._gpom) return;
-    const unsubscribe = window._gpom.subscribe((state) => {
-      // Only sync mode/durations, NOT running/secs - dashboard owns those
-      if(state.mode !== pomMode) setPomMode(state.mode);
-      if(JSON.stringify(state.durations) !== JSON.stringify(pomDurations)) setPomDurations(state.durations);
-    });
-    // Initialize from global state if it has custom values
-    const gpom = window._gpom;
-    if(gpom.durations.work !== 25){
-      setPomDurations(gpom.durations);
-    }
-    return unsubscribe;
-  },[]);
-  
-  // Sync to global (dashboard is the source of truth for timer)
-  useEffect(()=>{
-    if(!window._gpom) return;
-    window._gpom.mode = pomMode;
-    window._gpom.durations = pomDurations;
-    window._gpom.running = pomRunning;
-    window._gpom.secs = pomSecs;
-  },[pomMode, pomRunning, pomSecs, pomDurations]);
-  
-  const pomToggle = () => {
-    playSound('timer');
-    setPomRunning(r=>!r);
-  };
-  const pomReset = () => {
-    setPomRunning(false);
-    setPomSecs(POM_DURATIONS[pomMode]);
-  };
-  const setPomModeAndReset = (m) => {
-    playSound('click');
-    setPomMode(m);
-    setPomRunning(false);
-    setPomSecs(POM_DURATIONS[m]);
-  };
-  
-  const pomMins = String(Math.floor(pomSecs/60)).padStart(2,'0');
-  const pomSecStr = String(pomSecs%60).padStart(2,'0');
-  const pomTotal = POM_DURATIONS[pomMode];
-  const pomPct = (pomTotal-pomSecs)/pomTotal;
-  const pomR = 90;
-  const pomCirc = 2*Math.PI*pomR;
-  const pomColors = {work:'#FF4D6D',short:'#06D6A0',long:'#4CC9F0'};
-  const pomColor = pomColors[pomMode];
-
-  // ── MEDIA PONDERATA ──
-  const [esami, setEsami] = useState([]);
-  const [esamiF, setEsamiF] = useState({nome:'',voto:'',cfu:''});
-  const [cfuTarget, setCfuTarget] = useState('180');
-  useEffect(()=>{window._idb.getAll('esami').then(e=>setEsami(e)).catch(()=>setEsami([]));const saved=localStorage.getItem('uni_cfu_target');if(saved)setCfuTarget(saved);},[]);
-  const saveEsami = async (e) => {setEsami(e);await window._idb.clear('esami');for(const ex of e) await window._idb.save('esami',ex);};
-  const saveCfuTarget = (t) => {setCfuTarget(t);localStorage.setItem('uni_cfu_target',t);};
-  const addEsame = () => {
-    if(!esamiF.nome||!esamiF.voto||!esamiF.cfu) return;
-    const v=parseInt(esamiF.voto),c=parseInt(esamiF.cfu);
-    if(v<18||v>30||c<1) return;
-    saveEsami([...esami,{id:Date.now(),nome:esamiF.nome,voto:v,cfu:c}]);
-    setEsamiF({nome:'',voto:'',cfu:''});playSound('save');
-  };
-  const mediaPond = esami.length?( esami.reduce((s,e)=>s+e.voto*e.cfu,0)/esami.reduce((s,e)=>s+e.cfu,0)).toFixed(2):null;
-  const mediaSemp = esami.length?(esami.reduce((s,e)=>s+e.voto,0)/esami.length).toFixed(2):null;
-  const cfuTot = esami.reduce((s,e)=>s+e.cfu,0);
-  const target = parseInt(cfuTarget)||180;
-  const cfuLeft = Math.max(0, target - cfuTot);
-  const votoFinale = mediaPond ? (parseFloat(mediaPond)*110/30).toFixed(1) : null;
-  const voto110 = mediaPond?(parseFloat(mediaPond)*110/30).toFixed(1):null;
-
-  // ── FLASHCARD ──
-  const [decks, setDecks] = useState([]);
-  const [deckTitle, setDeckTitle] = useState('');
-  const [deckInput, setDeckInput] = useState('');
-  const [genBusy, setGenBusy] = useState(false);
-  const [activeDeck, setActiveDeck] = useState(null);
-  const [cardIdx, setCardIdx] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [score, setScore] = useState({ok:0,no:0});
-  useEffect(()=>{window._idb.getAll('flash_decks').then(d=>setDecks(d)).catch(()=>setDecks([]));},[]);
-  const saveDecks = async (d) => {setDecks(d);await window._idb.clear('flash_decks');for(const deck of d) await window._idb.save('flash_decks',deck);};
-
-  const genFlash = async() => {
-    if(!deckTitle.trim()||!deckInput.trim()) return;
-    setGenBusy(true);
-    try{
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions',{
-        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('groq_key') || '')},
-        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1500,messages:[{role:'user',content:'Genera 15 flashcard concise. Rispondi SOLO JSON array: [{"d":"domanda","r":"risposta breve"}]. Testo: '+deckInput.slice(0,3000)}]})
-      });
-      const d=await r.json();
-      const cards=JSON.parse(d.choices[0].message.content.replace(/```json|```/g,'').trim());
-      const deck={id:Date.now(),title:deckTitle,cards,createdAt:new Date().toISOString()};
-      saveDecks([deck,...decks]);
-      setActiveDeck(deck);setCardIdx(0);setFlipped(false);setScore({ok:0,no:0});
-      setDeckTitle('');setDeckInput('');
-    }catch(e){alert('Errore generazione: '+e.message);}
-    setGenBusy(false);
-  };
-
-  // ── STUDIA AI FEATURES HANDLERS ──
-  const studiaExtractPdfTable = async (file) => {
-    if (!file) return;
-    setStudiaPdfTable(s => ({ ...s, loading: true, show: true }));
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('user_id', 'lamiavita_user');
-    try {
-      const r = await fetch('https://api.chatpdf.com/v1/sources/add-file', { method: 'POST', headers: { 'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJlZDZkZTc4NS1mODU2LTRjODItOTVkZS0yNGE2YjIyZDNhNDAiLCJpYXQiOjE3NDU0MzAyMjd9.q1VNqLAYH1a0K3bNlEUlhV7lWjKHK0xkbTm1Z1Xq6fA' }, body: formData });
-      const d = await r.json();
-      const r2 = await fetch('https://api.chatpdf.com/v1/chats/message', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOiJlZDZkZTc4NS1mODU2LTRjODItOTVkZS0yNGE2YjIyZDNhNDAiLCJpYXQiOjE3NDU0MzAyMjd9.q1VNqLAYH1a0K3bNlEUlhV7lWjKHK0xkbTm1Z1Xq6fA' }, body: (JSON.stringify({sourceId: d.sourceId, messages: [{role: 'user', content: 'Extract all data as a table. Format as markdown table with headers.'}]})) });
-      const d2 = await r2.json();
-      setStudiaPdfTable(s => ({ ...s, loading: false, result: d2.content[0].text }));
-    } catch (e) { setStudiaPdfTable(s => ({ ...s, loading: false, result: 'Errore: ' + e.message })); }
-  };
-
-  const studiaRunCodeHelper = async () => {
-    if (!studiaCodeHelper.code.trim()) return;
-    setStudiaCodeHelper(s => ({ ...s, loading: true }));
-    try {
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: (JSON.stringify({model: 'llama-3.1-8b-instant', max_tokens: 1000, messages: [{role: 'user', content: 'Explain and fix if needed this ' + studiaCodeHelper.lang + ' code:\n' + studiaCodeHelper.code}]})) });
-      const d = await r.json();
-      setStudiaCodeHelper(s => ({ ...s, loading: false, result: d.choices[0].message.content }));
-    } catch (e) { setStudiaCodeHelper(s => ({ ...s, loading: false, result: 'Errore: ' + e.message })); }
-  };
-
-  const studiaSolveMath = async () => {
-    if (!studiaMathSolver.problem.trim()) return;
-    setStudiaMathSolver(s => ({ ...s, loading: true }));
-    try {
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: (JSON.stringify({model: 'llama-3.1-8b-instant', max_tokens: 800, messages: [{role: 'user', content: 'Risolvi questo problema di matematica passo per passo:\n' + studiaMathSolver.problem}]})) });
-      const d = await r.json();
-      setStudiaMathSolver(s => ({ ...s, loading: false, result: d.choices[0].message.content }));
-    } catch (e) { setStudiaMathSolver(s => ({ ...s, loading: false, result: 'Errore: ' + e.message })); }
-  };
-
-  const studiaRunBatchOp = async () => {
-    if (!studiaBatchOps.items.length) return;
-    setStudiaBatchOps(s => ({ ...s, loading: true }));
-    try {
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: (JSON.stringify({model: 'llama-3.1-8b-instant', max_tokens: 600, messages: [{role: 'user', content: 'Esegui operazione batch "' + studiaBatchOps.operation + '" su questi elementi:\n' + studiaBatchOps.items.join('\n') + '\nRispondi solo con il risultato.'}]})) });
-      const d = await r.json();
-      setStudiaBatchOps(s => ({ ...s, loading: false, result: d.choices[0].message.content }));
-    } catch (e) { setStudiaBatchOps(s => ({ ...s, loading: false, result: 'Errore: ' + e.message })); }
-  };
-
-  const studiaRunComparison = async () => {
-    if (!studiaCompareMode.items.length) return;
-    setStudiaCompareMode(s => ({ ...s, loading: true }));
-    try {
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: (JSON.stringify({model: 'llama-3.1-8b-instant', max_tokens: 800, messages: [{role: 'user', content: 'Comparazione dettagliata:\n' + studiaCompareMode.items.map((i, idx) => 'Elemento ' + (idx+1) + ': ' + i).join('\n\n')}]})) });
-      const d = await r.json();
-      setStudiaCompareMode(s => ({ ...s, loading: false, result: d.choices[0].message.content }));
-    } catch (e) { setStudiaCompareMode(s => ({ ...s, loading: false, result: 'Errore: ' + e.message })); }
-  };
-
-  const studiaStartDebate = async () => {
-    if (!studiaDebateMode.topic.trim()) return;
-    setStudiaDebateMode(s => ({ ...s, loading: true, positions: [], round: 0 }));
-    try {
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: (JSON.stringify({model: 'llama-3.1-8b-instant', max_tokens: 600, messages: [{role: 'user', content: 'Dibattito su: ' + studiaDebateMode.topic + '\nPresentati come due prospettive diverse (PRO e CONTRO). Formato:\nPRO: [argomento]\nCONTRO: [argomento]'}]})) });
-      const d = await r.json();
-      const content = d.choices[0].message.content;
-      const pro = content.match(/PRO:?\s*([\s\S]*?)(?=CONTRO:|$)/i)?.[1]?.trim() || '';
-      const contra = content.match(/CONTRO:?\s*([\s\S]*?)$/i)?.[1]?.trim() || '';
-      setStudiaDebateMode(s => ({ ...s, loading: false, positions: [{ side: 'PRO', text: pro }, { side: 'CONTRO', text: contra }], round: 1 }));
-    } catch (e) { setStudiaDebateMode(s => ({ ...s, loading: false, result: 'Errore: ' + e.message })); }
-  };
-
-  const studiaSolveDiagram = async () => {
-    if (!studiaDiagramSolver.image) return;
-    setStudiaDiagramSolver(s => ({ ...s, loading: true }));
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: (JSON.stringify({model: 'llama-3.1-8b-instant', max_tokens: 500, messages: [{role: 'user', content: 'Analizza questo diagramma e spiega cosa rappresenta. L\'immagine è codificata in base64: ' + reader.result.slice(0, 1000)}]})) });
-        const d = await r.json();
-        setStudiaDiagramSolver(s => ({ ...s, loading: false, result: d.choices[0].message.content }));
-      } catch (e) { setStudiaDiagramSolver(s => ({ ...s, loading: false, result: 'Errore: ' + e.message })); }
-    };
-    reader.readAsDataURL(studiaDiagramSolver.image);
-  };
-
-  const studiaUpdateProgressiveDash = () => {
-    const data = { esami, flashcardScore: score, pomodoroCycles: pomCycles, scadenze: scad.length };
-    setStudiaProgressiveDash({ show: true, data, insights: ['Hai ' + esami.length + ' esami registrati', 'Ciclo pomodoro: ' + pomCycles, 'Scadenze: ' + scad.length] });
-  };
-
-  const studiaUpdateLeaderboard = () => {
-    const scores = [
-      { user: 'Tu', points: pomCycles * 10 + esami.reduce((s, e) => s + e.voto, 0), trend: 'up' },
-      { user: 'Marco', points: 245, trend: 'up' },
-      { user: 'Giulia', points: 198, trend: 'down' },
-      { user: 'Luca', points: 176, trend: 'same' },
-    ];
-    setStudiaLeaderboard({ show: true, scores, timePeriod: 'week' });
-  };
-
-  // ── SCADENZE ──
-  const [scad, setScad] = useState([]);
-  const [scadF, setScadF] = useState({titolo:'',data:'',tipo:'esame',addCal:false});
-  useEffect(()=>{window._idb.getAll('scadenze').then(s=>setScad(s)).catch(()=>setScad([]));},[]);
-  const saveScad = async (s) => {setScad(s);await window._idb.clear('scadenze');for(const sc of s) await window._idb.save('scadenze',sc);};
-  const addScad = () => {
-    if(!scadF.titolo.trim()||!scadF.data) return;
-    const id = Date.now();
-    let calId = null;
-    if(scadF.addCal && addEvent) {
-      calId = id+1;
-      addEvent({
-        id:calId,
-        title:'[Uni] '+scadF.titolo.trim(),
-        date:scadF.data,
-        time:'',
-        color:'#4CC9F0',
-        fromUni:true
-      });
-      toast('Aggiunto anche al Calendario!','var(--blue)');
-    }
-    saveScad([...scad,{id,calId,titolo:scadF.titolo.trim(),data:scadF.data,tipo:scadF.tipo,addCal:scadF.addCal}]);
-    setScadF({titolo:'',data:'',tipo:'esame',addCal:false});
-    playSound('save');
-  };
-  const delScad = async (s) => {
-    if(s.calId){try{delEvent(s.calId);}catch(e){}}
-    saveScad(scad.filter(x=>x.id!==s.id));
-  };
-  const today = new Date().toISOString().split('T')[0];
-  const getDays = (data) => Math.ceil((new Date(data)-new Date())/(1000*60*60*24));
-
-  // ── EDITOR ──
-  const [docs, setDocs] = useState([]);
-  const [activeDoc, setActiveDoc] = useState(null);
-  const [docTitle, setDocTitle] = useState('');
-  const editorRef = useRef(null);
-  useEffect(()=>{window._idb.getAll('docs').then(d=>setDocs(d)).catch(()=>setDocs([]));},[]);
-  const saveDocs = async (d) => {setDocs(d);await window._idb.clear('docs');for(const doc of d) await window._idb.save('docs',doc);};
-
-  // Load document from Notes if requested
-  useEffect(()=>{
-    const loadDoc = () => {
-      if(window._loadDoc){
-        const doc = window._loadDoc;
-        window._loadDoc = null;
-        loadDocIntoEditor(doc);
-      }
-      if(window._loadDocFromNotes){
-        const doc = window._loadDocFromNotes;
-        window._loadDocFromNotes = null;
-        loadDocIntoEditor(doc);
-      }
-    };
-    loadDoc();
-    window.addEventListener('_loadDocFromNotes', loadDoc);
-    return () => window.removeEventListener('_loadDocFromNotes', loadDoc);
-  },[]);
-  
-  const loadDocIntoEditor = (doc) => {
-    setActiveDoc(doc);
-    setDocTitle(doc.title||'');
-    setDocType(doc.type||'doc');
-    setView('editor');
-    setTimeout(()=>{if(editorRef.current)editorRef.current.innerHTML=doc.content||'';},100);
-  };
-
-  const newDoc = (type='doc') => {
-    const titles = {doc:'Documento senza titolo',sheet:'Foglio di calcolo',slides:'Presentazione'};
-    const d={id:Date.now(),title:titles[type],content:type==='sheet'?'[]':type==='slides'?'[]':'',type,createdAt:new Date().toISOString()};
-    saveDocs([d,...docs]);setActiveDoc(d);setDocTitle(d.title);setDocType(type);
-    setTimeout(()=>{if(editorRef.current&&type==='doc'){editorRef.current.innerHTML='';editorRef.current.focus();}},100);
-  };
-  const saveDocContent = () => {
-    if(!activeDoc) return;
-    const content2 = editorRef.current?editorRef.current.innerHTML:'';
-    const updated={...activeDoc,title:docTitle||activeDoc.title,content:content2,updatedAt:new Date().toISOString()};
-    saveDocs(docs.map(d=>d.id===updated.id?updated:d));
-    setActiveDoc(updated);toast2('Salvato!');
-  };
-  const delDoc = (id) => {saveDocs(docs.filter(d=>d.id!==id));if(activeDoc&&activeDoc.id===id)setActiveDoc(null);};
-  const [toast2msg, setToast2] = useState('');
-  const toast2 = (msg) => {setToast2(msg);setTimeout(()=>setToast2(''),2000);};
-
-  const execCmd = (cmd,val=null) => {document.execCommand(cmd,false,val);editorRef.current&&editorRef.current.focus();};
-
-  const exportDoc = () => {
-    if(!activeDoc) return;
-    const content2 = editorRef.current?editorRef.current.innerHTML:'';
-    const blob=new Blob(['<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+docTitle+'</title><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7}</style></head><body>'+content2+'</body></html>'],{type:'text/html'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=docTitle+'.html';a.click();
-    URL.revokeObjectURL(url);toast2('Esportato!');
-  };
-
-  const saveToNotes = () => {
-    if(!activeDoc || !addNote) return;
-    const textContent = editorRef.current?editorRef.current.innerText:'';
-    const htmlContent = editorRef.current?editorRef.current.innerHTML:'';
-    addNote({title:docTitle||activeDoc.title, body:htmlContent||textContent, color:'#4CC9F0', docType:activeDoc.type||'doc', docId:activeDoc.id});
-    if(toast) toast('Salvato nelle Note!','var(--blue)');
-    else toast2('Salvato nelle Note!');
-  };
-
-  const VIEWS = [['pomodoro','Pomodoro'],['media','Media'],['flash','Flashcard'],['scadenze','Scadenze'],['editor','Documenti'],['studia','Studia']];
-  const [docType, setDocType] = useState('doc');
-
-  // ── STUDIA (PROJECTS + AI CHAT) ──
-  const [studyProjects, setStudyProjects] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('study_projects') || '[]'); } 
-    catch (e) { return []; }
-  });
-  const [activeProject, setActiveProject] = useState(null);
-  const [projectMsgs, setProjectMsgs] = useState([]);
-  const [projectInp, setProjectInp] = useState('');
-  const [projectBusy, setProjectBusy] = useState(false);
-  const [showNewProject, setShowNewProject] = useState(false);
-  const [newProjectName, setNewProjectName] = useState('');
-  const [newProjectSubject, setNewProjectSubject] = useState('');
-  const [studiaChatModel, setStudiaChatModel] = useState('groq');
-  const [isStudiaCallMode, setIsStudiaCallMode] = useState(false);
-  const [studiaCallMessages, setStudiaCallMessages] = useState([]);
-  const [studiaCallListening, setStudiaCallListening] = useState(false);
-  const [studiaCallSpeaking, setStudiaCallSpeaking] = useState(false);
-  const [studiaCallDuration, setStudiaCallDuration] = useState(0);
-  const studiaCallTimerRef = useRef(null);
-  const studiaCallRecognitionRef = useRef(null);
-  const projectRef = useRef(null);
-  const [studyScreenshotLoading, setStudyScreenshotLoading] = useState(false);
-  
-  // Screenshot per Dashboard Studia
-  const captureStudyScreenshot = async () => {
-    if (!activeProject) { toast('Apri un progetto prima', 'var(--red)'); return; }
-    setStudyScreenshotLoading(true);
-    try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:'monitor'},audio:false});
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.autoplay = true;
-      await new Promise(resolve => { video.onloadedmetadata = resolve; });
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const canvas = document.createElement('canvas');
-      // Comprimi screenshot
-      let w = video.videoWidth, h = video.videoHeight;
-      const maxDim = 1200;
-      if (w > maxDim || h > maxDim) {
-        const ratio = Math.min(maxDim / w, maxDim / h);
-        w = Math.round(w * ratio); h = Math.round(h * ratio);
-      }
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(video, 0, 0, w, h);
-      stream.getTracks().forEach(track => track.stop());
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
-      const file = new File([blob], 'screenshot_'+Date.now()+'.jpg', {type:'image/jpeg'});
-      setStudyLoadingFile(true);
-      setProjectMsgs(m => [...m, { role: 'bot', text: `📸 Acquisizione e analisi screenshot...` }]);
-      try {
-        const base64 = await new Promise(resolve => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result.split(',')[1]);
-          reader.readAsDataURL(blob);
-        });
-        const response = await fetch('https://api.ocr.space/parse/image', {
-          method: 'POST',
-          headers: {'apikey': 'helloworld'},
-          body: new URLSearchParams({
-            base64Image: 'data:image/jpeg;base64,'+base64,
-            language: 'ita',
-            isOverlayRequired: 'false',
-            scale: 'true',
-            OCREngine: '2'
-          })
-        });
-        const data = await response.json();
-        let content, wordCount;
-        if (data.ParsedResults && data.ParsedResults[0] && data.ParsedResults[0].ParsedText) {
-          const text = data.ParsedResults[0].ParsedText.trim();
-          if (text.length > 10) {
-            content = `[SCREENSHOT: ${file.name}]\n\n📝 TESTO ESTRATTO:\n${text}\n\n[Fine testo]`;
-          } else {
-            content = `[SCREENSHOT: ${file.name}]\n\n⚠️ Nessun testo rilevato. Descrivi cosa vedi.`;
-          }
-        } else {
-          content = `[SCREENSHOT: ${file.name}]\n\n⚠️ OCR fallito. Descrivi cosa vedi.`;
-        }
-        wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
-        const nf = { id: Date.now(), name: file.name, type: file.type, size: file.size, content, wordCount, projectId: activeProject.id, addedAt: new Date().toISOString() };
-        if (window._idb) { try { await window._idb.saveFile(nf); } catch (e) { } }
-        setStudyFiles(f => [...f, nf]);
-        setProjectMsgs(m => [...m, { role: 'bot', text: `📸 Screenshot acquisito! (~${wordCount} parole)\n\n✅ Testo estratto! Chiedimi qualsiasi cosa.` }]);
-        toast('Screenshot acquisito!', 'var(--green)');
-      } catch (err) {
-        const content = `[SCREENSHOT: ${file.name}]\n\n⚠️ OCR non disponibile. Descrivi cosa vedi.`;
-        const wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
-        const nf = { id: Date.now(), name: file.name, type: file.type, size: file.size, content, wordCount, projectId: activeProject.id, addedAt: new Date().toISOString() };
-        if (window._idb) { try { await window._idb.saveFile(nf); } catch (e) { } }
-        setStudyFiles(f => [...f, nf]);
-        setProjectMsgs(m => [...m, { role: 'bot', text: `📸 Screenshot aggiunto! (~${wordCount} parole)\n\n⚠️ OCR non disponibile. Descrivi cosa vedi.` }]);
-      }
-      setStudyLoadingFile(false);
-    } catch (err) {
-      if (err.name === 'NotAllowedError') toast('Permesso negato', 'var(--red)');
-      else toast('Errore: ' + err.message, 'var(--red)');
-    }
-    setStudyScreenshotLoading(false);
-  };
-  
-  // Wrapper per screenshot (apre selettore)
-  const handleStudyScreenshot = () => captureStudyScreenshot();
-  
-  // Wrapper per foto (da galleria) - con OCR
-  const handleStudyPhoto = async (file) => {
-    if (!file || !file.type.startsWith('image/')) return;
-    if (!activeProject) { toast('Apri un progetto prima', 'var(--red)'); return; }
-    setStudyLoadingFile(true);
-    try {
-      const reader = new FileReader();
-      const content = await new Promise((res, rej) => {
-        reader.onload = async (e) => {
-          try {
-            const img = new Image();
-            img.onload = async () => {
-              const maxDim = 1200;
-              let w = img.width, h = img.height;
-              if (w > maxDim || h > maxDim) {
-                const ratio = Math.min(maxDim / w, maxDim / h);
-                w = Math.round(w * ratio); h = Math.round(h * ratio);
-              }
-              const canvas = document.createElement('canvas');
-              canvas.width = w; canvas.height = h;
-              canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-              const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-              const response = await fetch('https://api.ocr.space/parse/image', {
-                method: 'POST',
-                headers: { 'apikey': 'helloworld' },
-                body: new URLSearchParams({
-                  base64Image: 'data:image/jpeg;base64,' + base64,
-                  language: 'ita',
-                  isOverlayRequired: 'false',
-                  scale: 'true',
-                  OCREngine: '2'
-                })
-              });
-              const data = await response.json();
-              if (data.ParsedResults && data.ParsedResults[0] && data.ParsedResults[0].ParsedText) {
-                const text = data.ParsedResults[0].ParsedText.trim();
-                if (text.length > 10) {
-                  res(`[IMMAGINE: ${file.name}]\n\n📝 TESTO ESTRATTO:\n${text}\n\n[Fine testo]`);
-                } else {
-                  res(`[IMMAGINE: ${file.name}]\n\n⚠️ Nessun testo rilevato. Descrivi cosa vedi.`);
-                }
-              } else {
-                res(`[IMMAGINE: ${file.name}]\n\n⚠️ OCR fallito. Descrivi cosa vedi.`);
-              }
-            };
-            img.onerror = () => res(`[IMMAGINE: ${file.name}]\n\n⚠️ Errore caricamento.`);
-            img.src = e.target.result;
-          } catch (err) {
-            res(`[IMMAGINE: ${file.name}]\n\n⚠️ OCR non disponibile. Descrivi cosa vedi.`);
-          }
-        };
-        reader.onerror = () => rej(new Error('Errore lettura'));
-        reader.readAsDataURL(file);
-      });
-      const wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
-      const nf = { id: Date.now(), name: file.name, type: file.type, size: file.size, content, wordCount, projectId: activeProject.id, addedAt: new Date().toISOString() };
-      if (window._idb) { try { await window._idb.saveFile(nf); } catch (e) { } }
-      setStudyFiles(f => [...f, nf]);
-      setProjectMsgs(m => [...m, { role: 'bot', text: `📷 Foto "${file.name}" caricata! (~${wordCount} parole)\n\n✅ Testo estratto! Chiedimi qualsiasi cosa sul contenuto.` }]);
-      toast('Foto caricata!', 'var(--green)');
-    } catch (err) {
-      toast('Errore foto', 'var(--red)');
-    }
-    setStudyLoadingFile(false);
-  };
-  
-  // File input ref per foto
-  const studyPhotoRef = useRef(null);
-  
-  // ── FILE UPLOAD FOR STUDIA ──
-  const [studyFiles, setStudyFiles] = useState([]);
-  const [studyLoadingFile, setStudyLoadingFile] = useState(false);
-  const [studyShowPaste, setStudyShowPaste] = useState(false);
-  const [studyPasteTitle, setStudyPasteTitle] = useState('');
-  const [studyPasteText, setStudyPasteText] = useState('');
-  const [studyTab, setStudyTab] = useState('chat');
-  
-  useEffect(() => {
-    if (activeProject && window._idb) {
-      window._idb.getAll('files').then(files => {
-        setStudyFiles(files.filter(f => f.projectId === activeProject.id));
-      }).catch(() => setStudyFiles([]));
-    } else if (!activeProject) {
-      setStudyFiles([]);
-    }
-  }, [activeProject]);
-  
-  const studyReadFile = async (file) => {
-    const ext = file.name.split('.').pop().toLowerCase();
-    if (file.type === 'application/pdf' || ext === 'pdf') {
-      try {
-        if (!window.pdfjs) {
-          console.log('Loading PDF.js...');
-          const script = document.createElement('script');
-          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-          await new Promise((res, rej) => { script.onload = res; script.onerror = rej; document.head.appendChild(script); });
-          console.log('PDF.js loaded');
-        }
-        window.pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        const arrayBuffer = await file.arrayBuffer();
-        console.log('Parsing PDF...');
-        const pdf = await window.pdfjs.getDocument({ data: arrayBuffer }).promise;
-        console.log('PDF pages:', pdf.numPages);
-        let text = '';
-        const maxPages = Math.min(pdf.numPages, 100);
-        for (let i = 1; i <= maxPages; i++) {
-          const page = await pdf.getPage(i);
-          const content = await page.getTextContent();
-          text += content.items.map(item => item.str).join(' ') + '\n\n';
-        }
-        console.log('Extracted text length:', text.length);
-        
-        // Check if text is useful (not just garbage)
-        const wordCount = text.trim().split(/\s+/).filter(w => w.length > 1).length;
-        const lines = text.split('\n').filter(l => l.trim().length > 0);
-        const avgWordsPerLine = lines.length > 0 ? wordCount / lines.length : 0;
-        const needsOCR = text.trim().length < 100 || wordCount < 20 || avgWordsPerLine < 2;
-        
-        if (needsOCR) {
-          console.log('Text quality low, trying OCR on ALL pages...', {wordCount, avgWordsPerLine});
-          let ocrText = '';
-          try {
-            // Process ALL pages
-            for (let i = 1; i <= pdf.numPages; i++) {
-              console.log(`OCR page ${i}/${pdf.numPages}...`);
-              const page = await pdf.getPage(i);
-              const scale = 2;
-              const viewport = page.getViewport({ scale });
-              const canvas = document.createElement('canvas');
-              canvas.height = viewport.height;
-              canvas.width = viewport.width;
-              const ctx = canvas.getContext('2d');
-              await page.render({ canvasContext: ctx, viewport }).promise;
-              
-              const maxDim = 1200;
-              let w = canvas.width, h = canvas.height;
-              if (w > maxDim || h > maxDim) {
-                const ratio = Math.min(maxDim / w, maxDim / h);
-                w = Math.round(w * ratio); h = Math.round(h * ratio);
-                const tmpCanvas = document.createElement('canvas');
-                tmpCanvas.width = w; tmpCanvas.height = h;
-                tmpCanvas.getContext('2d').drawImage(canvas, 0, 0, w, h);
-                canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(tmpCanvas, 0, 0);
-              }
-              
-              const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-              
-              const response = await fetch('https://api.ocr.space/parse/image', {
-                method: 'POST',
-                headers: { 'apikey': 'helloworld' },
-                body: new URLSearchParams({
-                  base64Image: 'data:image/jpeg;base64,' + base64,
-                  language: 'ita',
-                  isOverlayRequired: 'false',
-                  scale: 'true',
-                  OCREngine: '2'
-                })
-              });
-              const data = await response.json();
-              if (data.ParsedResults && data.ParsedResults[0] && data.ParsedResults[0].ParsedText) {
-                ocrText += `--- Pagina ${i} ---\n${data.ParsedResults[0].ParsedText}\n\n`;
-              } else if (data.ErrorMessage) {
-                console.log('OCR API error:', data.ErrorMessage);
-              }
-            }
-            
-            if (ocrText.trim().length > 50) {
-              console.log('OCR extracted ALL pages, text length:', ocrText.length);
-              return `[PDF: ${file.name}]\nPagine: ${pdf.numPages}\n\n📸 Testo estratto con OCR (TUTTE le ${pdf.numPages} pagine):\n\n${ocrText}`;
-            }
-          } catch (ocrErr) {
-            console.log('OCR failed:', ocrErr);
-          }
-        }
-        
-        if (pdf.numPages > 100) text += '\n[Documento troncato: ' + (pdf.numPages - 100) + ' pagine]';
-        return `[PDF: ${file.name}]\nPagine: ${pdf.numPages}\n\n${text}`;
-      } catch (e) {
-        console.error('PDF Error:', e);
-        return `[PDF: ${file.name}] - ${(file.size / 1024).toFixed(1)}KB\n\n⚠️ Errore lettura: ${e.message}\nProva a incollare il testo manualmente.`;
-      }
-    }
-    if (['txt', 'md', 'js', 'ts', 'py', 'html', 'css', 'json', 'xml'].includes(ext)) {
-      return new Promise((res, rej) => {
-        const r = new FileReader();
-        r.onload = e => res(e.target.result);
-        r.onerror = () => rej(new Error('Errore lettura'));
-        r.readAsText(file);
-      });
-    }
-    
-    // Image OCR
-    if (file.type.startsWith('image/')) {
-      return new Promise((res, rej) => {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          try {
-            const img = new Image();
-            img.onload = async () => {
-              const maxDim = 1200;
-              let w = img.width, h = img.height;
-              if (w > maxDim || h > maxDim) {
-                const ratio = Math.min(maxDim / w, maxDim / h);
-                w = Math.round(w * ratio); h = Math.round(h * ratio);
-              }
-              const canvas = document.createElement('canvas');
-              canvas.width = w; canvas.height = h;
-              canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-              const base64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
-              const response = await fetch('https://api.ocr.space/parse/image', {
-                method: 'POST',
-                headers: { 'apikey': 'helloworld' },
-                body: new URLSearchParams({
-                  base64Image: 'data:image/jpeg;base64,' + base64,
-                  language: 'ita',
-                  isOverlayRequired: 'false',
-                  scale: 'true',
-                  OCREngine: '2'
-                })
-              });
-              const data = await response.json();
-              if (data.ParsedResults && data.ParsedResults[0] && data.ParsedResults[0].ParsedText) {
-                const text = data.ParsedResults[0].ParsedText.trim();
-                if (text.length > 10) {
-                  res(`[IMMAGINE: ${file.name}]\n\n📝 TESTO ESTRATTO:\n${text}\n\n[Fine testo]`);
-                } else {
-                  res(`[IMMAGINE: ${file.name}]\n\n⚠️ Nessun testo rilevato. Descrivi cosa vedi.`);
-                }
-              } else {
-                res(`[IMMAGINE: ${file.name}]\n\n⚠️ OCR fallito. Descrivi cosa vedi.`);
-              }
-            };
-            img.onerror = () => res(`[IMMAGINE: ${file.name}]\n\n⚠️ Errore caricamento.`);
-            img.src = e.target.result;
-          } catch (err) {
-            res(`[IMMAGINE: ${file.name}]\n\n⚠️ OCR non disponibile. Descrivi cosa vedi.`);
-          }
-        };
-        reader.onerror = () => rej(new Error('Errore lettura'));
-        reader.readAsDataURL(file);
-      });
-    }
-    
-    return `[FILE: ${file.name}]\nDimensione: ${(file.size / 1024).toFixed(1)}KB`;
-  };
-  
-  const studyHandleUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file || !activeProject) return;
-    e.target.value = '';
-    setStudyLoadingFile(true);
-    setProjectMsgs(m => [...m, { role: 'bot', text: `📤 Caricamento "${file.name}"...` }]);
-    try {
-      const content = await studyReadFile(file);
-      const wordCount = content.split(/\s+/).filter(w => w.length > 0).length;
-      const nf = { id: Date.now(), name: file.name, type: file.type, size: file.size, content, wordCount, projectId: activeProject.id, addedAt: new Date().toISOString() };
-      if (window._idb) { try { await window._idb.saveFile(nf); } catch (e) { } }
-      setStudyFiles(f => [...f, nf]);
-      setProjectMsgs(m => [...m, { role: 'bot', text: `📄 "${file.name}" caricato! (~${wordCount} parole)` }]);
-    } catch (err) {
-      setProjectMsgs(m => [...m, { role: 'bot', text: `❌ Errore: ${err.message}` }]);
-    }
-    setStudyLoadingFile(false);
-  };
-  
-  const studyAddPaste = async () => {
-    if (!studyPasteText.trim() || !studyPasteTitle.trim() || !activeProject) return;
-    const size = new Blob([studyPasteText]).size;
-    const wordCount = studyPasteText.trim().split(/\s+/).filter(w => w.length > 0).length;
-    const nf = { id: Date.now(), name: studyPasteTitle.trim() + '.txt', type: 'text/plain', size, content: studyPasteText.trim(), wordCount, projectId: activeProject.id, addedAt: new Date().toISOString() };
-    if (window._idb) { try { await window._idb.saveFile(nf); } catch (e) { } }
-    setStudyFiles(f => [...f, nf]);
-    setProjectMsgs(m => [...m, { role: 'bot', text: `✅ "${studyPasteTitle}" aggiunto! (~${wordCount} parole)` }]);
-    setStudyPasteTitle('');
-    setStudyPasteText('');
-    setStudyShowPaste(false);
-    setStudyTab('chat');
-  };
-  
-  const studyDeleteFile = async (f) => {
-    if (window._idb) { try { await window._idb.deleteFile(f.id); } catch (e) { } }
-    setStudyFiles(files => files.filter(x => x.id !== f.id));
-  };
-  
-  const getFilesContext = () => {
-    if (studyFiles.length === 0) return '';
-    let totalContent = '';
-    for (const f of studyFiles) {
-      if (totalContent.length > 4000) break;
-      totalContent += `--- ${f.name} ---\n${f.content.slice(0, 1500)}\n\n`;
-    }
-    if (totalContent.length > 6000) totalContent += '\n...[contenso troncato per limiti API]';
-    return '\n\n[MATERIALE CARICATO]:\n' + totalContent + '\n';
-  };
-
-  const saveStudyProjects = (p) => {
-    setStudyProjects(p);
-    localStorage.setItem('study_projects', JSON.stringify(p));
-  };
-
-  const createProject = () => {
-    if (!newProjectName.trim()) return;
-    const project = {
-      id: Date.now(),
-      name: newProjectName.trim(),
-      subject: newProjectSubject.trim() || 'Generale',
-      createdAt: new Date().toISOString(),
-      messages: []
-    };
-    saveStudyProjects([project, ...studyProjects]);
-    setNewProjectName('');
-    setNewProjectSubject('');
-    setShowNewProject(false);
-    setActiveProject(project);
-    setProjectMsgs([{role:'bot',text:'Ciao! Sono il tuo tutor per "' + project.name + '" 🎓\n\nSono specializzato in ' + project.subject + '. Puoi chiedermi:\n• Spiegazioni di concetti\n• Esercizi e soluzioni\n• Riepiloghi\n• Domande d\'esame\n\nIniziamo! Dimmi cosa vuoi studiare.'}]);
-    playSound('save');
-  };
-
-  const deleteProject = (id) => {
-    if (!window.confirm('Eliminare il progetto?')) return;
-    saveStudyProjects(studyProjects.filter(p => p.id !== id));
-    if (activeProject && activeProject.id === id) {
-      setActiveProject(null);
-      setProjectMsgs([]);
-    }
-  };
-
-  const openProject = (project) => {
-    setActiveProject(project);
-    setProjectMsgs(project.messages.length > 0 ? project.messages : [{
-      role:'bot',text:'Ciao! Sono il tuo tutor per "' + project.name + '" 🎓\n\nSono specializzato in ' + project.subject + '. Cosa vuoi studiare oggi?'
-    }]);
-  };
-
-  const closeProject = () => {
-    // Save messages to project before closing
-    if (activeProject) {
-      const updated = studyProjects.map(p => p.id === activeProject.id ? {...p, messages: projectMsgs} : p);
-      saveStudyProjects(updated);
-    }
-    setActiveProject(null);
-    setProjectMsgs([]);
-  };
-
-  const STUDY_SYS = (subject) => `Sei un TUTOR ESPERTO in ${subject || 'generale'}. 
-
-**IMPORTANTE - ACCESSO AI FILE:**
-- Il materiale caricato e gia nel contesto sotto [MATERIALE CARICATO]
-- USA SEMPRE il materiale caricato come riferimento principale
-- Se l'utente chiede di qualcosa nel file, rispondi BASANDOTI sul contenuto del file
-- Cita passaggi specifici dai file quando pertinenti
-- Non dire mai "non posso accedere ai file" - il materiale e gia nel contesto
-
-COMPETENZE:
-- Spieghi concetti complessi in modo semplice
-- Fornisci esempi pratici
-- Generi esercizi con soluzioni
-- Prepari per esami e verifiche
-- Fai riepiloghi e mappe concettuali
-- Rispondi in italiano in modo chiaro
-
-STILE:
-- Usa emoji per rendere piacevole lo studio
-- Struttura le risposte con punti e sotto-punti
-- Chiedi se vuoi approfondire o fare esercizi
-- INCORAGGIA sempre lo studente
-
-ARGOMENTI CHE PUOI AFFRONTARE:
-- Definizioni e concetti teorici
-- Formule e applicazioni pratiche
-- Storia e contesto
-- Esercizi svolti e da fare
-- Consigli per lo studio efficace
-
-Sii ESPERTO, CHIARO e MOTIVANTE.`;
-
-  // Studia Call Mode Functions
-  const startStudiaCallMode = () => {
-    setIsStudiaCallMode(true);
-    setStudiaCallMessages([{role:'bot',text:'Ciao! Sono il tutor di '+activeProject?.subject+'. Come posso aiutarti?'}]);
-    setStudiaCallDuration(0);
-    studiaCallTimerRef.current = setInterval(() => setStudiaCallDuration(d => d + 1), 1000);
-    speakStudiaCallText('Ciao! Sono il tutor di '+(activeProject?.subject||'studio')+'. Come posso aiutarti?');
-  };
-  
-  const endStudiaCallMode = () => {
-    setIsStudiaCallMode(false);
-    setStudiaCallMessages([]);
-    setStudiaCallListening(false);
-    setStudiaCallSpeaking(false);
-    setStudiaCallDuration(0);
-    if (studiaCallTimerRef.current) clearInterval(studiaCallTimerRef.current);
-    window.speechSynthesis.cancel();
-    if (studiaCallRecognitionRef.current) { try { studiaCallRecognitionRef.current.stop(); } catch(e) {} }
-  };
-  
-  const speakStudiaCallText = (text) => {
-    if (!text) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'it-IT';
-    utterance.rate = 0.95;
-    utterance.onend = () => { setStudiaCallSpeaking(false); startStudiaCallListening(); };
-    utterance.onerror = () => { setStudiaCallSpeaking(false); startStudiaCallListening(); };
-    setStudiaCallSpeaking(true);
-    window.speechSynthesis.speak(utterance);
-  };
-  
-  const startStudiaCallListening = () => {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { setStudiaCallMessages(p => [...p, {role:'bot',text:'Riconoscimento vocale non supportato'}]); return; }
-    const r = new SR();
-    r.lang = 'it-IT'; r.interimResults = false; r.continuous = false;
-    studiaCallRecognitionRef.current = r;
-    setStudiaCallListening(true);
-    r.onresult = (ev) => {
-      const t = ev.results[0][0].transcript;
-      setStudiaCallMessages(p => [...p, {role:'user',text:t}]);
-      setStudiaCallListening(false);
-      studiaCallAIForCall(t);
-    };
-    r.onerror = () => { setStudiaCallListening(false); startStudiaCallListening(); };
-    r.onend = () => setStudiaCallListening(false);
-    r.start();
-  };
-  
-  const studiaCallAIForCall = async (userText) => {
-    try {
-      const key = localStorage.getItem('groq_key') || '';
-      const sysMsg = `Sei un tutor universitario esperto di ${activeProject?.subject||'materia'}. Rispondi in italiano in modo breve (max 2-3 frasi). Sii chiaro e motivante come in una conversazione telefonica.`;
-      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:200,messages:[
-          {role:'system',content:sysMsg},{role:'user',content:userText}
-        ]})
-      });
-      const d = await r.json();
-      const reply = d.choices?.[0]?.message?.content || 'Non ho capito, puoi ripetere?';
-      setStudiaCallMessages(p => [...p, {role:'bot',text:reply}]);
-      speakStudiaCallText(reply);
-    } catch(e) {
-      setStudiaCallMessages(p => [...p, {role:'bot',text:'Errore: '+e.message}]);
-      speakStudiaCallText('C\'è stato un errore, riprova.');
-    }
-  };
-  
-  const formatStudiaCallDuration = (s) => {
-    const m = Math.floor(s/60), sec = s%60;
-    return `${m.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
-  };
-
-  const sendToProjectAI = async () => {
-    if (!projectInp.trim() || !activeProject) return;
-    const text = projectInp.trim();
-    setProjectInp('');
-    const newMsgs = [...projectMsgs, {role:'user',text}];
-    setProjectMsgs(newMsgs);
-    setProjectBusy(true);
-    
-    try {
-      const filesContext = getFilesContext();
-      const systemWithFiles = STUDY_SYS(activeProject.subject) + (filesContext ? '\n\n' + filesContext : '');
-      
-      // Add file content directly to user's message
-      const userMsgWithContext = filesContext ? 
-        `${text}\n\n══════════════════════════════════════════\n📚 MATERIALE DI STUDIO (usa questo per rispondere)\n══════════════════════════════════════════\n${filesContext}\n══════════════════════════════════════════` : 
-        text;
-
-      let reply;
-      const prevMsgs = newMsgs.slice(0, -1).map(m => ({role: m.role === 'bot' ? 'assistant' : 'user', content: m.text}));
-      
-      if (studiaChatModel === 'deepseek') {
-        const r = await proxyFetch('https://api.deepseek.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('deepseek_key') || '')},
-          body: JSON.stringify({
-            model: 'deepseek-chat',
-            max_tokens: 2000,
-            messages: [
-              {role:'system', content: systemWithFiles},
-              ...prevMsgs,
-              {role:'user', content: userMsgWithContext}
-            ]
-          })
-        });
-        const d = await r.json();
-        if (d.error) throw new Error(d.error.message);
-        reply = d.choices[0].message.content;
-      } else if (studiaChatModel === 'grok') {
-        const r = await proxyFetch('https://api.x.ai/v1/chat/completions', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('grok_key') || '')},
-          body: JSON.stringify({
-            model: 'grok-2-1212',
-            max_tokens: 2000,
-            messages: [
-              {role:'system', content: systemWithFiles},
-              ...prevMsgs,
-              {role:'user', content: userMsgWithContext}
-            ]
-          })
-        });
-        const d = await r.json();
-        if (d.error) throw new Error(d.error.message);
-        reply = d.choices[0].message.content;
-      } else {
-        const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('groq_key') || '')},
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            max_tokens: 2000,
-            messages: [
-              {role:'system', content: systemWithFiles},
-              ...prevMsgs,
-              {role:'user', content: userMsgWithContext}
-            ]
-          })
-        });
-        const d = await r.json();
-        if (d.error) throw new Error(d.error.message);
-        reply = d.choices[0].message.content;
-      }
-      
-      setProjectMsgs([...newMsgs, {role:'bot',text:reply}]);
-      
-      // Save to project
-      const updatedProjects = studyProjects.map(p => 
-        p.id === activeProject.id ? {...p, messages: [...newMsgs, {role:'bot',text:reply}]} : p
-      );
-      saveStudyProjects(updatedProjects);
-      setActiveProject({...activeProject, messages: [...newMsgs, {role:'bot',text:reply}]});
-    } catch (e) {
-      setProjectMsgs([...newMsgs, {role:'bot',text:'❌ Errore: ' + e.message}]);
-    }
-    setProjectBusy(false);
-  };
-
-  useEffect(() => { if(projectRef.current) projectRef.current.scrollTop = projectRef.current.scrollHeight; }, [projectMsgs]);
+  const card = {background:'var(--card)',borderRadius:16,padding:'16px 18px',marginBottom:14,border:'1px solid var(--border)'};
+  const sectionTitle = {fontSize:13,fontWeight:700,color:'var(--accent)',marginBottom:10,textTransform:'uppercase',letterSpacing:'0.5px'};
+  const chip = (color) => ({display:'inline-block',padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:600,color:'#fff',background:color||'var(--accent)'});
 
   return (
-    <div className="uni-overlay">
-      <img src="https://i.imgur.com/X1BYLSa.png" className="uni-bg-logo" alt=""/>
-      <div className="uni-header">
-        <div className="uni-back" onClick={onClose}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-          Torna all'app
-        </div>
-        <div className="uni-title"><img src="https://i.imgur.com/X1BYLSa.png" alt="TUTT'UNI"/></div>
-        
-        {toast2msg&&<div style={{marginLeft:'auto',background:'rgba(6,214,160,.15)',border:'1px solid rgba(6,214,160,.3)',borderRadius:8,padding:'4px 12px',fontSize:'.8rem',color:'var(--green)'}}>{toast2msg}</div>}
+    <div style={{maxWidth:600,margin:'0 auto',padding:'0 12px 120px'}}>
+      {/* Header */}
+      <div style={{padding:'24px 4px 16px',textAlign:'center'}}>
+        <div style={{fontSize:14,color:'var(--muted)'}}>{days[now.getDay()]} {now.getDate()} {months[now.getMonth()]} {now.getFullYear()}</div>
+        <div style={{fontSize:28,fontWeight:800,marginTop:4,background:'linear-gradient(135deg,var(--accent),var(--green))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>{greeting}! {'\uD83D\uDC4B'}</div>
       </div>
 
-      <div style={{padding:'8px 12px',borderBottom:'1px solid rgba(255,255,255,.05)',background:'rgba(8,11,20,.95)',backdropFilter:'blur(10px)',position:'sticky',top:0,zIndex:10,flexShrink:0}}>
-        <div style={{display:'flex',gap:4,overflowX:'auto',WebkitOverflowScrolling:'touch',paddingBottom:2}}>
-          {VIEWS.map(([v,l])=>(
-            <button key={v} className={'uni-tab'+(view===v?' active':'')} onClick={()=>setView(v)} style={{padding:'8px 14px',fontSize:'.82rem',whiteSpace:'nowrap',minHeight:40,borderRadius:8,border:'none',cursor:'pointer',fontWeight:600,transition:'all .15s',background:view===v?'rgba(6,214,160,.2)':'transparent',color:view===v?'#06D6A0':'var(--text2)'}}>{l}</button>
+      {/* Quick Actions */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:16}}>
+        {quickActions.map(q => (
+          <div key={q.tab} onClick={() => setTab(q.tab)} style={{background:'var(--card)',border:'1px solid var(--border)',borderRadius:14,padding:'14px 8px',textAlign:'center',cursor:'pointer',transition:'all .15s'}}>
+            <div style={{fontSize:24,marginBottom:4}}>{q.icon}</div>
+            <div style={{fontSize:11,fontWeight:600,color:'var(--text)'}}>{q.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Stats Row */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:14}}>
+        {[
+          {n:todayEvents.length, l:'Oggi', c:'#FF6B6B'},
+          {n:activeReminders.length, l:'Promemoria', c:'#FFD93D'},
+          {n:pendingTodos.length, l:'To-Do', c:'#6BCB77'},
+          {n:totalPw, l:'Password', c:'#4D96FF'},
+        ].map(s => (
+          <div key={s.l} style={{background:'var(--card)',borderRadius:12,padding:'12px 6px',textAlign:'center',border:'1px solid var(--border)'}}>
+            <div style={{fontSize:22,fontWeight:800,color:s.c}}>{s.n}</div>
+            <div style={{fontSize:10,color:'var(--muted)',marginTop:2}}>{s.l}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Oggi */}
+      {todayEvents.length > 0 && (
+        <div style={card}>
+          <div style={sectionTitle}>{'\uD83D\uDCC5'} Oggi</div>
+          {todayEvents.map(ev => (
+            <div key={ev.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
+              <div style={{width:4,height:32,borderRadius:2,background:ev.color||'var(--accent)',flexShrink:0}}/>
+              <div>
+                <div style={{fontWeight:600,fontSize:14}}>{ev.title}</div>
+                {ev.time && <div style={{fontSize:12,color:'var(--muted)'}}>{ev.time}</div>}
+              </div>
+            </div>
           ))}
         </div>
-      </div>
+      )}
 
-      <div className="uni-body" style={{position:'relative',zIndex:1,paddingBottom:'max(120px, calc(80px + env(safe-area-inset-bottom)))'}}>
-
-        {view==='pomodoro'&&(
-          <div style={{maxWidth:480,margin:'0 auto',textAlign:'center'}}>
-            <div style={{display:'flex',gap:8,justifyContent:'center',marginBottom:28}}>
-              {[['work','Studio','#FF4D6D'],['short','Pausa corta','#06D6A0'],['long','Pausa lunga','#4CC9F0']].map(([m,l,c])=>(
-                <button key={m} className={'btn bs'+(pomMode===m?' br':' bg')} style={pomMode===m?{background:c,color:'#080B14'}:{}} onClick={()=>setPomModeAndReset(m)}>{l}</button>
-              ))}
-            </div>
-            <div className="pom-circle" onClick={pomToggle} style={{boxShadow:'0 0 '+(pomRunning?'40px':'20px')+' '+pomColor+'44'}}>
-              <svg className="pom-svg" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r={pomR} fill="none" stroke="rgba(255,255,255,.06)" strokeWidth="8"/>
-                <circle cx="100" cy="100" r={pomR} fill="none" stroke={pomColor} strokeWidth="8"
-                  strokeDasharray={pomCirc} strokeDashoffset={pomCirc*(1-pomPct)}
-                  strokeLinecap="round" style={{transition:'stroke-dashoffset .5s'}}/>
-              </svg>
-              <div className="pom-time" style={{color:pomColor}}>{pomMins}:{pomSecStr}</div>
-              <div className="pom-label">{pomRunning?'Clicca per pausa':'Clicca per iniziare'}</div>
-            </div>
-            <div style={{display:'flex',gap:10,justifyContent:'center',marginTop:24}}>
-              <button className="btn br" onClick={pomToggle}>{pomRunning?'Pausa':'Avvia'}</button>
-              <button className="btn bg" onClick={pomReset}>Reset</button>
-              <button className="btn bg" onClick={()=>setEditingPom(true)} title="Modifica durate">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-              </button>
-            </div>
-            <div style={{display:'flex',gap:6,justifyContent:'center',marginTop:20,flexWrap:'wrap'}}>
-              <button className="btn sm bg" onClick={()=>setStudiaPdfTable(s=>({...s,show:true}))} title="Estrai tabella PDF">📊</button>
-              <button className="btn sm bg" onClick={()=>setStudiaCodeHelper(s=>({...s,show:true}))} title="Code Helper">💻</button>
-              <button className="btn sm bg" onClick={()=>setStudiaMathSolver(s=>({...s,show:true}))} title="Math Solver">🧮</button>
-              <button className="btn sm bg" onClick={()=>setStudiaBatchOps(s=>({...s,show:true}))} title="Batch Operations">⚡</button>
-              <button className="btn sm bg" onClick={()=>setStudiaCompareMode(s=>({...s,show:true}))} title="Comparison Mode">⚖️</button>
-              <button className="btn sm bg" onClick={()=>setStudiaDebateMode(s=>({...s,show:true}))} title="Multi AI Debate">🎭</button>
-              <button className="btn sm bg" onClick={()=>setStudiaDiagramSolver(s=>({...s,show:true}))} title="Diagram Solver">📈</button>
-              <button className="btn sm bg" onClick={studiaUpdateProgressiveDash} title="Progressive Dashboard">📊</button>
-              <button className="btn sm bg" onClick={studiaUpdateLeaderboard} title="Leaderboard">🏆</button>
-            </div>
-            {editingPom&&(
-              <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.8)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setEditingPom(false)}>
-                <div style={{position:'relative',background:'linear-gradient(135deg,rgba(14,18,32,.99),rgba(10,14,24,.99)',border:'1px solid rgba(255,255,255,.12)',borderRadius:24,padding:24,width:'100%',maxWidth:340,boxShadow:'0 24px 80px rgba(0,0,0,.8)'}} onClick={e=>e.stopPropagation()}>
-                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
-                    <div style={{fontWeight:700,fontSize:'1.1rem'}}>Modifica durate</div>
-                    <div onClick={()=>setEditingPom(false)} style={{background:'rgba(255,77,109,.15)',border:'1px solid rgba(255,77,109,.3)',borderRadius:9,width:30,height:30,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'var(--red)'}}>✕</div>
-                  </div>
-                  {[['work','Studio (min)'],['short','Pausa corta (min)'],['long','Pausa lunga (min)']].map(([k,l])=>(
-                    <div key={k} className="fl">
-                      <label>{l}</label>
-                      <input className="field" type="number" min="1" max="120"
-                        value={pomDurations[k]}
-                        onChange={e=>{const v=Math.max(1,Math.min(120,parseInt(e.target.value)||1));savePomDurations({...pomDurations,[k]:v});}}/>
-                    </div>
-                  ))}
-                  <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:20}}>
-                    <button className="btn bg" onClick={()=>savePomDurations({work:25,short:5,long:15})}>Reset default</button>
-                    <button className="btn bt" onClick={()=>{setPomRunning(false);setPomSecs(pomDurations[pomMode]*60);setEditingPom(false);toast('Durate aggiornate!');}}>Applica</button>
-                  </div>
+      {/* Prossimi Eventi */}
+      {upcomingEvents.length > 0 && (
+        <div style={card}>
+          <div style={sectionTitle}>{'\u23F0'} Prossimi Eventi</div>
+          {upcomingEvents.map(ev => {
+            const diff = Math.ceil((new Date(ev.date) - now) / 86400000);
+            return (
+              <div key={ev.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
+                <div>
+                  <div style={{fontWeight:600,fontSize:14}}>{ev.title}</div>
+                  <div style={{fontSize:12,color:'var(--muted)'}}>{ev.date} {ev.time ? '\u2022 ' + ev.time : ''}</div>
                 </div>
+                <span style={chip(diff <= 1 ? '#FF6B6B' : diff <= 3 ? '#FFD93D' : '#6BCB77')}>{diff === 0 ? 'Oggi' : diff === 1 ? 'Domani' : 'tra ' + diff + ' gg'}</span>
               </div>
-            )}
-            <div style={{marginTop:28,display:'flex',gap:20,justifyContent:'center'}}>
-              <div className="card" style={{padding:'14px 24px',textAlign:'center'}}>
-                <div style={{fontSize:'1.8rem',fontWeight:800,color:pomColor}}>{pomCycles}</div>
-                <div style={{fontSize:'.75rem',color:'var(--text2)',marginTop:2}}>Sessioni completate</div>
-              </div>
-              <div className="card" style={{padding:'14px 24px',textAlign:'center'}}>
-                <div style={{fontSize:'1.8rem',fontWeight:800,color:'var(--green)'}}>{Math.floor(pomCycles*25/60)}h {(pomCycles*25)%60}m</div>
-                <div style={{fontSize:'.75rem',color:'var(--text2)',marginTop:2}}>Tempo studiato</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {view==='media'&&(
-          <div style={{maxWidth:560,margin:'0 auto'}}>
-            {mediaPond&&(
-              <>
-                <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(130px,1fr))',gap:10,marginBottom:20}}>
-                  {[
-                    {v:mediaPond,l:'Media',c:'var(--blue)'},
-                    {v:mediaSemp,l:'Media semplice',c:'var(--green)'},
-                    {v:cfuTot,l:'CFU',c:'var(--yellow)'},
-                    {v:votoFinale,l:'Voto/110',c:'var(--pink)'},
-                  ].map(s=>(
-                    <div key={s.l} className="card" style={{textAlign:'center',padding:'14px 10px'}}>
-                      <div style={{fontSize:'1.5rem',fontWeight:800,color:s.c}}>{s.v}</div>
-                      <div style={{fontSize:'.72rem',color:'var(--text2)',marginTop:4}}>{s.l}</div>
-                    </div>
-                  ))}
-                </div>
-                {cfuLeft>0&&(
-                  <div className="card" style={{marginBottom:14,background:'rgba(6,214,160,.05)',border:'1px solid rgba(6,214,160,.2)'}}>
-                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:12}}>
-                      <div>
-                        <div style={{fontWeight:700,marginBottom:4}}>🎓 Proiezione laurea</div>
-                        <div style={{fontSize:'.88rem',color:'var(--text2)'}}>Manca ancora <span style={{color:'var(--yellow)',fontWeight:700}}>{cfuLeft} CFU</span></div>
-                      </div>
-                      <div style={{textAlign:'right'}}>
-                        <div style={{fontSize:'1.3rem',fontWeight:800,color:'var(--green)'}}>{votoFinale}/110</div>
-                        <div style={{fontSize:'.72rem',color:'var(--text2)'}}>stimato</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-            <div className="card" style={{marginBottom:14}}>
-              <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
-                <div style={{fontWeight:700,fontSize:'.9rem'}}>CFU totali</div>
-                <input type="number" min="120" max="240" value={cfuTarget} onChange={e=>saveCfuTarget(e.target.value)} style={{width:70,padding:'4px 8px',background:'rgba(255,255,255,.05)',border:'1px solid rgba(255,255,255,.1)',borderRadius:6,color:'var(--text)',fontSize:'.85rem',textAlign:'center'}}/>
-              </div>
-              <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr',gap:8,marginBottom:8}}>
-                <input className="field" placeholder="Nome materia" value={esamiF.nome} onChange={e=>setEsamiF(f=>({...f,nome:e.target.value}))}/>
-                <input className="field" type="number" placeholder="Voto" min="18" max="30" value={esamiF.voto} onChange={e=>setEsamiF(f=>({...f,voto:e.target.value}))}/>
-                <input className="field" type="number" placeholder="CFU" min="1" max="18" value={esamiF.cfu} onChange={e=>setEsamiF(f=>({...f,cfu:e.target.value}))}/>
-              </div>
-              <button className="btn bt bs" onClick={addEsame} disabled={!esamiF.nome||!esamiF.voto||!esamiF.cfu}>Aggiungi</button>
-            </div>
-            {esami.length===0&&<Empty icon="uni" text="Nessun esame" sub="Aggiungi i tuoi esami per calcolare la media"/>}
-            {esami.map(e=>(
-              <div key={e.id} className="media-row">
-                <div style={{fontWeight:600,fontSize:'.88rem'}}>{e.nome}</div>
-                <div style={{fontWeight:700,color:'var(--green)',textAlign:'center'}}>{e.voto}</div>
-                <div style={{color:'var(--text2)',fontSize:'.82rem',textAlign:'center'}}>{e.cfu} CFU</div>
-                <div className="ib" style={{color:'var(--red)'}} onClick={()=>saveEsami(esami.filter(x=>x.id!==e.id))}>x</div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {view==='flash'&&(
-          <div style={{maxWidth:560,margin:'0 auto'}}>
-            {!activeDeck?(
-              <>
-                <div className="card" style={{marginBottom:16}}>
-                  <div style={{fontWeight:700,marginBottom:12}}>Genera flashcard con AI</div>
-                  <div className="fl"><label>Titolo mazzo</label>
-                    <input className="field" placeholder="Es. Diritto privato, cap.3..." value={deckTitle} onChange={e=>setDeckTitle(e.target.value)}/>
-                  </div>
-                  <div className="fl"><label>Testo da studiare</label>
-                    <textarea className="field" rows={5} placeholder="Incolla appunti o testo del libro..." value={deckInput} onChange={e=>setDeckInput(e.target.value)} style={{resize:'vertical'}}/>
-                  </div>
-                  <button className="btn bt" onClick={genFlash} disabled={genBusy||!deckTitle.trim()||!deckInput.trim()}>
-                    {genBusy?'Generando...':'Genera 10 flashcard'}
-                  </button>
-                </div>
-                {decks.map(d=>(
-                  <div key={d.id} className="card" style={{display:'flex',alignItems:'center',gap:12,marginBottom:8,cursor:'pointer'}}
-                    onClick={()=>{setActiveDeck(d);setCardIdx(0);setFlipped(false);setScore({ok:0,no:0});}}>
-                    <div style={{fontSize:'1.4rem'}}>flash</div>
-                    <div style={{flex:1}}>
-                      <div style={{fontWeight:700,fontSize:'.9rem'}}>{d.title}</div>
-                      <div style={{fontSize:'.75rem',color:'var(--text2)'}}>{d.cards.length} carte</div>
-                    </div>
-                    <div className="ib" style={{color:'var(--red)',flexShrink:0}} onClick={e=>{e.stopPropagation();saveDecks(decks.filter(x=>x.id!==d.id));}}>x</div>
-                  </div>
-                ))}
-              </>
-            ):(
-              <div>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
-                  <div style={{fontWeight:700}}>{activeDeck.title}</div>
-                  <button className="btn bg bs" onClick={()=>setActiveDeck(null)}>Esci</button>
-                </div>
-                {cardIdx<activeDeck.cards.length?(
-                  <>
-                    <div style={{fontSize:'.78rem',color:'var(--text2)',textAlign:'center',marginBottom:12}}>
-                      {cardIdx+1}/{activeDeck.cards.length} - ok:{score.ok} no:{score.no}
-                    </div>
-                    <div className="flash-card" style={{background:flipped?'rgba(6,214,160,.08)':'rgba(255,255,255,.04)',border:'1px solid '+(flipped?'rgba(6,214,160,.3)':'rgba(255,255,255,.08)')}}
-                      onClick={()=>setFlipped(f=>!f)}>
-                      <div>
-                        <div style={{fontSize:'.72rem',color:'var(--text2)',marginBottom:10,textTransform:'uppercase',letterSpacing:'.06em'}}>{flipped?'Risposta':'Domanda - clicca per girare'}</div>
-                        <div style={{fontWeight:flipped?400:700,fontSize:'1rem',lineHeight:1.6}}>{flipped?activeDeck.cards[cardIdx].r:activeDeck.cards[cardIdx].d}</div>
-                      </div>
-                    </div>
-                    {flipped&&(
-                      <div style={{display:'flex',gap:10,marginTop:14}}>
-                        <button className="btn bg" style={{flex:1,justifyContent:'center',color:'var(--red)'}} onClick={()=>{setScore(s=>({...s,no:s.no+1}));setCardIdx(i=>i+1);setFlipped(false);playSound('error');}}>Non sapevo</button>
-                        <button className="btn bt" style={{flex:1,justifyContent:'center'}} onClick={()=>{setScore(s=>({...s,ok:s.ok+1}));setCardIdx(i=>i+1);setFlipped(false);playSound('success');}}>Lo sapevo!</button>
-                      </div>
-                    )}
-                  </>
-                ):(
-                  <div className="card" style={{textAlign:'center',padding:40}}>
-                    <div style={{fontSize:'2rem',marginBottom:12}}>ok</div>
-                    <div style={{fontWeight:700,marginBottom:8}}>Completato!</div>
-                    <div style={{color:'var(--green)'}}>Corrette: {score.ok}</div>
-                    <div style={{color:'var(--red)',marginBottom:16}}>Errate: {score.no}</div>
-                    <div style={{display:'flex',gap:8,justifyContent:'center'}}>
-                      <button className="btn bt" onClick={()=>{setCardIdx(0);setFlipped(false);setScore({ok:0,no:0});}}>Ricomincia</button>
-                      <button className="btn bg" onClick={()=>setActiveDeck(null)}>Esci</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {view==='scadenze'&&(
-          <div style={{maxWidth:560,margin:'0 auto'}}>
-            <div className="card" style={{marginBottom:16}}>
-              <div style={{fontWeight:700,marginBottom:12}}>Aggiungi scadenza</div>
-              <div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:8,marginBottom:8}}>
-                <input className="field" placeholder="Nome esame o scadenza" value={scadF.titolo} onChange={e=>setScadF(f=>({...f,titolo:e.target.value}))}/>
-                <input className="field" type="date" min={today} value={scadF.data} onChange={e=>setScadF(f=>({...f,data:e.target.value}))}/>
-              </div>
-              <div style={{display:'flex',gap:8,alignItems:'center',marginBottom:10}}>
-                <select className="field" style={{flex:1}} value={scadF.tipo} onChange={e=>setScadF(f=>({...f,tipo:e.target.value}))}>
-                  <option value="esame">Esame</option>
-                  <option value="consegna">Consegna</option>
-                  <option value="altro">Altro</option>
-                </select>
-                <label style={{display:'flex',alignItems:'center',gap:7,fontSize:'.82rem',color:'var(--text2)',cursor:'pointer',flexShrink:0}}>
-                  <input type="checkbox" checked={scadF.addCal} onChange={e=>setScadF(f=>({...f,addCal:e.target.checked}))} style={{accentColor:'var(--blue)'}}/>
-                  Aggiungi al Calendario
-                </label>
-              </div>
-              <button className="btn by bs" onClick={addScad} disabled={!scadF.titolo||!scadF.data}>Aggiungi</button>
-            </div>
-            {scad.length===0&&<Empty icon="cal" text="Nessuna scadenza" sub="Aggiungi esami e consegne"/>}
-            {[...scad].sort((a,b)=>a.data.localeCompare(b.data)).map(s=>{
-              const days=getDays(s.data);
-              const past=days<0;
-              return(
-                <div key={s.id} className="card" style={{display:'flex',alignItems:'center',gap:12,marginBottom:8,borderColor:past?'rgba(255,77,109,.2)':days<=3?'rgba(255,209,102,.2)':''}}>
-                  <div style={{fontSize:'1.3rem'}}>{s.tipo==='esame'?'uni':'scad'}</div>
-                  <div style={{flex:1}}>
-                    <div style={{fontWeight:700,fontSize:'.9rem'}}>{s.titolo}</div>
-                    <div style={{fontSize:'.76rem',color:'var(--text2)',marginTop:2}}>
-                      {new Date(s.data).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'})}
-                      {s.calId&&<span style={{marginLeft:8,color:'var(--blue)',fontSize:'.7rem'}}>cal</span>}
-                    </div>
-                  </div>
-                  <div style={{fontWeight:700,fontSize:'.85rem',color:past?'var(--red)':days<=3?'var(--yellow)':'var(--text2)',flexShrink:0}}>
-                    {past?'Passato':days===0?'Oggi!':days+'gg'}
-                  </div>
-                  <div className="ib" style={{color:'var(--red)',flexShrink:0}} onClick={()=>delScad(s)}>x</div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {view==='editor'&&(
-          <div style={{maxWidth:780,margin:'0 auto'}}>
-            {!activeDoc?(
-              <>
-                <div style={{display:'flex',justifyContent:'flex-end',marginBottom:12,gap:8}}>
-                  <button className="btn bt bs" onClick={()=>newDoc('doc')}>+ Documento</button>
-                  <button className="btn bs" style={{background:'rgba(6,214,160,.15)',color:'var(--green)',border:'1px solid rgba(6,214,160,.3)'}} onClick={()=>newDoc('sheet')}>+ Foglio</button>
-                  <button className="btn bs" style={{background:'rgba(123,94,167,.15)',color:'var(--purple)',border:'1px solid rgba(123,94,167,.3)'}} onClick={()=>newDoc('slides')}>+ Slide</button>
-                </div>
-                {docs.length===0&&<Empty icon="doc" text="Nessun documento" sub="Crea il tuo primo documento di studio"/>}
-                {docs.map(d=>(
-                  <div key={d.id} className="card" style={{marginBottom:10,padding:16}}>
-                    <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
-                      <div style={{fontSize:'1.3rem',padding:'8px 12px',borderRadius:10,background:d.type==='sheet'?'rgba(6,214,160,.15)':d.type==='slides'?'rgba(123,94,167,.15)':'rgba(255,209,102,.15)'}}>
-                        {d.type==='sheet'?'📊':d.type==='slides'?'📽️':'📄'}
-                      </div>
-                      <div style={{flex:1}}>
-                        <div style={{fontWeight:700,fontSize:'.95rem'}}>{d.title}</div>
-                        <div style={{fontSize:'.72rem',color:'var(--text2)',marginTop:2}}>
-                          {d.type==='sheet'?'Foglio di calcolo':d.type==='slides'?'Presentazione':'Documento'} • 
-                          {d.updatedAt?'Modificato: '+new Date(d.updatedAt).toLocaleDateString('it-IT'):'Creato: '+new Date(d.createdAt).toLocaleDateString('it-IT')}
-                        </div>
-                      </div>
-                      <div style={{display:'flex',gap:6}}>
-                        <button className="btn bs" style={{background:'rgba(76,201,240,.15)',color:'var(--blue)',fontSize:'.75rem',padding:'6px 12px'}} onClick={()=>{setActiveDoc(d);setDocTitle(d.title);setDocType(d.type||'doc');setTimeout(()=>{if(editorRef.current&&(d.type||'doc')==='doc')editorRef.current.innerHTML=d.content||'';},80);}}>
-                          ✏️ Modifica
-                        </button>
-                        <div className="ib" style={{color:'var(--red)',padding:'6px 8px'}} onClick={()=>delDoc(d.id)} title="Elimina">🗑️</div>
-                      </div>
-                    </div>
-                    {d.type==='doc'&&d.content&&(
-                      <div style={{fontSize:'.8rem',color:'var(--text2)',lineHeight:1.6,background:'rgba(255,255,255,.03)',padding:12,borderRadius:10,maxHeight:80,overflow:'hidden',whiteSpace:'pre-wrap'}}>
-                        {d.content.replace(/<[^>]*>/g,' ').substring(0,300)}
-                      </div>
-                    )}
-                    {d.type==='sheet'&&(
-                      <div style={{fontSize:'.8rem',color:'var(--text2)',padding:8}}>
-                        📊 {d.content ? JSON.parse(d.content).length + ' righe' : '0 righe'}
-                      </div>
-                    )}
-                    {d.type==='slides'&&(
-                      <div style={{fontSize:'.8rem',color:'var(--text2)',padding:8}}>
-                        📽️ {d.content ? JSON.parse(d.content).length + ' slide' : '0 slide'}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </>
-            ):(
-              <div>
-                {/* Header Editor */}
-                <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:20,marginBottom:16}}>
-                  <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:16}}>
-                    <button className="btn bg" onClick={()=>setActiveDoc(null)} style={{display:'flex',alignItems:'center',gap:6,padding:'10px 16px'}}>
-                      ← Lista
-                    </button>
-                    <input className="field" style={{flex:1,fontWeight:700,fontSize:'1.1rem'}} value={docTitle} onChange={e=>setDocTitle(e.target.value)} placeholder="Titolo documento"/>
-                  </div>
-                  <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
-                    <button className="btn bt" onClick={saveDocContent} style={{background:'linear-gradient(135deg,#06D6A0,#00B894)',color:'#fff',fontWeight:700,padding:'12px 24px',fontSize:'.9rem'}}>
-                      💾 Salva
-                    </button>
-                    <button className="btn bg bs" onClick={exportDoc} style={{padding:'12px 16px'}}>
-                      📥 Esporta
-                    </button>
-                    {addNote&&<button className="btn bs" onClick={saveToNotes} style={{background:'rgba(76,201,240,.12)',color:'var(--blue)',border:'1px solid rgba(76,201,240,.3)',padding:'12px 16px'}}>
-                      📝 Copia in Note
-                    </button>}
-                  </div>
-                </div>
-                
-                {/* Toolbar Documento */}
-                {(activeDoc.type||'doc')==='doc'&&<div className="uni-toolbar" style={{marginBottom:12}}>
-                  {[['bold','G'],['italic','C'],['underline','S'],['strikeThrough','~~']].map(([cmd,l])=>(
-                    <button key={cmd} className="uni-tool" onMouseDown={e=>{e.preventDefault();execCmd(cmd);}}><b style={cmd==='bold'?{fontWeight:700}:cmd==='italic'?{fontStyle:'italic'}:cmd==='underline'?{textDecoration:'underline'}:{textDecoration:'line-through'}}>{l}</b></button>
-                  ))}
-                  <div style={{width:1,background:'rgba(255,255,255,.1)',margin:'0 4px'}}/>
-                  {[['insertUnorderedList','Lista'],['insertOrderedList','1. Lista']].map(([cmd,l])=>(
-                    <button key={cmd} className="uni-tool" onMouseDown={e=>{e.preventDefault();execCmd(cmd);}}>{l}</button>
-                  ))}
-                  <div style={{width:1,background:'rgba(255,255,255,.1)',margin:'0 4px'}}/>
-                  {[['h1','H1'],['h2','H2'],['h3','H3']].map(([tag,l])=>(
-                    <button key={tag} className="uni-tool" onMouseDown={e=>{e.preventDefault();execCmd('formatBlock',tag);}}>{l}</button>
-                  ))}
-                  <div style={{width:1,background:'rgba(255,255,255,.1)',margin:'0 4px'}}/>
-                  <button className="uni-tool" onMouseDown={e=>{e.preventDefault();execCmd('removeFormat');}}>Reset</button>
-                </div>}
-                
-                {/* Editor Documento */}
-                {(activeDoc.type||'doc')==='doc'&&(
-                  <div
-                    ref={editorRef}
-                    className="uni-editor"
-                    contentEditable
-                    suppressContentEditableWarning
-                    onInput={()=>{}}
-                    style={{minHeight:'calc(100vh - 350px)',borderRadius:16}}
-                  />
-                )}
-                
-                {/* Editor Foglio */}
-                {activeDoc.type==='sheet'&&(
-                  <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:16}}>
-                    <div style={{fontWeight:700,marginBottom:12,color:'var(--green)'}}>📊 Foglio di Calcolo</div>
-                    <SpreadsheetEditor doc={activeDoc} onSave={(data)=>{const updated={...activeDoc,content:JSON.stringify(data),updatedAt:new Date().toISOString()};saveDocs(docs.map(d=>d.id===updated.id?updated:d));setActiveDoc(updated);toast2('Salvato!');}}/>
-                  </div>
-                )}
-                
-                {/* Editor Slide */}
-                {activeDoc.type==='slides'&&(
-                  <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:16}}>
-                    <div style={{fontWeight:700,marginBottom:12,color:'var(--purple)'}}>📽️ Presentazione</div>
-                    <SlidesEditor doc={activeDoc} onSave={(data)=>{const updated={...activeDoc,content:JSON.stringify(data),updatedAt:new Date().toISOString()};saveDocs(docs.map(d=>d.id===updated.id?updated:d));setActiveDoc(updated);toast2('Salvato!');}}/>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {view==='studia'&&(
-          <div style={{maxWidth:900,margin:'0 auto'}}>
-            {/* Header con lista progetti */}
-            {!activeProject ? (
-              <>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16,gap:12,flexWrap:'wrap'}}>
-                  <div>
-                    <div style={{fontWeight:700,fontSize:'1.1rem',marginBottom:4}}>📚 Progetti di Studio</div>
-                    <div style={{fontSize:'.82rem',color:'var(--text2)'}}>Crea progetti per materia e chatta con l'AI tutor</div>
-                  </div>
-                  <button className="btn bt bs" onClick={()=>setShowNewProject(true)}>+ Nuovo Progetto</button>
-                </div>
-
-                {/* Nuovo Progetto Modal */}
-                {showNewProject && (
-                  <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:20,marginBottom:16}}>
-                    <div style={{fontWeight:700,marginBottom:16,fontSize:'.95rem'}}>🎓 Nuovo Progetto di Studio</div>
-                    <div className="fl" style={{marginBottom:12}}>
-                      <label>Nome progetto *</label>
-                      <input className="field" placeholder="Es. Analisi 2, Diritto Privato..." value={newProjectName} onChange={e=>setNewProjectName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&createProject()}/>
-                    </div>
-                    <div className="fl" style={{marginBottom:16}}>
-                      <label>Materia (opzionale)</label>
-                      <input className="field" placeholder="Es. Matematica, Storia..." value={newProjectSubject} onChange={e=>setNewProjectSubject(e.target.value)}/>
-                    </div>
-                    <div style={{display:'flex',gap:8}}>
-                      <button className="btn bg" onClick={()=>{setShowNewProject(false);setNewProjectName('');setNewProjectSubject('');}}>Annulla</button>
-                      <button className="btn bt" onClick={createProject} disabled={!newProjectName.trim()}>Crea Progetto</button>
-                    </div>
-                  </div>
-                )}
-
-                {studyProjects.length===0 && !showNewProject && (
-                  <div style={{textAlign:'center',padding:'60px 20px',background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16}}>
-                    <div style={{fontSize:'3rem',marginBottom:16}}>📚</div>
-                    <div style={{fontWeight:700,marginBottom:8}}>Nessun progetto</div>
-                    <div style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:16}}>Crea il tuo primo progetto di studio per iniziare a chattare con l'AI tutor</div>
-                    <button className="btn bt" onClick={()=>setShowNewProject(true)}>+ Crea Progetto</button>
-                  </div>
-                )}
-
-                {studyProjects.map(p => (
-                  <div key={p.id} className="card" style={{marginBottom:12,padding:16}}>
-                    <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:10}}>
-                      <div style={{width:48,height:48,borderRadius:14,background:'linear-gradient(135deg,rgba(6,214,160,.2),rgba(76,201,240,.1))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.5rem',flexShrink:0}}>📚</div>
-                      <div style={{flex:1}}>
-                        <div style={{fontWeight:700,fontSize:'.95rem'}}>{p.name}</div>
-                        <div style={{fontSize:'.78rem',color:'var(--text2)'}}>{p.subject} • {p.messages.length} messaggi</div>
-                      </div>
-                      <div style={{display:'flex',gap:6}}>
-                        <button className="btn bt bs" onClick={()=>openProject(p)}>💬 Chatta</button>
-                        <div className="ib" style={{color:'var(--red)',padding:'8px'}} onClick={()=>deleteProject(p.id)} title="Elimina">🗑️</div>
-                      </div>
-                    </div>
-                    <div style={{fontSize:'.72rem',color:'var(--text2)'}}>
-                      Creato: {new Date(p.createdAt).toLocaleDateString('it-IT')}
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : (
-              /* Chat del Progetto */
-              <div className="study-chat-container" style={{height:'calc(100vh - 250px)',display:'flex',flexDirection:'column'}}>
-                {/* Header Chat */}
-                <div className="study-chat-header" style={{display:'flex',alignItems:'center',gap:10,marginBottom:8,padding:10,background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12,flexShrink:0}}>
-                  <button className="btn bg" onClick={closeProject} style={{display:'flex',alignItems:'center',gap:4,padding:'8px 12px',fontSize:'.78rem'}}>
-                    ←
-                  </button>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontWeight:700,fontSize:'.88rem',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>📚 {activeProject.name}</div>
-                    <div style={{fontSize:'.68rem',color:'var(--text2)'}}>{activeProject.subject}</div>
-                  </div>
-                  <div style={{display:'flex',gap:4,flexShrink:0}}>
-                    <label className="btn bg bs" style={{cursor:'pointer',opacity:studyLoadingFile?0.7:1,padding:'6px 10px',fontSize:'.72rem'}}>
-                      {studyLoadingFile?'⏳':'📎'}<input type="file" accept=".pdf,.txt,.md,.js,.ts,.py,.html,.css,.json" style={{display:'none'}} onChange={studyHandleUpload}/>
-                    </label>
-                    <button className="btn bg bs" onClick={()=>setStudyShowPaste(true)} style={{padding:'6px 10px',fontSize:'.72rem'}}>+Testo</button>
-                  </div>
-                </div>
-                
-                {/* File Tabs */}
-                <div style={{display:'flex',gap:8,marginBottom:10}}>
-                  <button onClick={()=>setStudyTab('chat')} className={'btn '+(studyTab==='chat'?'br':'bg')+' bs'} style={{fontSize:'.8rem',padding:'8px 16px'}}>
-                    💬 Chat
-                  </button>
-                  <button onClick={()=>setStudyTab('files')} className={'btn '+(studyTab==='files'?'br':'bg')+' bs'} style={{fontSize:'.8rem',padding:'8px 16px'}}>
-                    📁 File ({studyFiles.length})
-                  </button>
-                </div>
-                
-                {/* Files List */}
-                {studyTab==='files'&&(
-                  <div style={{flex:1,overflowY:'auto',background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:16,marginBottom:12}}>
-                    {studyFiles.length===0&&(
-                      <div style={{textAlign:'center',padding:'40px 20px',color:'var(--text2)'}}>
-                        <div style={{fontSize:'2rem',marginBottom:8}}>📂</div>
-                        <div style={{fontWeight:600,marginBottom:4}}>Nessun file</div>
-                        <div style={{fontSize:'.8rem'}}>Carica PDF, TXT o incolla appunti</div>
-                      </div>
-                    )}
-                    {studyFiles.map(f=>(
-                      <div key={f.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.05)'}}>
-                        <div style={{fontSize:'1.2rem',flexShrink:0}}>{f.type==='application/pdf'?'📄':'📝'}</div>
-                        <div style={{flex:1,minWidth:0}}>
-                          <div style={{fontWeight:600,fontSize:'.85rem',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{f.name}</div>
-                          <div style={{fontSize:'.72rem',color:'var(--text2)'}}>~{f.wordCount||0} parole</div>
-                        </div>
-                        <div className="ib" style={{color:'var(--red)',flexShrink:0}} onClick={()=>studyDeleteFile(f)}>x</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Messaggi Chat */}
-                {studyTab==='chat'&&(
-                  <>
-                    {studyFiles.length>0&&(
-                      <div style={{display:'flex',gap:5,flexWrap:'wrap',marginBottom:8}}>
-                        {studyFiles.map(f=>(
-                          <div key={f.id} style={{display:'flex',alignItems:'center',gap:4,background:'rgba(6,214,160,.08)',border:'1px solid rgba(6,214,160,.2)',borderRadius:7,padding:'4px 10px',fontSize:'.72rem',color:'var(--green)'}}>
-                            {f.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div ref={projectRef} style={{flex:1,overflowY:'auto',background:'var(--surface)',border:'1px solid var(--border)',borderRadius:16,padding:16,marginBottom:12}}>
-                      {projectMsgs.map((msg,i)=>(
-                        <div key={i} className={`msg ${msg.role}`}>
-                          <div className={`cav ${msg.role==='user'?'usr':'bot'}`}>{msg.role==='user'?'👤':'🤖'}</div>
-                          <div className="bub" dangerouslySetInnerHTML={{__html:msg.text.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br/>')}}/>
-                        </div>
-                      ))}
-                      {projectBusy&&<div className="msg bot"><div className="cav bot">🤖</div><div className="bub"><div className="typing"><span/><span/><span/></div></div></div>}
-                    </div>
-                  </>
-                )}
-
-                {/* Input Chat */}
-                {studyTab==='chat'&&(
-                  <div style={{display:'flex',gap:8,alignItems:'flex-end'}}>
-                    <button className="btn bg" onClick={handleStudyScreenshot} disabled={studyScreenshotLoading} style={{padding:'10px',fontSize:'1.1rem',opacity:studyScreenshotLoading?0.5:1,border:'none',cursor:'pointer',background:'rgba(76,201,240,.2)',color:'var(--blue)',borderRadius:10}} title="Screenshot schermo">
-                      {studyScreenshotLoading?'⏳':'📸'}
-                    </button>
-                    <label className="btn bg" style={{cursor:'pointer',padding:'10px',fontSize:'1.1rem',border:'none',background:'rgba(139,92,246,.2)',color:'var(--purple)',borderRadius:10}} title="Carica foto">
-                      📷<input type="file" accept="image/*" style={{display:'none'}} onChange={e=>handleStudyPhoto(e.target.files[0])}/>
-                    </label>
-                    <div style={{display:'flex',gap:4,marginBottom:8,flexWrap:'wrap'}}>
-                      <span style={{fontSize:'.65rem',color:'var(--text2)',marginRight:4}}>AI:</span>
-                      <button onClick={()=>setStudiaChatModel('groq')} style={{padding:'4px 10px',borderRadius:16,border:'none',cursor:'pointer',fontSize:'.7rem',fontWeight:600,background:studiaChatModel==='groq'?'#00D4AA':'rgba(255,255,255,.08)',color:studiaChatModel==='groq'?'#fff':'var(--text2)'}}>Groq</button>
-                      <button onClick={()=>{if(!localStorage.getItem('gemini_key')){if(window.apiKeyManager)window.apiKeyManager.showModal('gemini',()=>setStudiaChatModel('gemini'));}else{setStudiaChatModel('gemini');}}} style={{padding:'4px 10px',borderRadius:16,border:'none',cursor:'pointer',fontSize:'.7rem',fontWeight:600,background:studiaChatModel==='gemini'?'#4285F4':'rgba(255,255,255,.08)',color:studiaChatModel==='gemini'?'#fff':'var(--text2)'}}>Gemini</button>
-                      <button onClick={()=>{if(!localStorage.getItem('deepseek_key')){if(window.apiKeyManager)window.apiKeyManager.showModal('deepseek',()=>setStudiaChatModel('deepseek'));}else{setStudiaChatModel('deepseek');}}} style={{padding:'4px 10px',borderRadius:16,border:'none',cursor:'pointer',fontSize:'.7rem',fontWeight:600,background:studiaChatModel==='deepseek'?'#00BFFF':'rgba(255,255,255,.08)',color:studiaChatModel==='deepseek'?'#fff':'var(--text2)'}}>DeepSeek</button>
-                      <button onClick={()=>{if(!localStorage.getItem('grok_key')){if(window.apiKeyManager)window.apiKeyManager.showModal('grok',()=>setStudiaChatModel('grok'));}else{setStudiaChatModel('grok');}}} style={{padding:'4px 10px',borderRadius:16,border:'none',cursor:'pointer',fontSize:'.7rem',fontWeight:600,background:studiaChatModel==='grok'?'#FF6B6B':'rgba(255,255,255,.08)',color:studiaChatModel==='grok'?'#fff':'var(--text2)'}}>Grok</button>
-                      <button onClick={()=>{if(projectMsgs.length>1 && window.confirm('Azzera chat?')){setProjectMsgs([{role:'bot',text:'Chat azzerata!'}]);}}} style={{padding:'4px 10px',borderRadius:16,border:'none',cursor:'pointer',fontSize:'.7rem',fontWeight:600,background:'rgba(255,77,109,.15)',color:'var(--red)',marginLeft:'auto'}}>azzera</button>
-                    </div>
-                    <textarea 
-                      className="field" 
-                      rows={2} 
-                      placeholder='Chiedi al tutor...' 
-                      value={projectInp} 
-                      onChange={e=>setProjectInp(e.target.value)} 
-                      onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendToProjectAI();}}}
-                      style={{flex:1,resize:'none'}}
-                    />
-                    <button className="btn bt" onClick={()=>{const lastBot=projectMsgs.filter(m=>m.role==='bot').pop();if(lastBot)speakText(lastBot.text.slice(0,2000));}} style={{padding:'12px 14px',fontSize:'1.1rem',background:'rgba(139,92,246,.2)',color:'var(--purple)',borderRadius:10,border:'none',cursor:'pointer'}} title="Ascolta risposta">🔊</button>
-                    <button className="btn bt" onClick={startStudiaCallMode} style={{padding:'12px 14px',fontSize:'1.1rem',background:'rgba(6,214,160,.2)',color:'var(--green)',borderRadius:10,border:'none',cursor:'pointer'}} title="Modalità Chiamata">📞</button>
-                    <button className="btn bt" onClick={sendToProjectAI} disabled={projectBusy||!projectInp.trim()} style={{padding:'12px 20px',fontSize:'1.2rem'}}>➤</button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Studia Call Mode */}
-        {isStudiaCallMode && (
-          <div style={{position:'fixed',inset:0,zIndex:999999,background:'linear-gradient(180deg,#0a0a1a,#1a0a2e)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#fff'}}>
-            <div style={{position:'absolute',inset:0,overflow:'hidden',opacity:.15}}>
-              <div style={{position:'absolute',top:'20%',left:'30%',width:300,height:300,borderRadius:'50%',background:'radial-gradient(circle,#8B5CF6,transparent)',filter:'blur(80px)',animation:'pulse 3s infinite'}}/>
-              <div style={{position:'absolute',bottom:'20%',right:'30%',width:250,height:250,borderRadius:'50%',background:'radial-gradient(circle,#06D6A0,transparent)',filter:'blur(80px)',animation:'pulse 4s infinite'}}/>
-            </div>
-            <div style={{position:'relative',zIndex:10,textAlign:'center',marginBottom:40}}>
-              <div style={{width:100,height:100,borderRadius:'50%',background:'linear-gradient(135deg,#8B5CF6,#06D6A0)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'2.5rem',margin:'0 auto 16px',boxShadow:studiaCallSpeaking?'0 0 60px rgba(139,92,246,.5)':studiaCallListening?'0 0 60px rgba(6,214,160,.5)':'none',transition:'box-shadow .3s'}}>🎓</div>
-              <div style={{fontSize:'1.3rem',fontWeight:700,marginBottom:4}}>Tutor: {activeProject?.subject}</div>
-              <div style={{fontSize:'.85rem',color:'rgba(255,255,255,.6)'}}>{studiaCallSpeaking?'🔊 Parlando...':studiaCallListening?'🎤 Ascoltando...':'In chiamata'}</div>
-              <div style={{fontSize:'.75rem',color:'rgba(255,255,255,.4)',marginTop:8}}>{formatStudiaCallDuration(studiaCallDuration)}</div>
-            </div>
-            <div style={{position:'relative',zIndex:10,width:'90%',maxWidth:500,maxHeight:200,overflowY:'auto',padding:'0 16px',marginBottom:30}}>
-              {studiaCallMessages.slice(-5).map((m,i)=>(
-                <div key={i} style={{textAlign:m.role==='user'?'right':'left',marginBottom:8}}>
-                  <div style={{display:'inline-block',padding:'8px 14px',borderRadius:16,background:m.role==='user'?'rgba(6,214,160,.2)':'rgba(139,92,246,.2)',border:`1px solid ${m.role==='user'?'rgba(6,214,160,.3)':'rgba(139,92,246,.3)'}`,fontSize:'.85rem',maxWidth:'80%'}}>{m.text}</div>
-                </div>
-              ))}
-            </div>
-            <button onClick={endStudiaCallMode} style={{position:'relative',zIndex:10,width:70,height:70,borderRadius:'50%',background:'#FF4D6D',border:'none',cursor:'pointer',fontSize:'1.5rem',color:'#fff',boxShadow:'0 4px 20px rgba(255,77,109,.4)'}}>📵</button>
-            <div style={{position:'relative',zIndex:10,fontSize:'.75rem',color:'rgba(255,255,255,.4)',marginTop:8}}>Tocca per chiudere</div>
-          </div>
-        )}
-
-        {/* Paste Modal for Studia */}
-        {studyShowPaste && (
-          <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.8)',zIndex:2000,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setStudyShowPaste(false)}>
-            <div style={{position:'relative',background:'linear-gradient(135deg,rgba(14,18,32,.99),rgba(10,14,24,.99)',border:'1px solid rgba(255,255,255,.12)',borderRadius:24,padding:24,width:'100%',maxWidth:420,boxShadow:'0 24px 80px rgba(0,0,0,.8)'}} onClick={e=>e.stopPropagation()}>
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:20}}>
-                <div style={{fontWeight:700,fontSize:'1rem'}}>📝 Incolla Appunti</div>
-                <div onClick={()=>setStudyShowPaste(false)} style={{background:'rgba(255,77,109,.15)',border:'1px solid rgba(255,77,109,.3)',borderRadius:9,width:28,height:28,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',color:'var(--red)'}}>✕</div>
-              </div>
-              <div className="fl" style={{marginBottom:12}}>
-                <label>Titolo</label>
-                <input className="field" placeholder="Capitolo 3, Appunti..." value={studyPasteTitle} onChange={e=>setStudyPasteTitle(e.target.value)}/>
-              </div>
-              <div className="fl" style={{marginBottom:12}}>
-                <label>Testo</label>
-                <textarea className="field" rows={8} placeholder="Incolla appunti o testo..." value={studyPasteText} onChange={e=>setStudyPasteText(e.target.value)} style={{resize:'vertical'}}/>
-              </div>
-              <div style={{fontSize:'.74rem',color:'var(--text2)',marginBottom:12}}>~{studyPasteText.trim().split(/\s+/).filter(w=>w.length>0).length} parole</div>
-              <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}>
-                <button className="btn bg" onClick={()=>setStudyShowPaste(false)}>Annulla</button>
-                <button className="btn bt" onClick={studyAddPaste} disabled={!studyPasteText.trim()||!studyPasteTitle.trim()}>Aggiungi</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-      </div>
-
-      {/* STUDIA AI FEATURES MODALS */}
-      {studiaPdfTable.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaPdfTable(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:500}}>
-            <div className="modal-header"><h3>📊 Estrai Tabella PDF</h3><button className="modal-close" onClick={()=>setStudiaPdfTable(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <input type="file" accept="application/pdf" onChange={e=>studiaExtractPdfTable(e.target.files[0])} style={{marginBottom:12}}/>
-              {studiaPdfTable.loading && <div className="spinner"/>}
-              {studiaPdfTable.result && <div style={{whiteSpace:'pre-wrap',fontSize:'.85rem',maxHeight:300,overflow:'auto',background:'rgba(0,0,0,0.2)',padding:12,borderRadius:8}}>{studiaPdfTable.result}</div>}
-            </div>
-          </div>
+            );
+          })}
+          <div onClick={() => setTab('cal')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Calendario {'\u2192'}</div>
         </div>
       )}
 
-      {studiaCodeHelper.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaCodeHelper(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:550}}>
-            <div className="modal-header"><h3>💻 Code Helper</h3><button className="modal-close" onClick={()=>setStudiaCodeHelper(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <select className="field" value={studiaCodeHelper.lang} onChange={e=>setStudiaCodeHelper(s=>({...s,lang:e.target.value}))} style={{marginBottom:8}}>
-                <option value="javascript">JavaScript</option>
-                <option value="python">Python</option>
-                <option value="java">Java</option>
-                <option value="cpp">C++</option>
-                <option value="html">HTML/CSS</option>
-              </select>
-              <textarea className="field" rows={6} placeholder="Incolla il codice..." value={studiaCodeHelper.code} onChange={e=>setStudiaCodeHelper(s=>({...s,code:e.target.value}))} style={{marginBottom:8,fontFamily:'monospace'}}/>
-              <button className="btn bt" onClick={studiaRunCodeHelper} disabled={studiaCodeHelper.loading||!studiaCodeHelper.code.trim()}>
-                {studiaCodeHelper.loading ? 'Elaborazione...' : 'Analizza'}
-              </button>
-              {studiaCodeHelper.result && <div style={{marginTop:12,whiteSpace:'pre-wrap',fontSize:'.85rem',background:'rgba(0,0,0,0.2)',padding:12,borderRadius:8,maxHeight:250,overflow:'auto'}}>{studiaCodeHelper.result}</div>}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {studiaMathSolver.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaMathSolver(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:500}}>
-            <div className="modal-header"><h3>🧮 Math Solver</h3><button className="modal-close" onClick={()=>setStudiaMathSolver(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <textarea className="field" rows={4} placeholder="Inserisci il problema di matematica..." value={studiaMathSolver.problem} onChange={e=>setStudiaMathSolver(s=>({...s,problem:e.target.value}))} style={{marginBottom:8}}/>
-              <button className="btn bt" onClick={studiaSolveMath} disabled={studiaMathSolver.loading||!studiaMathSolver.problem.trim()}>
-                {studiaMathSolver.loading ? 'Risoluzione...' : 'Risolvi'}
-              </button>
-              {studiaMathSolver.result && <div style={{marginTop:12,whiteSpace:'pre-wrap',fontSize:'.85rem',background:'rgba(0,0,0,0.2)',padding:12,borderRadius:8}}>{studiaMathSolver.result}</div>}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {studiaBatchOps.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaBatchOps(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:500}}>
-            <div className="modal-header"><h3>⚡ Batch Operations</h3><button className="modal-close" onClick={()=>setStudiaBatchOps(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <input className="field" placeholder="Operazione (es. traduci, riassumi, categorizza)" value={studiaBatchOps.operation} onChange={e=>setStudiaBatchOps(s=>({...s,operation:e.target.value}))} style={{marginBottom:8}}/>
-              <textarea className="field" rows={4} placeholder="Inserisci elementi (uno per riga)..." value={studiaBatchOps.items.join('\n')} onChange={e=>setStudiaBatchOps(s=>({...s,items:e.target.value.split('\n').filter(l=>l.trim())}))} style={{marginBottom:8}}/>
-              <button className="btn bt" onClick={studiaRunBatchOp} disabled={studiaBatchOps.loading||!studiaBatchOps.operation.trim()||!studiaBatchOps.items.length}>
-                {studiaBatchOps.loading ? 'Elaborazione...' : 'Esegui'}
-              </button>
-              {studiaBatchOps.result && <div style={{marginTop:12,whiteSpace:'pre-wrap',fontSize:'.85rem',background:'rgba(0,0,0,0.2)',padding:12,borderRadius:8}}>{studiaBatchOps.result}</div>}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {studiaCompareMode.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaCompareMode(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:550}}>
-            <div className="modal-header"><h3>⚖️ Comparison Mode</h3><button className="modal-close" onClick={()=>setStudiaCompareMode(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <textarea className="field" rows={5} placeholder="Inserisci elementi da comparare (uno per riga)..." value={studiaCompareMode.items.join('\n')} onChange={e=>setStudiaCompareMode(s=>({...s,items:e.target.value.split('\n').filter(l=>l.trim())}))} style={{marginBottom:8}}/>
-              <button className="btn bt" onClick={studiaRunComparison} disabled={studiaCompareMode.loading||!studiaCompareMode.items.length}>
-                {studiaCompareMode.loading ? 'Comparazione...' : 'Comparare'}
-              </button>
-              {studiaCompareMode.result && <div style={{marginTop:12,whiteSpace:'pre-wrap',fontSize:'.85rem',background:'rgba(0,0,0,0.2)',padding:12,borderRadius:8,maxHeight:300,overflow:'auto'}}>{studiaCompareMode.result}</div>}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {studiaDebateMode.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaDebateMode(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:650}}>
-            <div className="modal-header"><h3>🎭 Multi AI Debate</h3><button className="modal-close" onClick={()=>setStudiaDebateMode(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <input className="field" placeholder="Argomento del dibattito..." value={studiaDebateMode.topic} onChange={e=>setStudiaDebateMode(s=>({...s,topic:e.target.value}))} style={{marginBottom:8}}/>
-              <div style={{display:'flex',gap:8,marginBottom:8}}>
-                <button className="btn bt" onClick={studiaStartDebate} disabled={studiaDebateMode.loading||!studiaDebateMode.topic.trim()} style={{flex:1}}>
-                  {studiaDebateMode.loading ? 'Groq...' : '🎭 Groq AI'}
-                </button>
-                <button className="btn bg" onClick={async () => {
-                  if(!studiaDebateMode.topic.trim()) return;
-                  setStudiaDebateMode(s=>({...s, loading:true, positions:[], round:0, secondary:'deepseek'}));
-                  try {
-                    const filesCtx = studiaFiles.length > 0 ? '\n\n[MATERIALE DI RIFERIMENTO]:\n' + studiaFiles.map(f => `--- ${f.name} ---\n${f.content.slice(0, 3000)}`).join('\n\n').slice(0, 12000) : '';
-                    const r = await proxyFetch('https://api.deepseek.com/v1/chat/completions', {
-                      method:'POST',
-                      headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('deepseek_key') || '')},
-                      body:(JSON.stringify({model:'deepseek-chat',max_tokens:1500,messages:[{role:'system',content:'Sei un assistente di dibattiti equilibrato. Fornisci prospettive diverse su qualsiasi argomento, basandoti sul materiale fornito.'},{role:'user',content:'Dibattito su: '+studiaDebateMode.topic+filesCtx+'\n\nPresenta PRO e CONTRO con argomentazioni, basandoti sul materiale se disponibile. Formato: PRO: [testo]\nCONTRO: [testo]'}]}))
-                    });
-                    const d = await r.json();
-                    const content = d.choices?.[0]?.message?.content || '';
-                    const pro = content.match(/PRO:?\s*([\s\S]*?)(?=CONTRO:|$)/i)?.[1]?.trim() || '';
-                    const contra = content.match(/CONTRO:?\s*([\s\S]*?)$/i)?.[1]?.trim() || '';
-                    setStudiaDebateMode(s=>({...s, loading:false, positions:[{side:'PRO',text:pro},{side:'CONTRO',text:contra}], round:1}));
-                  } catch(e) {
-                    setStudiaDebateMode(s=>({...s, loading:false, result:'Errore: '+e.message}));
-                  }
-                }} disabled={studiaDebateMode.loading||!studiaDebateMode.topic.trim()} style={{flex:1}}>🔍 DeepSeek</button>
-                <button className="btn bg" onClick={async () => {
-                  if(!studiaDebateMode.topic.trim()) return;
-                  setStudiaDebateMode(s=>({...s, loading:true, positions:[], round:0, secondary:'grok'}));
-                  try {
-                    const filesCtx = studiaFiles.length > 0 ? '\n\n[MATERIALE DI RIFERIMENTO]:\n' + studiaFiles.map(f => `--- ${f.name} ---\n${f.content.slice(0, 3000)}`).join('\n\n').slice(0, 12000) : '';
-                    const r = await proxyFetch('https://api.x.ai/v1/chat/completions', {
-                      method:'POST',
-                      headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('grok_key') || '')},
-                      body:(JSON.stringify({model:'grok-2-1212',max_tokens:1500,messages:[{role:'system',content:'Sei un assistente di dibattiti equilibrato. Fornisci prospettive diverse su qualsiasi argomento, basandoti sul materiale fornito.'},{role:'user',content:'Dibattito su: '+studiaDebateMode.topic+filesCtx+'\n\nPresenta PRO e CONTRO con argomentazioni, basandoti sul materiale se disponibile. Formato: PRO: [testo]\nCONTRO: [testo]'}]}))
-                    });
-                    const d = await r.json();
-                    const content = d.choices?.[0]?.message?.content || '';
-                    const pro = content.match(/PRO:?\s*([\s\S]*?)(?=CONTRO:|$)/i)?.[1]?.trim() || '';
-                    const contra = content.match(/CONTRO:?\s*([\s\S]*?)$/i)?.[1]?.trim() || '';
-                    setStudiaDebateMode(s=>({...s, loading:false, positions:[{side:'PRO',text:pro},{side:'CONTRO',text:contra}], round:1}));
-                  } catch(e) {
-                    setStudiaDebateMode(s=>({...s, loading:false, result:'Errore Grok: '+e.message}));
-                  }
-                }} disabled={studiaDebateMode.loading||!studiaDebateMode.topic.trim()} style={{flex:1}}>🌟 Grok</button>
+      {/* Promemoria Attivi */}
+      {activeReminders.length > 0 && (
+        <div style={card}>
+          <div style={sectionTitle}>{'\uD83D\uDD14'} Promemoria Attivi ({activeReminders.length})</div>
+          {activeReminders.slice(0,4).map(r => (
+            <div key={r.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontSize:18}}>{r.priority === 'high' ? '\u26A0\uFE0F' : '\uD83D\uDD14'}</div>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:600,fontSize:14}}>{r.title}</div>
+                <div style={{fontSize:12,color:'var(--muted)'}}>{r.date} {r.time ? '\u2022 ' + r.time : ''}</div>
               </div>
-              {studiaDebateMode.secondary && <div style={{fontSize:'.75rem',color:studiaDebateMode.secondary==='grok'?'#FF6B6B':'#00BFFF',marginBottom:12}}>🔍 {studiaDebateMode.secondary==='grok'?'Grok (xAI)':'DeepSeek'}</div>}
-              {studiaDebateMode.positions.length > 0 && (
-                <div style={{marginTop:16}}>
-                  <div style={{fontSize:'.9rem',fontWeight:600,marginBottom:8}}>Round {studiaDebateMode.round}</div>
-                  {studiaDebateMode.positions.map((p, i) => (
-                    <div key={i} style={{background:p.side==='PRO'?'rgba(6,214,160,.15)':'rgba(255,77,109,.15)',borderLeft:'3px solid '+(p.side==='PRO'?'#06D6A0':'#FF4D6D'),padding:12,borderRadius:4,marginBottom:8}}>
-                      <div style={{fontWeight:600,color:p.side==='PRO'?'#06D6A0':'#FF4D6D',marginBottom:4}}>{p.side}</div>
-                      <div style={{fontSize:'.85rem'}}>{p.text}</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {studiaDebateMode.result && <div style={{marginTop:12,background:'rgba(255,77,109,.1)',padding:12,borderRadius:8,fontSize:'.85rem',color:'var(--red)'}}>{studiaDebateMode.result}</div>}
+              {r.repeat && r.repeat !== 'none' && <span style={chip('#9B59B6')}>{r.repeat === 'daily' ? 'Giornaliero' : r.repeat === 'weekdays' ? 'Festivi' : r.repeat}</span>}
             </div>
-          </div>
+          ))}
+          <div onClick={() => setTab('reminders')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Gestisci Promemoria {'\u2192'}</div>
         </div>
       )}
 
-      {studiaDiagramSolver.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaDiagramSolver(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:500}}>
-            <div className="modal-header"><h3>📈 Diagram Solver</h3><button className="modal-close" onClick={()=>setStudiaDiagramSolver(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <input type="file" accept="image/*" onChange={e=>setStudiaDiagramSolver(s=>({...s,image:e.target.files[0]}))} style={{marginBottom:8}}/>
-              {studiaDiagramSolver.image && <div style={{marginBottom:8,fontSize:'.85rem'}}>{studiaDiagramSolver.image.name}</div>}
-              <button className="btn bt" onClick={studiaSolveDiagram} disabled={studiaDiagramSolver.loading||!studiaDiagramSolver.image}>
-                {studiaDiagramSolver.loading ? 'Analisi...' : 'Analizza Diagramma'}
-              </button>
-              {studiaDiagramSolver.result && <div style={{marginTop:12,whiteSpace:'pre-wrap',fontSize:'.85rem',background:'rgba(0,0,0,0.2)',padding:12,borderRadius:8}}>{studiaDiagramSolver.result}</div>}
-            </div>
+      {/* Completare */}
+      {pendingTodos.length > 0 && (
+        <div style={card}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+            <div style={sectionTitle}>{'\u2705'} To-Do ({pendingTodos.length} da fare)</div>
+            {doneTodos.length > 0 && <span style={{fontSize:11,color:'var(--green)',fontWeight:600}}>{doneTodos.length}/{todos.length} completati</span>}
           </div>
+          {pendingTodos.slice(0,4).map(t => (
+            <div key={t.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
+              <div style={{width:20,height:20,borderRadius:6,border:'2px solid var(--muted)',flexShrink:0}}/>
+              <span style={{fontSize:14}}>{t.title}</span>
+            </div>
+          ))}
+          <div onClick={() => setTab('todo')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Apri To-Do {'\u2192'}</div>
         </div>
       )}
 
-      {studiaProgressiveDash.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaProgressiveDash(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:450}}>
-            <div className="modal-header"><h3>📊 Progressive Dashboard</h3><button className="modal-close" onClick={()=>setStudiaProgressiveDash(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
-                <div style={{background:'rgba(255,77,109,.15)',padding:16,borderRadius:8,textAlign:'center'}}><div style={{fontSize:'1.5rem',fontWeight:700}}>{studiaProgressiveDash.data.esami?.length||0}</div><div style={{fontSize:'.75rem',color:'var(--text2)'}}>Esami</div></div>
-                <div style={{background:'rgba(6,214,160,.15)',padding:16,borderRadius:8,textAlign:'center'}}><div style={{fontSize:'1.5rem',fontWeight:700}}>{studiaProgressiveDash.data.pomodoroCycles||0}</div><div style={{fontSize:'.75rem',color:'var(--text2)'}}>Cicli Pomodoro</div></div>
+      {/* Wallet */}
+      {wallet && wallet.transactions && wallet.transactions.length > 0 && (
+        <div style={card}>
+          <div style={sectionTitle}>{'\uD83D\uDCB0'} Wallet</div>
+          <div style={{fontSize:28,fontWeight:800,color: wallet.balance >= 0 ? 'var(--green)' : '#FF6B6B',marginBottom:6}}>
+            {'\u20AC'} {wallet.balance.toFixed(2)}
+          </div>
+          {wallet.transactions.slice(0,3).map(tx => (
+            <div key={tx.id} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid var(--border)',fontSize:13}}>
+              <span>{tx.title}</span>
+              <span style={{fontWeight:700,color:tx.type==='income'?'var(--green)':'#FF6B6B'}}>{tx.type==='income'?'+':'-'}{'\u20AC'}{tx.amount.toFixed(2)}</span>
+            </div>
+          ))}
+          <div onClick={() => setTab('wallet')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Wallet {'\u2192'}</div>
+        </div>
+      )}
+
+      {/* Note Recenti */}
+      {recentNotes.length > 0 && (
+        <div style={card}>
+          <div style={sectionTitle}>{'\uD83D\uDCDD'} Note Recenti</div>
+          {recentNotes.map(n => (
+            <div key={n.id} style={{padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
+              <div style={{fontWeight:600,fontSize:14}}>{n.title || 'Nota senza titolo'}</div>
+              <div style={{fontSize:12,color:'var(--muted)',marginTop:2,maxHeight:32,overflow:'hidden'}}>{(n.text||'').slice(0,80)}</div>
+            </div>
+          ))}
+          <div onClick={() => setTab('notes')} style={{textAlign:'center',padding:10,color:'var(--accent)',fontWeight:600,cursor:'pointer',fontSize:13}}>Vedi Note {'\u2192'}</div>
+        </div>
+      )}
+
+      {/* Compleanni */}
+      {upcomingBirthdays.length > 0 && (
+        <div style={card}>
+          <div style={sectionTitle}>{'\uD83C\uDF82'} Compleanni</div>
+          {upcomingBirthdays.map(b => {
+            const bd = new Date(now.getFullYear(), b.month-1, b.day);
+            if(bd < now) bd.setFullYear(bd.getFullYear()+1);
+            const diff = Math.ceil((bd - now) / 86400000);
+            return (
+              <div key={b.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
+                <span style={{fontSize:14,fontWeight:500}}>{b.name}</span>
+                <span style={chip('#FF69B4')}>{diff === 0 ? 'Oggi!' : diff === 1 ? 'Domani' : 'tra ' + diff + ' gg'}</span>
               </div>
-              <div style={{fontSize:'.85rem',fontWeight:600,marginBottom:8}}>Insights:</div>
-              {studiaProgressiveDash.insights.map((insight, i) => (
-                <div key={i} style={{padding:'8px 12px',background:'rgba(255,255,255,.03)',borderRadius:6,marginBottom:6,fontSize:'.85rem'}}>{insight}</div>
-              ))}
-            </div>
-          </div>
+            );
+          })}
         </div>
       )}
 
-      {studiaLeaderboard.show && (
-        <div className="modal-overlay" onClick={()=>setStudiaLeaderboard(s=>({...s,show:false}))}>
-          <div className="modal" onClick={e=>e.stopPropagation()} style={{maxWidth:400}}>
-            <div className="modal-header"><h3>🏆 Leaderboard</h3><button className="modal-close" onClick={()=>setStudiaLeaderboard(s=>({...s,show:false}))}>&times;</button></div>
-            <div className="modal-body">
-              <div style={{display:'flex',gap:8,marginBottom:12}}>
-                {['week','month','all'].map(t=>(<button key={t} className={'btn sm '+(studiaLeaderboard.timePeriod===t?'bt':'bg')} onClick={()=>setStudiaLeaderboard(s=>({...s,timePeriod:t}))}>{t==='week'?'Settimana':t==='month'?'Mese':'Totale'}</button>))}
-              </div>
-              {studiaLeaderboard.scores.sort((a,b)=>b.points-a.points).map((s, i) => (
-                <div key={i} style={{display:'flex',alignItems:'center',gap:12,padding:'10px 12px',background:i===0?'rgba(255,215,0,.1)':'rgba(255,255,255,.02)',borderRadius:8,marginBottom:6}}>
-                  <div style={{fontSize:'1.1rem',fontWeight:700,width:24,color:i===0?'#FFD700':i===1?'#C0C0C0':i===2?'#CD7F32':'var(--text2)'}}>{i+1}</div>
-                  <div style={{flex:1}}><div style={{fontWeight:600}}>{s.user}</div></div>
-                  <div style={{fontWeight:700,color:'#06D6A0'}}>{s.points}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Empty State */}
+      {todayEvents.length === 0 && upcomingEvents.length === 0 && activeReminders.length === 0 && pendingTodos.length === 0 && recentNotes.length === 0 && (
+        <div style={{textAlign:'center',padding:'40px 20px',color:'var(--muted)'}}>
+          <div style={{fontSize:48,marginBottom:12}}>{'\uD83C\uDF1F'}</div>
+          <div style={{fontSize:16,fontWeight:600,marginBottom:6}}>Tutto quiete oggi!</div>
+          <div style={{fontSize:13}}>Aggiungi qualcosa con i bottoni qui sopra</div>
         </div>
       )}
-
     </div>
   );
 }
+
 
 // Mini Pomodoro Timer
 function MiniPomTimer() {
@@ -28016,7 +26138,7 @@ function App(){
   const [fbOk,setFbOk]=useState(!!window._fbReady);
   const [user,setUser]=useState(null);
   const [checked,setChecked]=useState(false);
-  const [tab,setTab]=useState('pw');
+  const [tab,setTab]=useState('home');
   const [isLocked, setIsLocked] = useState(!!localStorage.getItem('lmv_pin'));
   const [pin, setPin] = useState(localStorage.getItem('lmv_pin') || '1234');
   const [apiKeys,setApiKeys]=useState({groq:'',gemini:'',openrouter:''});
@@ -28996,6 +27118,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
   };
 
   const TABS=[
+    {id:'home',   label:'Home',        cls:'thome'},
     {id:'pw',     label:'Password',    cls:'tpw'},
     {id:'cal',    label:'Calendario',  cls:'tc'},
     {id:'email',  label:'Email',       cls:'temail'},
@@ -30716,6 +28839,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
           )}
           
           <div className="content">
+             {tab==='home'&&<DashboardHome toast={toast} setTab={setTab}/>}
              {tab==='pw'&&<PwTab toast={toast} />}
              {tab==='cal'&&<CalTab toast={toast}/>}
              {tab==='email'&&<EmailTab toast={toast} callAI={callAI}/>}
