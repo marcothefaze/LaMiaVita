@@ -8,6 +8,9 @@
 <meta name="theme-color" content="#FF4D6D">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LaMiaVita">
 <meta name="format-detection" content="telephone=no">
@@ -15546,7 +15549,7 @@ function GlobalTwitchMini({currentTab, setTab}) {
     };
   }, [isDragging]);
   
-  if (!twitchState?.channel || currentTab === 'tuttuni') return null;
+  if (!twitchState?.channel) return null;
   
   const handleDragStart = (e) => {
     if (e.target.closest('button') || e.target.closest('a')) return;
@@ -24965,6 +24968,13 @@ function NotesPage({onClose, toast}) {
     reader.readAsDataURL(file);
   });
 
+  // Safe tags helpers
+  const tagsToString = (t) => Array.isArray(t) ? t.join(', ') : (typeof t === 'string' ? t : '');
+  const tagsToArray = (t) => {
+    const s = Array.isArray(t) ? t.join(', ') : (typeof t === 'string' ? t : '');
+    return s ? s.split(',').map(x=>x.trim()).filter(Boolean) : [];
+  };
+
   // Add media from file input
   const handleAddMedia = async (e) => {
     const file = e.target.files?.[0];
@@ -24976,8 +24986,7 @@ function NotesPage({onClose, toast}) {
     const updated = {...editForm, media: [...(editForm.media||[]), newMedia]};
     setEditForm(updated);
     if (selectedId) {
-      const tags = updated.tags ? updated.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
-      autoSave(selectedId, {...updated, tags});
+      autoSave(selectedId, {...updated, tags: tagsToArray(updated.tags)});
     }
     toast('Foto aggiunta!','var(--green)');
   };
@@ -24987,8 +24996,7 @@ function NotesPage({onClose, toast}) {
     const updated = {...editForm, media: (editForm.media||[]).filter(m=>m.id!==mediaId)};
     setEditForm(updated);
     if (selectedId) {
-      const tags = updated.tags ? updated.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
-      autoSave(selectedId, {...updated, tags});
+      autoSave(selectedId, {...updated, tags: tagsToArray(updated.tags)});
     }
   };
 
@@ -24997,8 +25005,7 @@ function NotesPage({onClose, toast}) {
     const updated = {...editForm, media: (editForm.media||[]).map(m=>m.id===mediaId?{...m,width}:m)};
     setEditForm(updated);
     if (selectedId) {
-      const tags = updated.tags ? updated.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
-      autoSave(selectedId, {...updated, tags});
+      autoSave(selectedId, {...updated, tags: tagsToArray(updated.tags)});
     }
   };
 
@@ -25013,8 +25020,7 @@ function NotesPage({onClose, toast}) {
     const updated = {...editForm, media};
     setEditForm(updated);
     if (selectedId) {
-      const tags = updated.tags ? updated.tags.split(',').map(t=>t.trim()).filter(Boolean) : [];
-      autoSave(selectedId, {...updated, tags});
+      autoSave(selectedId, {...updated, tags: tagsToArray(updated.tags)});
     }
   };
 
@@ -25058,13 +25064,6 @@ function NotesPage({onClose, toast}) {
         setTimeout(()=>titleRef.current?.focus(),100);
       }
     },50);
-  };
-
-  // Safe: convert tags to comma string for editing
-  const tagsToString = (t) => Array.isArray(t) ? t.join(', ') : (typeof t === 'string' ? t : '');
-  const tagsToArray = (t) => {
-    const s = Array.isArray(t) ? t.join(', ') : (typeof t === 'string' ? t : '');
-    return s ? s.split(',').map(x=>x.trim()).filter(Boolean) : [];
   };
 
   // Select a note — immediately editable (no read/edit toggle)
@@ -25596,7 +25595,7 @@ function SettingsTab({toast}) {
 
   const exportData = () => {
     const data={};
-    ['passwords','notes','events','birthdays','reminders','yt_saved','lmv_apikeys','todo_cats','todo_items','uni_projects'].forEach(k=>{
+    ['passwords','notes','events','birthdays','reminders','yt_saved','lmv_apikeys','todo_cats','todo_items'].forEach(k=>{
       try{const v=localStorage.getItem(k);if(v)data[k]=v;}catch(e){}
     });
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -26048,7 +26047,7 @@ function SettingsTab({toast}) {
         <div style={{marginTop:12}}>
           <div style={{fontSize:'.75rem',color:'var(--text2)',fontWeight:700,textTransform:'uppercase',letterSpacing:'.05em',marginBottom:8}}>Elimina sezione</div>
           <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
-            {[['passwords','Password'],['notes','Note'],['events','Eventi'],['birthdays','Compleanni'],['reminders','Promemoria'],['todo_items','To-Do'],['uni_projects','Universita']].map(([k,l])=>(
+            {[['passwords','Password'],['notes','Note'],['events','Eventi'],['birthdays','Compleanni'],['reminders','Promemoria'],['todo_items','To-Do']].map(([k,l])=>(
               <button key={k} className="btn bg bs" style={{color:'var(--red)',fontSize:'.75rem'}} onClick={()=>clearSection(k,l)}>x {l}</button>
             ))}
           </div>
@@ -28568,1147 +28567,6 @@ function MiniPomTimer() {
   );
 }
 
-function TuttUniTab({uid, toast, apiKeys}) {
-  const {addNote} = useContext(DataCtx);
-  const [showDash, setShowDash] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [activeProj, setActiveProj] = useState(null);
-  const [projMod, setProjMod] = useState(false);
-  const [projF, setProjF] = useState({name:'',color:'#4CC9F0',desc:''});
-  const [geminiKey, setGeminiKey] = useState(()=>localStorage.getItem('gemini_api_key')||'');
-  const [showApiSettings, setShowApiSettings] = useState(false);
-  const [showExternalAI, setShowExternalAI] = useState(false);
-  const [externalAIUrl, setExternalAIUrl] = useState('https://claude.ai');
-  
-  // Floating AI Panel State
-  const [floatingPanel, setFloatingPanel] = useState(() => {
-    const saved = localStorage.getItem('lmv_floating_panel');
-    return saved ? JSON.parse(saved) : { x: 50, y: 100, width: 400, height: 500 };
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
-  const saveFloatingPanel = (panel) => {
-    localStorage.setItem('lmv_floating_panel', JSON.stringify(panel));
-    setFloatingPanel(panel);
-  };
-
-  const handleFloatingMouseDown = (e) => {
-    if (e.target.closest('.resize-handle') || e.target.closest('.panel-controls')) return;
-    setIsDragging(true);
-    setDragOffset({ x: e.clientX - floatingPanel.x, y: e.clientY - floatingPanel.y });
-  };
-
-  const handleResizeMouseDown = (e) => {
-    e.stopPropagation();
-    setIsResizing(true);
-    setDragOffset({ x: e.clientX - floatingPanel.width, y: e.clientY - floatingPanel.height });
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (isDragging) {
-        const newX = Math.max(0, Math.min(window.innerWidth - 200, e.clientX - dragOffset.x));
-        const newY = Math.max(0, Math.min(window.innerHeight - 100, e.clientY - dragOffset.y));
-        saveFloatingPanel({ ...floatingPanel, x: newX, y: newY });
-      }
-      if (isResizing) {
-        const newWidth = Math.max(280, Math.min(window.innerWidth, e.clientX - dragOffset.x + floatingPanel.width));
-        const newHeight = Math.max(300, Math.min(window.innerHeight, e.clientY - dragOffset.y + floatingPanel.height));
-        saveFloatingPanel({ ...floatingPanel, width: newWidth, height: newHeight });
-      }
-    };
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      setIsResizing(false);
-    };
-    if (isDragging || isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, isResizing, dragOffset, floatingPanel]);
-
-  const openAIPopup = (url) => {
-    const aiName = EXTERNAL_AI_OPTIONS.find(a => a.url === url)?.name || 'AI';
-    const popup = window.open(url, 'AI_' + aiName, 'width=1200,height=800,left=100,top=50,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes');
-    if (popup) {
-      setShowExternalAI(false);
-    }
-  };
-  
-  const PROJ_COLORS = ['#4CC9F0','#06D6A0','#FFD166','#FF4D6D','#7B5EA7','#FF6B9D','#1ED760','#FF8C42'];
-
-  const EXTERNAL_AI_OPTIONS = [
-    { id: 'claude', name: 'Claude', url: 'https://claude.ai', icon: '🤖', color: '#FF6B6B', desc: 'Anthropic' },
-    { id: 'chatgpt', name: 'ChatGPT', url: 'https://chat.openai.com', icon: '💬', color: '#10A37F', desc: 'OpenAI' },
-    { id: 'perplexity', name: 'Perplexity', url: 'https://perplexity.ai', icon: '🔍', color: '#20B2AA', desc: 'Ricerca AI' },
-    { id: 'phind', name: 'Phind', url: 'https://phind.com', icon: '💻', color: '#8B5CF6', desc: 'Dev Search' },
-    { id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com', icon: '✨', color: '#4285F4', desc: 'Google' },
-    { id: 'mistral', name: 'Mistral', url: 'https://chat.mistral.ai', icon: '🌊', color: '#FF6B35', desc: 'Le Chat' },
-    { id: 'cohere', name: 'Cohere', url: 'https://cohere.com', icon: '🌐', color: '#00C4B4', desc: 'Command R' },
-    { id: 'poe', name: 'Poe', url: 'https://poe.com', icon: '🦉', color: '#6B5CE7', desc: 'Multi-AI' },
-  ];
-  
-  useEffect(()=>{
-    window._idb.getAllProjects().then(p=>setProjects(p)).catch(()=>setProjects([]));
-  },[]);
-  
-  const saveGeminiKey = (key) => {
-    setGeminiKey(key);
-    localStorage.setItem('gemini_api_key', key);
-  };
-  
-  const saveProjects = async (p) => {
-    setProjects(p);
-    if(window._idb) {
-      try {
-        await window._idb.clear('projects');
-        for(const proj of p) {
-          await window._idb.saveProject(proj);
-        }
-      } catch(e) {
-        console.log('IndexedDB save error:', e);
-      }
-    }
-  };
-  
-  const addProject = async () => {
-    if(!projF.name.trim()) return;
-    const p = {id:Date.now(),name:projF.name.trim(),color:projF.color,desc:projF.desc,files:[],chat:[{role:'bot',text:'Ciao! Sono il tuo assistente per "'+projF.name+'". Carica file o incolla testo e potro risponderti basandomi sul tuo materiale.'}],createdAt:new Date().toISOString()};
-    if(window._idb) {
-      try { await window._idb.saveProject(p); } catch(e) {}
-    }
-    saveProjects([p,...projects]);
-    setProjMod(false);setProjF({name:'',color:'#4CC9F0',desc:''});
-    setActiveProj(p);playSound('save');
-  };
-  
-  const delProject = async (id) => {
-    if(!window.confirm('Eliminare questo progetto?')) return;
-    if(window._idb) {
-      try { await window._idb.deleteProject(id); } catch(e) {}
-    }
-    saveProjects(projects.filter(p=>p.id!==id));
-    if(activeProj&&activeProj.id===id) setActiveProj(null);
-    playSound('delete');
-  };
-  
-  const updateProject = async (updated) => {
-    if(window._idb) {
-      try { await window._idb.saveProject(updated); } catch(e) {}
-    }
-    saveProjects(projects.map(p=>p.id===updated.id?updated:p));
-    setActiveProj(updated);
-  };
-
-  // Pomodoro mini state synced with global
-  const [pomRunning, setPomRunning] = useState(false);
-  const [pomSecs, setPomSecs] = useState(25*60);
-  const [pomMode, setPomMode] = useState('work');
-  useEffect(()=>{
-    if(!window._gpom) return;
-    const sync = (s) => {setPomMode(s.mode);setPomRunning(s.running);setPomSecs(s.secs);};
-    sync(window._gpom);
-    const unsub = window._gpom.subscribe(sync);
-    return unsub;
-  },[]);
-  const pomToggle = () => { if(window._gpom) window._gpom.toggle(); };
-  const pomColors = {work:'#FF4D6D',short:'#06D6A0',long:'#4CC9F0'};
-  const pomMins = String(Math.floor(pomSecs/60)).padStart(2,'0');
-  const pomSecStr = String(pomSecs%60).padStart(2,'0');
-
-  // Handle opening doc from Notes
-  useEffect(()=>{
-    if(window._openDocFromNote){
-      const note = window._openDocFromNote;
-      window._openDocFromNote = null;
-      if(note.docId){
-        window._idb.get('docs', note.docId).then(doc => {
-          if(doc){
-            setShowDash(true);
-            setTimeout(()=>{
-              window._loadDocFromNotes = doc;
-              window.dispatchEvent(new Event('_loadDocFromNotes'));
-            },100);
-          }
-        }).catch(()=>{});
-      }
-    }
-  },[]);
-
-  if(showDash) return <UniDashboard onClose={()=>setShowDash(false)} addNote={addNote} toast={toast}/>;
-  if(activeProj) return <ProjectView project={activeProj} onUpdate={updateProject} onBack={()=>setActiveProj(null)} uid={uid} apiKeys={apiKeys}/>;
-
-
-  return (
-    <div className="fi2">
-      <div className="sh">
-        <div className="sht" style={{display:'flex',alignItems:'center',gap:8}}><img src="https://i.imgur.com/X1BYLSa.png" height="80" className="tuttuni-logo" style={{borderRadius:12,boxShadow:"0 6px 30px rgba(6,214,160,.5)"}} alt="TUTT'UNI"/>
-          <MiniPomTimer />
-        </div>
-        <div style={{display:'flex',gap:8}}>
-          <button className="btn bs" style={{background:'linear-gradient(135deg,#4CC9F0,#06D6A0)',color:'#080B14',fontWeight:700,fontSize:'.78rem'}} onClick={()=>setShowDash(true)}>
-            Dashboard
-          </button>
-          <button className="btn bt bs" onClick={()=>setProjMod(true)}>+ Progetto</button>
-          <button className="btn bg bs" onClick={()=>setShowExternalAI(true)} style={{background:'rgba(139,92,246,.15)',border:'1px solid rgba(139,92,246,.3)'}}>🌐 AI Esterna</button>
-        </div>
-      </div>
-      <div style={{marginBottom:16,padding:'14px 16px',background:'rgba(6,214,160,.06)',border:'1px solid rgba(6,214,160,.15)',borderRadius:14,fontSize:'.84rem',color:'var(--text2)',lineHeight:1.6}}>
-        Crea un progetto per ogni materia. Carica PDF o TXT, incolla appunti, e studia con l'AI che conosce il tuo materiale.
-        <span style={{display:'block',marginTop:6,color:'var(--blue)',cursor:'pointer',fontWeight:600}} onClick={()=>setShowDash(true)}>
-          Pomodoro, Media, Flashcard, Scadenze e Documenti nella Dashboard
-        </span>
-      </div>
-      
-      {projects.length===0&&<Empty icon="uni" text="Nessun progetto" sub="Crea il tuo primo progetto di studio"/>}
-      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:12}}>
-        {projects.map(p=>(
-          <div key={p.id} className="card" style={{cursor:'pointer',borderTop:'3px solid '+p.color,transition:'all .2s'}}
-            onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-3px)';e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,.3)';}}
-            onMouseLeave={e=>{e.currentTarget.style.transform='';e.currentTarget.style.boxShadow='';}}
-            onClick={()=>setActiveProj(p)}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
-              <div style={{width:36,height:36,borderRadius:10,background:p.color+'22',border:'1px solid '+p.color+'44',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,color:p.color,fontSize:'1rem'}}>
-                {p.name.slice(0,2).toUpperCase()}
-              </div>
-              <div className="ib" style={{color:'var(--red)',flexShrink:0}} onClick={e=>{e.stopPropagation();delProject(p.id);}}>x</div>
-            </div>
-            <div style={{fontWeight:700,fontSize:'.95rem',marginBottom:4}}>{p.name}</div>
-            {p.desc&&<div style={{fontSize:'.78rem',color:'var(--text2)',marginBottom:8}}>{p.desc}</div>}
-            <div style={{fontSize:'.72rem',color:'var(--text2)',display:'flex',gap:10,marginTop:8}}>
-              <span style={{color:p.color}}>{p.files?p.files.length:0} file</span>
-              <span>{p.chat?Math.max(0,p.chat.length-1):0} messaggi</span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <Modal open={projMod} onClose={()=>setProjMod(false)} title="Nuovo Progetto di Studio"
-        footer={<><button className="btn bg" onClick={()=>setProjMod(false)}>Annulla</button><button className="btn bt" onClick={addProject}>Crea</button></>}>
-        <div className="fl"><label>Nome materia o progetto</label><input className="field" placeholder="Es. Biologia, Diritto, Tesi..." value={projF.name} onChange={e=>setProjF(f=>({...f,name:e.target.value}))} onKeyDown={e=>e.key==='Enter'&&addProject()}/></div>
-        <div className="fl"><label>Descrizione (opzionale)</label><input className="field" placeholder="Anno, professore, note..." value={projF.desc} onChange={e=>setProjF(f=>({...f,desc:e.target.value}))}/></div>
-        <div className="fl"><label>Colore</label><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{PROJ_COLORS.map(c=><div key={c} onClick={()=>setProjF(f=>({...f,color:c}))} style={{width:28,height:28,borderRadius:'50%',background:c,cursor:'pointer',border:projF.color===c?'3px solid #fff':'3px solid transparent',transition:'all .2s'}}/>)}</div></div>
-      </Modal>
-      {showExternalAI && (
-        <div style={{
-          position: 'fixed', zIndex: 9999, cursor: isDragging ? 'grabbing' : 'default',
-          left: floatingPanel.x, top: floatingPanel.y,
-          width: floatingPanel.width, height: floatingPanel.height,
-          background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)',
-          borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
-          display: 'flex', flexDirection: 'column', overflow: 'hidden',
-          userSelect: 'none'
-        }}>
-          <div style={{
-            padding: '10px 14px', background: 'rgba(6,214,160,0.2)', cursor: 'grab',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
-            borderBottom: '1px solid rgba(255,255,255,0.05)'
-          }} onMouseDown={handleFloatingMouseDown}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: '1.2rem' }}>{EXTERNAL_AI_OPTIONS.find(a => a.url === externalAIUrl)?.icon || '🌐'}</span>
-              <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>🌐 {EXTERNAL_AI_OPTIONS.find(a => a.url === externalAIUrl)?.name || 'AI Esterna'}</span>
-            </div>
-            <div className="panel-controls" style={{ display: 'flex', gap: 6 }}>
-              <button onClick={(e) => { e.stopPropagation(); window.open(externalAIUrl, '_blank'); }} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 6, padding: '4px 10px', color: '#fff', cursor: 'pointer', fontSize: '0.75rem' }}>↗</button>
-              <button onClick={(e) => { e.stopPropagation(); setShowExternalAI(false); }} style={{ background: 'rgba(255,100,100,0.3)', border: 'none', borderRadius: 6, padding: '4px 10px', color: '#fff', cursor: 'pointer', fontSize: '0.75rem' }}>✕</button>
-            </div>
-          </div>
-          <div style={{ padding: 16 }}>
-            <div style={{fontSize:'0.9rem',color:'var(--text2)',marginBottom:12}}>Apri un'AI esterna in una nuova scheda:</div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {EXTERNAL_AI_OPTIONS.map(ai => (
-              <button key={ai.id} onClick={() => window.open(ai.url, '_blank')} style={{
-                padding: '10px 16px', borderRadius: 10, cursor: 'pointer', fontSize: '0.85rem',
-                background: `linear-gradient(135deg, ${ai.color}22, ${ai.color}11)`,
-                border: `1px solid ${ai.color}55`,
-                color: '#fff', fontWeight: 600, transition: 'all 0.2s',
-                display: 'flex', alignItems: 'center', gap: 8,
-                boxShadow: `0 2px 10px ${ai.color}22`
-              }}>
-                <span style={{fontSize:'1.1rem'}}>{ai.icon}</span>
-                <span>{ai.name}</span>
-              </button>
-            ))}
-            </div>
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 20, textAlign: 'center' }}>
-            <div style={{fontSize:'3rem',marginBottom:12}}>📚</div>
-            <div style={{fontSize:'1.1rem',fontWeight:700,color:'var(--text)',marginBottom:8}}>Scegli un'AI qui sopra</div>
-            <div style={{fontSize:'0.85rem',color:'var(--text2)',maxWidth:300}}>Si aprirà in una nuova finestra dove potrai studiare con l'AI</div>
-          </div>
-          <div className="resize-handle" onMouseDown={handleResizeMouseDown} style={{
-            position: 'absolute', right: 0, bottom: 0, width: 20, height: 20, cursor: 'se-resize',
-            background: 'linear-gradient(135deg, transparent 50%, rgba(6,214,160,0.5) 50%)',
-            borderRadius: '0 0 16px 0'
-          }}/>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ProjectView({project, onUpdate, onBack, uid, apiKeys}) {
-  const [tab, setTab] = useState('chat');
-  const [msgs, setMsgs] = useState(project?.chat||[{role:'bot',text:'Ciao! Carica del materiale e iniziamo.'}]);
-  const [inp, setInp] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [geminiBusy, setGeminiBusy] = useState(false);
-  const [geminiResult, setGeminiResult] = useState(null);
-  const [files, setFiles] = useState(project?.files||[]);
-  const [summary, setSummary] = useState(project?.summary||'');
-  const [loadingFile, setLoadingFile] = useState(false);
-  const [showPaste, setShowPaste] = useState(false);
-  const [pasteText, setPasteText] = useState('');
-  const [pasteTitle, setPasteTitle] = useState('');
-  const [officeFiles, setOfficeFiles] = useState(project?.officeFiles||[]);
-  const [storageUsed, setStorageUsed] = useState(0);
-  const [chatModel, setChatModel] = useState('groq');
-  const MAX_STORAGE = 180 * 1024 * 1024;
-  const fmtStorage = (bytes) => (bytes/(1024*1024)).toFixed(1)+'MB';
-  const dataCtx = useContext(DataCtx) || {};
-  const {notes=[],addNote=()=>{},addEvent=()=>{}} = dataCtx;
-  const chatRef = useRef(null);
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef(null);
-  const [showExternalAI, setShowExternalAI] = useState(false);
-  const [externalAIUrl, setExternalAIUrl] = useState('https://claude.ai');
-  const [aiPopup, setAiPopup] = useState(null);
-  const [screenshotLoading, setScreenshotLoading] = useState(false);
-  
-  // Screenshot capture for ProjectView - compressed
-  const captureScreenshotProj = async () => {
-    setScreenshotLoading(true);
-    try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:'monitor'},audio:false});
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      video.autoplay = true;
-      await new Promise(resolve => { video.onloadedmetadata = resolve; });
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const canvas = document.createElement('canvas');
-      let w = video.videoWidth, h = video.videoHeight;
-      const maxDim = 1200;
-      if (w > maxDim || h > maxDim) {
-        const ratio = Math.min(maxDim / w, maxDim / h);
-        w = Math.round(w * ratio); h = Math.round(h * ratio);
-      }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(video, 0, 0, w, h);
-      stream.getTracks().forEach(track => track.stop());
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
-      const file = new File([blob], 'screenshot_'+Date.now()+'.jpg', {type:'image/jpeg'});
-      await handleUpload({target:{files:[file]}});
-      toast('Screenshot acquisito!', 'var(--green)');
-    } catch (err) {
-      if (err.name === 'NotAllowedError') toast('Permesso negato', 'var(--red)');
-      else toast('Errore: ' + err.message, 'var(--red)');
-    }
-    setScreenshotLoading(false);
-  };
-  
-  // Photo upload for ProjectView
-  const photoFileRef = useRef(null);
-  const handlePhotoUpload = (e) => { const files = Array.from(e.target.files || []); if(files.length) {handleUpload({target:{files}});} e.target.value=''; };
-  
-  // Floating AI Panel State
-  const [floatingPanel, setFloatingPanel] = useState(() => {
-    const saved = localStorage.getItem('lmv_floating_panel');
-    return saved ? JSON.parse(saved) : { x: 50, y: 100, width: 400, height: 500 };
-  });
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
-  const saveFloatingPanel = (panel) => {
-    localStorage.setItem('lmv_floating_panel', JSON.stringify(panel));
-    setFloatingPanel(panel);
-  };
-
-  const handleFloatingMouseDown = (e) => {
-    if (e.target.closest('.resize-handle') || e.target.closest('.panel-controls')) return;
-    setIsDragging(true);
-    setDragOffset({ x: e.clientX - floatingPanel.x, y: e.clientY - floatingPanel.y });
-  };
-
-  const handleResizeMouseDown = (e) => {
-    e.stopPropagation();
-    setIsResizing(true);
-    setDragOffset({ x: e.clientX - floatingPanel.width, y: e.clientY - floatingPanel.height });
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (isDragging) {
-        const newX = Math.max(0, Math.min(window.innerWidth - 200, e.clientX - dragOffset.x));
-        const newY = Math.max(0, Math.min(window.innerHeight - 100, e.clientY - dragOffset.y));
-        saveFloatingPanel({ ...floatingPanel, x: newX, y: newY });
-      }
-      if (isResizing) {
-        const newWidth = Math.max(280, Math.min(window.innerWidth, e.clientX - dragOffset.x + floatingPanel.width));
-        const newHeight = Math.max(300, Math.min(window.innerHeight, e.clientY - dragOffset.y + floatingPanel.height));
-        saveFloatingPanel({ ...floatingPanel, width: newWidth, height: newHeight });
-      }
-    };
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      setIsResizing(false);
-    };
-    if (isDragging || isResizing) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, isResizing, dragOffset, floatingPanel]);
-
-  const openAIPopup = (url) => {
-    const aiName = EXTERNAL_AI_OPTIONS.find(a => a.url === url)?.name || 'AI';
-    const popup = window.open(url, 'AI_' + aiName, 'width=1200,height=800,left=100,top=50,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes');
-    if (popup) {
-      setShowExternalAI(false);
-    }
-  };
-
-  const EXTERNAL_AI_OPTIONS = [
-    { id: 'claude', name: 'Claude', url: 'https://claude.ai', icon: '🤖', color: '#FF6B6B', desc: 'Anthropic' },
-    { id: 'chatgpt', name: 'ChatGPT', url: 'https://chat.openai.com', icon: '💬', color: '#10A37F', desc: 'OpenAI' },
-    { id: 'perplexity', name: 'Perplexity', url: 'https://perplexity.ai', icon: '🔍', color: '#20B2AA', desc: 'Ricerca AI' },
-    { id: 'phind', name: 'Phind', url: 'https://phind.com', icon: '💻', color: '#8B5CF6', desc: 'Dev Search' },
-    { id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com', icon: '✨', color: '#4285F4', desc: 'Google' },
-    { id: 'mistral', name: 'Mistral', url: 'https://chat.mistral.ai', icon: '🌊', color: '#FF6B35', desc: 'Le Chat' },
-    { id: 'cohere', name: 'Cohere', url: 'https://cohere.com', icon: '🌐', color: '#00C4B4', desc: 'Command R' },
-    { id: 'poe', name: 'Poe', url: 'https://poe.com', icon: '🦉', color: '#6B5CE7', desc: 'Multi-AI' },
-  ];
-  
-  const startVoiceInput = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      toast2('Il tuo browser non supporta il riconoscimento vocale');
-      return;
-    }
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!recognitionRef.current) {
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'it-IT';
-    }
-    const recognition = recognitionRef.current;
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = (e) => { setIsListening(false); };
-    recognition.onresult = (event) => {
-      let transcript = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
-      }
-      setInp(prev => prev + transcript);
-    };
-    recognition.start();
-  };
-  
-  // Load storage used on mount
-  useEffect(() => {
-    if(window._fb && uid) {
-      window._fb.getStorageUsed(uid).then(u => setStorageUsed(u)).catch(() => {});
-    }
-  }, [uid]);
-
-  useEffect(()=>{
-    const updated = {...project,chat:msgs.slice(-400),files,summary,officeFiles};
-    onUpdate(updated);
-  },[msgs,files,summary,officeFiles]);
-
-  useEffect(()=>{if(chatRef.current) chatRef.current.scrollTop=chatRef.current.scrollHeight;},[msgs,busy]);
-
-  // Render LaTeX math in chat after messages update
-  useEffect(()=>{
-    if(window.renderMathInElement && chatRef.current){
-      setTimeout(()=>{
-        window.renderMathInElement(chatRef.current, {
-          delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '$', right: '$', display: false}
-          ],
-          throwOnError: false
-        });
-      }, 100);
-    }
-  },[msgs]);
-
-  const buildContext = () => {
-    if(!files.length) return '';
-    if(summary) return `[RIASSUNTO]\n${summary}\n\n[CONTENUTO COMPLETO]\n`;
-    let ctx = '';
-    let total = 0;
-    for(const f of files){
-      if(total>20000) break;
-      const chunk = f.content.slice(0,10000);
-      ctx += `\n[FILE: ${f.name}]\n${chunk}\n`;
-      total += chunk.length;
-    }
-    return ctx;
-  };
-  
-  const generateSummary = async(text) => {
-    try{
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions',{
-        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('groq_key') || '')},
-        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1000,messages:[{role:'system',content:'Sei un insegnante esperto. Crea riassunti chiari, strutturati con punti chiave evidenziati.'},{role:'user',content:'Crea un riassunto didattico del materiale seguente. Usa:\n- Titoli e sezioni\n- Punti chiave (•)\n- Termini importanti in grassetto\n- Massimo 500 parole\n\n'+(text.slice(0,8000))}]})
-      });
-      const d = await r.json();
-      if(d.choices&&d.choices[0]) return d.choices[0].message.content;
-    }catch(e){}
-    return '';
-  };
-  
-  const deepResearch = async() => {
-    if(!files.length||geminiBusy) return;
-    setGeminiBusy(true);
-    setGeminiResult(null);
-    try{
-      const fullText = files.map(f=>f.content).join('\n\n').slice(0,8000);
-      const prompt = "Analizza questo materiale di studio e fornisci: 1) Riepilogo concetti chiave, 2) Connessioni tra argomenti, 3) Possibili domande esame, 4) Suggerimenti studio.\n\n" + fullText;
-      const key = localStorage.getItem('groq_key') || '';
-      const sys = 'Sei un assistente universitario esperto in analisi di materiale di studio. Fornisci risposte accurate e didattiche.';
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:2000,messages:[{role:'system',content:sys},{role:'user',content:prompt}]})
-      });
-      const d = await r.json();
-      if(d.error) throw new Error(d.error.message);
-      setGeminiResult(d.choices[0].message.content);
-    }catch(e){setGeminiResult('Errore: '+e.message);}
-    setGeminiBusy(false);
-  };
-
-  const projSearchWeb = async(query) => {
-    const results = [];
-
-    try {
-      const wikiItRes = await Promise.race([
-        fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query.split(' ').slice(0, 4).join(' '))}`),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
-      ]);
-      if (wikiItRes.ok) {
-        const wikiIt = await wikiItRes.json();
-        if (wikiIt.extract) {
-          results.push(`📚 **Wikipedia IT:**\n${wikiIt.extract.substring(0, 500)}`);
-          if (wikiIt.content_urls?.desktop?.page) {
-            results.push(`🔗 ${wikiIt.content_urls.desktop.page}`);
-          }
-        }
-      }
-    } catch(e) {}
-
-    try {
-      const res = await Promise.race([
-        fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_html=1&skip_disambig=1'),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
-      ]);
-      const data = await res.json();
-      if(data.AbstractText) {
-        results.push(`🔍 **DuckDuckGo:**\n${data.AbstractText.substring(0, 500)}`);
-      }
-    } catch(e) {}
-
-    return results.length > 0 ? '\n\n' + results.join('\n\n') : null;
-  };
-
-  const sendMsg = async() => {
-    const text = inp.trim();
-    if(!text||busy) return;
-    setInp('');
-    const newMsgs = [...msgs,{role:'user',text}];
-    setMsgs(newMsgs);
-    setBusy(true);
-    try{
-      const ctx = buildContext();
-
-      // ============================================
-      // MASTER PROMPT - TUTT'UNI AI ENGINEERING
-      // ============================================
-      const materialeFile = ctx ? `
-
-═══════════════════════════════════════════════════════
-📚 DOCUMENTI CARICATI PER LO STUDIO
-═══════════════════════════════════════════════════════
-${ctx}
-═══════════════════════════════════════════════════════` : '';
-
-      const masterPrompt = `**SEI TUTT'UNI - TUTOR DI STUDIO INGEGNERISTICO**
-
-🎯 Materia: ${project?.name || 'Generale'}
-${materialeFile}
-
-═══════════════════════════════════════════════════════
-📐 REGOLE PER RISPOSTE TECNICHE/INGEGNERISTICHE
-═══════════════════════════════════════════════════════
-
-**FORMULE MATEMATICHE:**
-- USA SEMPRE LaTeX inline: $formula$ per inline
-- USA SEMPRE LaTeX blocco: $$formula$$ per equazioni su riga separata
-- Esempio: $\\int_0^1 x^2 dx = \\frac{1}{3}$
-- Esempio: $$F = m \\cdot a$$
-- Scrivi TUTTE le formule con LaTeX, anche le piu semplici
-- NON usare ASCII math come x^2 o sqrt()
-
-**CODICE E ALGORITMI:**
-- Usa blocchi codice con linguaggio: \`\`\`python, \`\`\`c, \`\`\`matlab, ecc.
-- Spiega ogni riga importante con commenti inline
-- Usa indentazione corretta
-
-**RISOLUZIONE PROBLEMI (step-by-step):**
-1. Identifica cosa viene chiesto
-2. Scrivi i dati e le incognite
-3. Seleziona formula/teorema da applicare
-4. Sostituisci i valori
-5. Risolvi mostrando ogni passaggio
-6. Verifica dimensionalmente il risultato
-7. Interpreta il risultato fisicamente
-
-**DIAGRAMMI E SCHEMI:**
-- Usa ASCII art per diagrammi quando utile
-- Esempio: schema elettrico, diagramma di corpo libero, grafico
-
-**FORMATO RISPOSTA OBBLIGATORIO:**
-
-\`\`\`markdown
-## 📖 Definizione
-[Definizione chiara e concisa]
-
-## 📐 Formula Principale
-$$[formula in LaTeX]$$
-
-## 🔍 Spiegazione
-[Spiegazione passo-passo]
-
-## 💻 Esempio Pratico
-\`\`\`[linguaggio]
-[codice se applicabile]
-\`\`\`
-
-oppure risoluzione numerica:
-[Dati] → [Formula] → [Calcolo] → [Risultato]
-
-## 🎯 Punti Chiave
-- ...
-- ...
-
-## 💡 Verifica
-[Come verificare il risultato]
-\`\`\`
-
-**INGEGNERIA SPECIFICA:**
-- Fisica: $F=ma$, termodinamica, circuiti
-- Informatica: algoritmi, strutture dati, OOP
-- Meccanica: cinematica, dinamica, resistenza materiali
-- Elettronica: leggi di Kirchhoff, circuiti RC/RL/RLC
-- Matematica: analisi, algebra lineare, probabilità
-
-**IMPORTANTE:**
-- Il contenuto dei file caricati è DISPONIBILE qui sopra
-- USA il materiale come riferimento principale
-- Per ogni formula mostra il LATeX corretto
-- INCORAGGIA con "Ottimo ragionamento!", "Quasi!", "Continua così"
-- Propone sempre esercizi simili per pratica`;
-
-      const hist = newMsgs.slice(-10).map(m=>({role:m.role==='user'?'user':'assistant',content:m.text}));
-      
-      const userMsgWithContext = ctx ? 
-        `${text}\n\n══════════════════════════════════════════\n📚 MATERIALE DI STUDIO (usa questo per rispondere)\n══════════════════════════════════════════\n${ctx}\n══════════════════════════════════════════` : 
-        text;
-      
-      // Only search web when query clearly needs external info
-      const lowerText = text.toLowerCase();
-      const needsWeb = lowerText.includes('cerca') || lowerText.includes('notizia') || lowerText.includes('oggi') || lowerText.includes('attuale') || lowerText.includes('chi è') || lowerText.includes('cosa è successo');
-      let webResults = null;
-      if (needsWeb) {
-        try {
-          webResults = await Promise.race([
-            projSearchWeb(text),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout ricerca web')), 5000))
-          ]);
-        } catch(e) { /* timeout or error, continue without web */ }
-      }
-      
-      if(chatModel==='gemini'){
-        let fullPrompt = masterPrompt;
-        if (webResults) {
-          fullPrompt += `\n\n**INFO DAL WEB (usa queste informazioni):**\n${webResults}`;
-        }
-        
-        const gm = hist.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
-        const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + (localStorage.getItem('gemini_key') || '') + '',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({
-            system_instruction:{parts:[{text:fullPrompt}]},
-            contents:gm,
-            generationConfig:{temperature:0.7,maxOutputTokens:1200}
-          })
-        });
-        const d = await r.json();
-        if(d.error){
-          if(d.error.message && d.error.message.includes('quota')) throw new Error('Gemini: Quote superate. Prova Groq.');
-          throw new Error(d.error.message);
-        }
-        if(d.candidates&&d.candidates[0]&&d.candidates[0].content&&d.candidates[0].content.parts){
-          setMsgs(m=>[...m,{role:'bot',text:d.candidates[0].content.parts[0].text}]);
-        } else {
-          throw new Error('Risposta Gemini non valida');
-        }
-      } else if(chatModel==='deepseek'){
-        const r = await proxyFetch('https://api.deepseek.com/v1/chat/completions', {
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':'Bearer ' + (localStorage.getItem('deepseek_key') || '')},
-          body:JSON.stringify({model:'deepseek-chat',max_tokens:1500,messages:[{role:'system',content:masterPrompt},...hist]})
-        });
-        const d = await r.json();
-        if(d.error) throw new Error(d.error.message);
-        setMsgs(m=>[...m,{role:'bot',text:d.choices[0].message.content}]);
-      } else if(chatModel==='grok'){
-        const grokKey = localStorage.getItem('grok_key');
-        if (!grokKey) throw new Error('Grok: chiave API mancante. Inseriscila nelle impostazioni.');
-        const r = await proxyFetch('https://api.x.ai/v1/chat/completions', {
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':'Bearer ' + grokKey},
-          body:JSON.stringify({model:'grok-2-1212',max_tokens:1500,messages:[{role:'system',content:masterPrompt},...hist]})
-        });
-        const d = await r.json();
-        if(d.error) throw new Error(d.error.message);
-        setMsgs(m=>[...m,{role:'bot',text:d.choices[0].message.content}]);
-      } else {
-        const key = localStorage.getItem('groq_key') || '';
-        let fullPrompt = masterPrompt;
-        if (webResults) {
-          fullPrompt += `\n\n**INFO WEB (integra nella risposta):**\n${webResults}`;
-        }
-        
-        const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-          body:JSON.stringify({
-            model:'llama-3.3-70b-versatile',
-            max_tokens:1500,
-            temperature:0.7,
-            messages:[{role:'system',content:fullPrompt},...hist]
-          })
-        });
-        if (!r.ok) {
-          const errText = await r.text();
-          throw new Error('Groq API error: ' + r.status + ' ' + errText.substring(0, 100));
-        }
-        const d = await r.json();
-        if(d.error) throw new Error(d.error.message);
-        setMsgs(m=>[...m,{role:'bot',text:d.choices[0].message.content}]);
-      }
-    }catch(e){
-      setMsgs(m=>[...m,{role:'bot',text:'Errore: '+e.message}]);
-    }
-    setBusy(false);
-  };
-
-  const readFile = async(file, onProgress) => {
-    try {
-      return await window.readFileContent(file);
-    } catch(e) {
-      return `[FILE: ${file.name}]\n⚠️ Errore: ${e.message}`;
-    }
-  };
-
-  const handleUpload = async(e) => {
-    const file=e.target.files[0];
-    if(!file) return;
-    e.target.value = '';
-    setLoadingFile(true);
-    const isPdf = file.type === 'application/pdf' || file.name.endsWith('.pdf');
-    setMsgs(m=>[...m,{role:'bot',text:'📤 Caricamento di "'+file.name+'" in corso...'}]);
-    setTab('chat');
-    try {
-      const content = await readFile(file, (current, total) => {
-        if (isPdf) {
-          setMsgs(m=>[...m.slice(0,-1),{role:'bot',text:'📤 Caricamento PDF... ('+current+'/'+total+' pagine)'}]);
-        }
-      });
-      console.log('📄 File letto:', file.name, '| Caratteri estratti:', content.length);
-      
-      if(content.length < 50) {
-        setMsgs(m=>[...m,{role:'bot',text:'⚠️ Il file "'+file.name+'" sembra vuoto o illeggibile. Proviamo comunque a usarlo...'}]);setTab('chat');
-      } else {
-        setMsgs(m=>[...m,{role:'bot',text:'📄 File "'+file.name+'" caricato! Testo estratto: ~'+content.split(/\s+/).filter(w=>w.length>0).length+' parole.'}]);setTab('chat');
-      }
-      
-      const wordCount = content.split(/\s+/).filter(w=>w.length>0).length;
-      const nf={id:Date.now(),name:file.name,type:file.type,size:file.size,content,wordCount,projectId:project?.id,addedAt:new Date().toISOString()};
-      
-      await window.saveFileToIDB(nf);
-      setFiles(f=>[...f,nf]);
-      
-      // Show preview of extracted content
-      const preview = content.slice(0, 300);
-      setMsgs(m=>[...m,{role:'bot',text:'📝 Anteprima contenuto:\n"'+preview+(content.length > 300 ? '...' : '')+'"\n\n✅ Il materiale è pronto! Chiedimi qualsiasi cosa.'}]);setTab('chat');
-      
-    } catch(err) {
-      console.error('Errore caricamento file:', err);
-      setMsgs(m=>[...m,{role:'bot',text:'❌ Errore lettura file: '+err.message+'\n\nProva a usare "+ Testo" per incollare il contenuto direttamente.'}]);
-    } finally {
-      setLoadingFile(false);
-    }
-  };
-
-  const addPaste = async() => {
-    if(!pasteText.trim()||!pasteTitle.trim()) return;
-    const size = new Blob([pasteText]).size;
-    const wordCount = pasteText.trim().split(/\s+/).filter(w=>w.length>0).length;
-    const nf={id:Date.now(),name:pasteTitle.trim()+'.txt',type:'text/plain',size:size,content:pasteText.trim(),wordCount,projectId:project?.id,addedAt:new Date().toISOString()};
-    
-    // Save to IndexedDB
-    if(window._idb) {
-      try { await window._idb.saveFile(nf); } catch(e) { console.log('IDB save error:', e); }
-    }
-    
-    setFiles(f=>[...f,nf]);
-    setShowPaste(false);setPasteText('');setPasteTitle('');
-    setMsgs(m=>[...m,{role:'bot',text:'📝 Testo "'+pasteTitle+'" aggiunto! (~'+wordCount+' parole) Sto generando un riassunto...'}]);
-    const s = await generateSummary(pasteText);
-    if(s){setSummary(prev=>prev?(prev+'\n\n'+s):s);setMsgs(m=>[...m,{role:'bot',text:'✅ Riassunto generato!'}]);}
-    else {setMsgs(m=>[...m,{role:'bot',text:'Testo "'+pasteTitle+'" aggiunto! Chiedimi qualsiasi cosa.'}]);}
-    setTab('chat');
-  };
-
-  const fmtSize=(b)=>b<1024?b+'B':b<1024*1024?Math.round(b/1024)+'KB':(b/1024/1024).toFixed(1)+'MB';
-
-  // ===== NUOVE FUNZIONI STUDIO =====
-  
-  // Genera Quiz dal materiale
-  const generateQuiz = async () => {
-    if (!files.length) { toast('Carica prima del materiale'); return; }
-    setBusy(true);
-    const materialText = files.map(f=>f.content).join('\n').slice(0,15000);
-    try {
-      const key = localStorage.getItem('groq_key') || '';
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body: (JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          max_tokens: 2000,
-          messages: [{role:'system',content:'Sei un professore universitario. Genera quiz in italiano con 5 domande a risposta multipla basate sul materiale. FORMATO:\n```\n1. [Domanda]\na) risposta\nb) risposta\nc) risposta\nd) risposta\nRISPOSTA: [lettera] - [spiegazione]\n```'}, {role:'user',content:'Genera un quiz di 5 domande da questo materiale:\n' + materialText}]
-        }))
-      });
-      const d = await r.json();
-      if (d.choices && d.choices[0]) {
-        const quiz = d.choices[0].message.content;
-        setMsgs(m=>[...m,{role:'bot',text:'📝 QUIZ GENERATO:\n\n' + quiz + '\n\n💡 Copia le risposte e usale per ripassare!'}]);
-        // Save quiz to project
-        const quizNote = {id:Date.now(),name:'Quiz_'+new Date().toLocaleDateString()+'.txt',type:'text/plain',content:quiz,wordCount:quiz.split(/\s+/).length,projectId:project?.id};
-        setFiles(f=>[...f,quizNote]);
-      }
-    } catch(e) { setMsgs(m=>[...m,{role:'bot',text:'Errore: '+e.message}]); }
-    setBusy(false);
-  };
-
-  // Genera Mappa Mentale
-  const generateMindMap = async () => {
-    if (!files.length) { toast('Carica prima del materiale'); return; }
-    setBusy(true);
-    const materialText = files.map(f=>f.content).join('\n').slice(0,15000);
-    try {
-      const key = localStorage.getItem('groq_key') || '';
-      const r = await proxyFetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json','Authorization':'Bearer '+key},
-        body: (JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          max_tokens: 2000,
-          messages: [{role:'system',content:'Sei un esperto di mappe concettuali. Crea una mappa mentale testuale gerarchica in ASCII.\nFORMATO:\n```\n[CONCETTO PRINCIPALE]\n├── [Sottoconcetto 1]\n│   ├── dettaglio\n│   └── dettaglio\n├── [Sottoconcetto 2]\n│   └── dettaglio\n```'}, {role:'user',content:'Crea una mappa mentale di questo materiale:\n' + materialText}]}
-        ))
-      });
-      const d = await r.json();
-      if (d.choices && d.choices[0]) {
-        const map = d.choices[0].message.content;
-        setMsgs(m=>[...m,{role:'bot',text:'🗺️ MAPPA MENTALE:\n\n' + map}]);
-        const mapNote = {id:Date.now(),name:'Mappa_'+new Date().toLocaleDateString()+'.txt',type:'text/plain',content:map,wordCount:map.split(/\s+/).length,projectId:project?.id};
-        setFiles(f=>[...f,mapNote]);
-      }
-    } catch(e) { setMsgs(m=>[...m,{role:'bot',text:'Errore: '+e.message}]); }
-    setBusy(false);
-  };
-
-  // Sintesi Vocale
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const speakText = (text) => {
-    if (!('speechSynthesis' in window)) { toast('Sintesi vocale non supportata'); return; }
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'it-IT';
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
-  };
-  const stopSpeaking = () => { window.speechSynthesis.cancel(); setIsSpeaking(false); };
-
-  // Backup Progetto
-  const exportProject = () => {
-    const data = {
-      project,
-      files,
-      summary,
-      chat: msgs,
-      exportedAt: new Date().toISOString()
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${project?.name || 'project'}_backup_${new Date().toLocaleDateString()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast('Backup scaricato! ✅');
-  };
-
-  // Import Backup
-  const importProject = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const data = JSON.parse(ev.target.result);
-        if (data.project) { onUpdate(data); setFiles(data.files || []); setSummary(data.summary || ''); setMsgs(data.chat || []); }
-        toast('Backup ripristinato! ✅');
-      } catch(err) { toast('File non valido'); }
-    };
-    reader.readAsText(file);
-  };
-
-  // Esporta Riassunto PDF
-  const exportSummary = () => {
-    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${project?.name}</title><style>body{font-family:system-ui;max-width:800px;margin:40px auto;padding:20px;line-height:1.8}h1{color:#8B5CF6}h2{color:#06D6A0;border-bottom:1px solid #eee}pre{background:#f5f5f5;padding:15px;border-radius:8px;overflow-x:auto}</style></head><body><h1>📚 ${project?.name}</h1><p><strong>Riassunto generato:</strong></p><pre>${summary || 'Nessun riassunto'}</pre><hr><h2>📄 File caricati</h2>${files.map(f=>`<p>• ${f.name}</p>`).join('')}<footer><small>Generato da LaMiaVita 2.0</small></footer></body></html>`;
-    const blob = new Blob([html], {type:'text/html'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${project?.name || 'summary'}_riassunto.html`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast('Riassunto esportato!');
-  };
-
-  // Condividi Appunti
-  const shareNotes = async () => {
-    const text = `# ${project?.name}\n\n## Riassunto\n${summary}\n\n## File\n${files.map(f=>`- ${f.name}`).join('\n')}\n\n---\n*Generato da LaMiaVita 2.0*`;
-    if (navigator.share) {
-      try { await navigator.share({title: project?.name, text}); } catch(e) {}
-    } else {
-      await navigator.clipboard.writeText(text);
-      toast('Appunti copiati! 📋');
-    }
-  };
-
-  return (
-    <div className="fi2 pv2" style={{height:'calc(100vh - 100px)',display:'flex',flexDirection:'column'}}>
-      <div className="sh pv-hd">
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <button className="ib" onClick={onBack} style={{fontSize:'.8rem',flexShrink:0}}>back</button>
-          <div style={{width:10,height:10,borderRadius:'50%',background:project?.color,flexShrink:0}}/>
-          <div className="sht" style={{fontSize:'1.1rem'}}>{project?.name}</div>
-          <MiniPomTimer />
-        </div>
-        <div style={{display:'flex',gap:6,flexShrink:0}}>
-          <button className="btn bg bs" onClick={captureScreenshotProj} disabled={screenshotLoading} style={{background:screenshotLoading?'rgba(255,77,109,.2)':'rgba(76,201,240,.15)',border:'1px solid rgba(76,201,240,.3)'}} title="Screenshot">{screenshotLoading?'⏳':'📸'}</button>
-          <input type="file" ref={photoFileRef} style={{display:'none'}} accept="image/*" multiple onChange={handlePhotoUpload}/>
-          <button className="btn bg bs" onClick={()=>photoFileRef.current?.click()} style={{background:'rgba(139,92,246,.15)',border:'1px solid rgba(139,92,246,.3)'}} title="Carica foto">📷</button>
-          <label className="btn bg bs" style={{cursor:'pointer',opacity:loadingFile?0.7:1}}>{loadingFile?'⏳':'+'}<input type="file" accept=".pdf,.txt,.md,.doc,.docx,.xls,.xlsx,.ppt,.pptx" style={{display:'none'}} onChange={handleUpload}/></label>
-          <button className="btn bg bs" onClick={()=>setShowPaste(true)}>+ Testo</button>
-          <button className="btn bg bs" onClick={()=>openAIPopup(externalAIUrl)} style={{background:'linear-gradient(135deg,rgba(139,92,246,.3),rgba(139,92,246,.2))',border:'1px solid rgba(139,92,246,.5)',boxShadow:'0 2px 10px rgba(139,92,246,.3)'}}>🌐 Apri AI</button>
-        </div>
-      </div>
-      <div className="stabs">
-        <button className={'stab'+(tab==='chat'?' active':'')} onClick={()=>setTab('chat')}>Chat AI</button>
-        <button className={'stab'+(tab==='files'?' active':'')} onClick={()=>setTab('files')}>Materiale ({files.length})</button>
-        <button className={'stab'+(tab==='gemini'?' active':'')} onClick={()=>setTab('gemini')} style={{background:tab==='gemini'?'rgba(66,133,244,.2)':'transparent',color:tab==='gemini'?'#4285F4':'var(--text2)'}}>🟦 Gemini</button>
-        <button className="btn bg bs" style={{marginLeft:'auto',fontSize:'.72rem',color:'var(--red)'}} onClick={()=>{if(window.confirm('Azzerare la chat?')){setMsgs([{role:'bot',text:'Chat azzerata! Cosa vuoi studiare?'}]);}}}>azzera chat</button>
-      </div>
-      {files.length>0&&tab==='chat'&&(
-        <div style={{display:'flex',gap:5,flexWrap:'wrap',marginBottom:8}}>
-          {files.map(f=><div key={f.id} style={{display:'flex',alignItems:'center',gap:4,background:'rgba(6,214,160,.08)',border:'1px solid rgba(6,214,160,.2)',borderRadius:7,padding:'3px 8px',fontSize:'.72rem',color:'var(--green)'}}>{f.name}</div>)}
-        </div>
-      )}
-      {tab==='chat'&&(
-        <div className="cb" style={{flex:1,minHeight:0}}>
-          <div className="cm" ref={chatRef}>
-            {msgs.map((m,i)=>(
-              <div key={i} className={'msg '+(m.role==='user'?'user':'bot')}>
-                <div className={'cav '+(m.role==='user'?'usr':'bot')}>{m.role==='user'?'U':'AI'}</div>
-                <div className="bub" style={{whiteSpace:'pre-wrap'}}>{m.text}</div>
-              </div>
-            ))}
-            {busy&&<div className="msg bot"><div className="cav bot">AI</div><div className="bub"><div className="typing"><span/><span/><span/></div></div></div>}
-          </div>
-          <div style={{display:'flex',gap:6,marginBottom:8,padding:'0 8px',alignItems:'center'}}>
-            <span style={{fontSize:'.72rem',color:'var(--text2)'}}>AI:</span>
-            <button onClick={()=>setChatModel('groq')} style={{padding:'4px 12px',borderRadius:20,border:'none',cursor:'pointer',fontSize:'.72rem',fontWeight:600,background:chatModel==='groq'?'linear-gradient(135deg,#00D4AA,#00B894)':'rgba(255,255,255,.08)',color:chatModel==='groq'?'#fff':'var(--text2)'}}>Groq</button>
-            <button onClick={()=>{if(!localStorage.getItem('gemini_key')){if(window.apiKeyManager)window.apiKeyManager.showModal('gemini',()=>setChatModel('gemini'));}else{setChatModel('gemini');}}} style={{padding:'4px 12px',borderRadius:20,border:'none',cursor:'pointer',fontSize:'.72rem',fontWeight:600,background:chatModel==='gemini'?'linear-gradient(135deg,#4285F4,#34A853)':'rgba(255,255,255,.08)',color:chatModel==='gemini'?'#fff':'var(--text2)'}}>Gemini</button>
-            <button onClick={()=>{if(!localStorage.getItem('deepseek_key')){if(window.apiKeyManager)window.apiKeyManager.showModal('deepseek',()=>setChatModel('deepseek'));}else{setChatModel('deepseek');}}} style={{padding:'4px 12px',borderRadius:20,border:'none',cursor:'pointer',fontSize:'.72rem',fontWeight:600,background:chatModel==='deepseek'?'linear-gradient(135deg,#00BFFF,#0080FF)':'rgba(255,255,255,.08)',color:chatModel==='deepseek'?'#fff':'var(--text2)'}}>DeepSeek</button>
-            <button onClick={()=>{if(!localStorage.getItem('grok_key')){if(window.apiKeyManager)window.apiKeyManager.showModal('grok',()=>setChatModel('grok'));}else{setChatModel('grok');}}} style={{padding:'4px 12px',borderRadius:20,border:'none',cursor:'pointer',fontSize:'.72rem',fontWeight:600,background:chatModel==='grok'?'linear-gradient(135deg,#FF6B6B,#FF4D6D)':'rgba(255,255,255,.08)',color:chatModel==='grok'?'#fff':'var(--text2)'}}>Grok</button>
-            <span style={{fontSize:'.6rem',marginLeft:4,color:chatModel==='groq'?'#00D4AA':chatModel==='gemini'?'#4285F4':chatModel==='deepseek'?'#00BFFF':'#FF6B6B'}}>● Attiva</span>
-          </div>
-          
-          {/* Sintesi Vocale */}
-          {msgs.length > 1 && (
-            <div style={{padding:'4px 8px',marginBottom:4}}>
-              <button onClick={()=>{const lastBot=msgs.filter(m=>m.role==='bot').pop();if(lastBot)speakText(lastBot.text.slice(0,1000));}} style={{padding:'4px 12px',borderRadius:8,border:'none',cursor:'pointer',fontSize:'.72rem',background:'rgba(139,92,246,.15)',color:'#8B5CF6',fontWeight:600}}>
-                {isSpeaking ? '⏹️ Ferma' : '🔊 Ascolta risposta'}
-              </button>
-            </div>
-          )}
-          
-          <div className="cir">
-            <textarea className="cinp" rows={3} placeholder="Spiegami... Fammi domande su... Riassumi..." value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}}/>
-            <button onClick={startVoiceInput} disabled={isListening} style={{background:isListening?'var(--red)':'rgba(76,201,240,.2)',color:isListening?'#fff':'var(--blue)',padding:'8px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:'1rem',marginRight:4}} title="Dettatura vocale">
-              {isListening ? '🔴' : '🎤'}
-            </button>
-            <button className="csnd" onClick={()=>{const lastBot=msgs.filter(m=>m.role==='bot').pop();if(lastBot)speakText(lastBot.text.slice(0,2000));}} style={{background:'rgba(139,92,246,.2)',color:'var(--purple)',padding:'8px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:'1rem',marginRight:4}} title="Ascolta risposta">🔊</button>
-            <button className="csnd" onClick={()=>window._startCallMode&&window._startCallMode()} style={{background:'rgba(6,214,160,.2)',color:'var(--green)',padding:'8px 12px',borderRadius:10,border:'none',cursor:'pointer',fontSize:'1rem',marginRight:4}} title="Modalità Chiamata">📞</button>
-            <button className="csnd" onClick={sendMsg} style={{background:'linear-gradient(135deg,'+project?.color+','+project?.color+'88)'}}>ok</button>
-          </div>
-        </div>
-      )}
-      {tab==='files'&&(
-        <div style={{flex:1,overflowY:'auto'}}>
-          {files.length===0&&<div style={{textAlign:'center',padding:'40px 20px',color:'var(--text2)'}}><div style={{fontSize:'2rem',marginBottom:12}}>file</div><div style={{fontWeight:700,marginBottom:8}}>Nessun materiale</div><div style={{fontSize:'.85rem'}}>Carica PDF, TXT o incolla appunti</div></div>}
-          
-          {/* Strumenti di Studio */}
-          {files.length > 0 && (
-            <div style={{padding:'12px',background:'rgba(139,92,246,.05)',border:'1px solid rgba(139,92,246,.15)',borderRadius:12,marginBottom:12}}>
-              <div style={{fontSize:'.8rem',fontWeight:600,color:'var(--purple)',marginBottom:10}}>🛠️ Strumenti di Studio</div>
-              <div style={{display:'grid',gridTemplateColumns:'repeat(2, 1fr)',gap:8}}>
-                <button onClick={generateQuiz} disabled={busy} style={{padding:'10px',borderRadius:10,border:'none',cursor:'pointer',background:'linear-gradient(135deg,rgba(244,63,94,.2),rgba(244,63,94,.1))',color:'#fff',fontSize:'.78rem',fontWeight:600}}>
-                  📝 Quiz & Esercizi
-                </button>
-                <button onClick={generateMindMap} disabled={busy} style={{padding:'10px',borderRadius:10,border:'none',cursor:'pointer',background:'linear-gradient(135deg,rgba(6,214,160,.2),rgba(6,214,160,.1))',color:'#fff',fontSize:'.78rem',fontWeight:600}}>
-                  🗺️ Mappa Mentale
-                </button>
-                <button onClick={exportSummary} style={{padding:'10px',borderRadius:10,border:'none',cursor:'pointer',background:'linear-gradient(135deg,rgba(251,191,36,.2),rgba(251,191,36,.1))',color:'#fff',fontSize:'.78rem',fontWeight:600}}>
-                  📄 Esporta PDF
-                </button>
-                <button onClick={shareNotes} style={{padding:'10px',borderRadius:10,border:'none',cursor:'pointer',background:'linear-gradient(135deg,rgba(66,133,244,.2),rgba(66,133,244,.1))',color:'#fff',fontSize:'.78rem',fontWeight:600}}>
-                  📤 Condividi
-                </button>
-                <button onClick={exportProject} style={{padding:'10px',borderRadius:10,border:'none',cursor:'pointer',background:'rgba(255,255,255,.1)',color:'#fff',fontSize:'.78rem',fontWeight:600}}>
-                  💾 Backup
-                </button>
-                <label style={{padding:'10px',borderRadius:10,border:'none',cursor:'pointer',background:'rgba(255,255,255,.1)',color:'#fff',fontSize:'.78rem',fontWeight:600,textAlign:'center'}}>
-                  📂 Ripristina
-                  <input type="file" accept=".json" style={{display:'none'}} onChange={importProject}/>
-                </label>
-              </div>
-            </div>
-          )}
-          
-          {files.map(f=>(
-            <div key={f.id} className="pwi" style={{marginBottom:8}}>
-              <div style={{fontSize:'1.3rem',flexShrink:0}}>{f.type==='application/pdf'?'pdf':'txt'}</div>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontWeight:700,fontSize:'.88rem',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{f.name}</div>
-                <div style={{fontSize:'.74rem',color:'var(--text2)',marginTop:2}}>{f.wordCount?f.wordCount+' parole':'~'+Math.round(f.content.length/5)+' parole'} - {fmtSize(f.size)}</div>
-              </div>
-              <button className="ib" style={{color:'var(--red)',flexShrink:0,background:'rgba(244,63,94,.1)',border:'none',cursor:'pointer',padding:'6px 10px',borderRadius:8}} onClick={async()=>{await window.deleteFileFromIDB(f.id);setFiles(fl=>fl.filter(x=>x.id!==f.id));}} title="Elimina file">🗑️</button>
-            </div>
-          ))}
-        </div>
-      )}
-      {tab==='gemini'&&(
-        <div style={{flex:1,overflowY:'auto',padding:'0 4px'}}>
-          <div className="card" style={{marginBottom:14,textAlign:'center'}}>
-            <div style={{fontSize:'1.4rem',marginBottom:8}}>🟦</div>
-            <div style={{fontWeight:700,marginBottom:6}}>Deep Research con Gemini</div>
-            <div style={{fontSize:'.8rem',color:'var(--text2)',marginBottom:14}}>Analisi approfondita del tuo materiale con Gemini 1.5 Flash (1M token)</div>
-            <button className="btn" onClick={deepResearch} disabled={geminiBusy||!files.length} style={{background:'linear-gradient(135deg,#4285F4,#34A853)',color:'#fff',padding:'12px 24px',fontSize:'.9rem'}}>
-              {geminiBusy?'🔄 Analisi in corso...':'🔍 Approfondisci con Gemini'}
-            </button>
-            {!files.length&&<div style={{fontSize:'.78rem',color:'var(--red)',marginTop:8}}>Carica prima del materiale</div>}
-          </div>
-          {geminiResult&&(
-            <div className="card" style={{background:'rgba(66,133,244,.05)',border:'1px solid rgba(66,133,244,.2)'}}>
-              <div style={{fontWeight:700,marginBottom:12,color:'#4285F4'}}>🟦 Analisi Gemini</div>
-              <div style={{whiteSpace:'pre-wrap',lineHeight:1.7,fontSize:'.88rem'}}>{geminiResult}</div>
-              <button className="btn bg bs" style={{marginTop:12}} onClick={()=>navigator.clipboard.writeText(geminiResult)}>📋 Copia</button>
-            </div>
-          )}
-          {geminiBusy&&<div style={{textAlign:'center',padding:40}}><div style={{fontSize:'2rem',marginBottom:12}}>⏳</div><div style={{color:'var(--text2)'}}>Gemini sta analizzando il tuo materiale...</div></div>}
-        </div>
-      )}
-      {showPaste&&(
-        <div className="mbg" onClick={()=>setShowPaste(false)}>
-          <div className="modal" onClick={e=>e.stopPropagation()}>
-            <div className="mh"><div className="mt">Incolla appunti</div><div className="mx" onClick={()=>setShowPaste(false)}>x</div></div>
-            <div className="fl"><label>Titolo</label><input className="field" placeholder="Capitolo 3, Appunti lezione..." value={pasteTitle} onChange={e=>setPasteTitle(e.target.value)}/></div>
-            <div className="fl"><label>Testo</label><textarea className="field" rows={8} placeholder="Incolla appunti, testo del libro..." value={pasteText} onChange={e=>setPasteText(e.target.value)} style={{resize:'vertical'}}/></div>
-            <div style={{fontSize:'.74rem',color:'var(--text2)',marginBottom:12}}>~{pasteText.trim().split(/\s+/).filter(w=>w.length>0).length} parole</div>
-            <div style={{display:'flex',gap:8,justifyContent:'flex-end'}}><button className="btn bg" onClick={()=>setShowPaste(false)}>Annulla</button><button className="btn bt" onClick={addPaste} disabled={!pasteText.trim()||!pasteTitle.trim()}>Aggiungi</button></div>
-          </div>
-        </div>
-      )}
-      {showExternalAI && (
-        <div style={{
-          position: 'fixed', zIndex: 9999, cursor: isDragging ? 'grabbing' : 'default',
-          left: floatingPanel.x, top: floatingPanel.y,
-          width: floatingPanel.width, height: floatingPanel.height,
-          background: 'linear-gradient(180deg, #1a1a2e 0%, #16213e 100%)',
-          borderRadius: 16, boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
-          display: 'flex', flexDirection: 'column', overflow: 'hidden',
-          userSelect: 'none'
-        }}>
-          <div style={{
-            padding: '10px 14px', background: 'rgba(139,92,246,0.2)',
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
-            borderBottom: '1px solid rgba(139,92,246,0.2)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: '1.2rem' }}>🤖</span>
-              <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Apri AI Esterna</span>
-            </div>
-            <button onClick={() => setShowExternalAI(false)} style={{ background: 'rgba(255,100,100,0.3)', border: 'none', borderRadius: 6, padding: '4px 10px', color: '#fff', cursor: 'pointer', fontSize: '0.75rem' }}>✕ Chiudi</button>
-          </div>
-          <div style={{ flex: 1, padding: 16 }}>
-            <div style={{fontSize:'0.9rem',color:'var(--text2)',marginBottom:12}}>
-              Apri un'AI in una nuova scheda:
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {EXTERNAL_AI_OPTIONS.map(ai => (
-                <button key={ai.id} onClick={() => window.open(ai.url, '_blank')} style={{
-                  padding: '10px 16px', borderRadius: 10, cursor: 'pointer', fontSize: '0.85rem',
-                  background: `linear-gradient(135deg, ${ai.color}22, ${ai.color}11)`,
-                  border: `1px solid ${ai.color}55`,
-                  color: '#fff', fontWeight: 600, transition: 'all 0.2s',
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  boxShadow: `0 2px 10px ${ai.color}22`
-                }}>
-                  <span>{ai.icon}</span>
-                  <span>{ai.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function useNotifications(events, birthdays) {
   const [notifList, setNotifList] = useState([]);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -30781,7 +29639,6 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
     {id:'youtube', label:'Video',      cls:'tyoutube'},
     {id:'todo',   label:'To-Do',       cls:'ttodo'},
     {id:'wallet', label:'Wallet',      cls:'twallet'},
-    {id:'tuttuni',label:"TUTT'UNI",    cls:'ttu'},
     {id:'games',  label:'Giochi',      cls:'tgames'},
     {id:'extra',  label:'Extra',       cls:'textra'},
     {id:'stats',  label:'Statistiche', cls:'tstats'},
@@ -31522,59 +30379,6 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
       );
     }
     
-    if(id==='tuttuni') {
-      if(vs==='elegant') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:8,objectFit:'cover',boxShadow:'0 2px 8px rgba(139,115,85,.4)',filter:'sepia(0.3)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-      if(vs==='minimal') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:2,objectFit:'cover',opacity:0.7}} alt="TUTT'UNI"/>
-        </div>
-      );
-      if(vs==='retro') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:12,objectFit:'cover',boxShadow:'0 4px 12px rgba(255,107,107,.5)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-      if(vs==='futuristic') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:4,objectFit:'cover',boxShadow:'0 0 8px rgba(0,245,255,.5)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-      if(vs==='glass') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:12,objectFit:'cover',boxShadow:'0 4px 16px rgba(102,126,234,.4)',backdropFilter:'blur(4px)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-      if(vs==='nature') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:14,objectFit:'cover',boxShadow:'0 4px 12px rgba(17,153,142,.4)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-      if(vs==='sunset2') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:14,objectFit:'cover',boxShadow:'0 4px 14px rgba(255,106,0,.5)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-      if(vs==='cyber') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:4,objectFit:'cover',boxShadow:'0 0 12px rgba(255,0,255,.6), 0 0 4px rgba(0,255,255,.4)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-      if(vs==='nordic') return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:size-4,height:size-4,borderRadius:6,objectFit:'cover',boxShadow:'0 2px 8px rgba(136,192,208,.3)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-      return (
-        <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <img src="https://i.imgur.com/X1BYLSa.png" style={{width:28,height:28,borderRadius:6,objectFit:'cover',boxShadow:'0 2px 8px rgba(6,214,160,.4)'}} alt="TUTT'UNI"/>
-        </div>
-      );
-    }
-    
     if(id==='games') {
       const gm = active ? '#F97316' : 'rgba(249,115,22,.4)';
       if(vs==='elegant') return (
@@ -32208,7 +31012,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
     
     return null;
   });
-  const TITLES={pw:'Password & Note',cal:'Calendario',email:'Email',ai:'Marco IA',music:'Spotify',studio:'Music Studio',video:'Video Editor',youtube:'YouTube',todo:'To-Do List',wallet:'Wallet',tuttuni:"TUTT'UNI",reminders:'Promemoria & Notifiche',aiplus:'AI & Integrazioni',extra:'Extra',settings:'Impostazioni',profile:'Il mio Profilo',stats:'Statistiche'};
+  const TITLES={pw:'Password & Note',cal:'Calendario',email:'Email',ai:'Marco IA',music:'Spotify',studio:'Music Studio',video:'Video Editor',youtube:'YouTube',todo:'To-Do List',wallet:'Wallet',reminders:'Promemoria & Notifiche',aiplus:'AI & Integrazioni',extra:'Extra',settings:'Impostazioni',profile:'Il mio Profilo',stats:'Statistiche'};
 
   // Section-specific background config
   const BG_CONFIG = {
@@ -32222,7 +31026,6 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
     youtube:{a:'rgba(255,0,0,.06)',    b:'rgba(255,100,0,.05)',   c:'rgba(200,0,0,.03)',     ap:'top:-70px;right:-50px',   bp:'bottom:-60px;left:-40px',  cp:'top:40%;right:30%'},
     todo:   {a:'rgba(76,201,240,.07)', b:'rgba(6,214,160,.05)',   c:'rgba(255,209,102,.04)', ap:'top:-80px;left:-50px',    bp:'bottom:-70px;right:-60px', cp:'top:50%;left:25%'},
     wallet: {a:'rgba(6,214,160,.07)',  b:'rgba(76,201,240,.05)',  c:'rgba(6,214,160,.04)',   ap:'top:-80px;left:-60px',    bp:'bottom:-70px;right:-40px', cp:'top:35%;left:30%'},
-    tuttuni:{a:'rgba(6,214,160,.07)',  b:'rgba(76,201,240,.05)',  c:'rgba(30,215,96,.04)',   ap:'top:-60px;right:-40px',   bp:'bottom:-80px;left:-60px',  cp:'top:35%;right:35%'},
     reminders:{a:'rgba(255,209,102,.07)',b:'rgba(255,77,109,.05)',c:'rgba(255,140,66,.04)', ap:'top:-90px;left:-70px',    bp:'bottom:-60px;right:-40px', cp:'top:45%;left:35%'},
     aiplus: {a:'rgba(123,94,167,.07)',b:'rgba(255,107,157,.06)',  c:'rgba(76,201,240,.04)',  ap:'top:-90px;right:-70px',   bp:'bottom:-60px;left:-50px',  cp:'top:35%;right:20%'},
     settings:{a:'rgba(156,163,175,.06)',b:'rgba(76,201,240,.04)', c:'rgba(123,94,167,.04)', ap:'top:-70px;right:-60px',   bp:'bottom:-70px;left:-50px',  cp:'top:40%;left:30%'},
@@ -32546,7 +31349,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
           )}
           
           <div className="content">
-             {tab==='pw'&&<PwTab toast={toast} onOpenDoc={(note)=>{window._openDocFromNote=note;setTab('tuttuni');}}/>}
+             {tab==='pw'&&<PwTab toast={toast} />}
              {tab==='cal'&&<CalTab toast={toast}/>}
              {tab==='email'&&<EmailTab toast={toast} callAI={callAI}/>}
              {tab==='ai'&&<AITab toast={toast} onTabSwitch={setTab} apiKeys={apiKeys} callAI={callAI} user={user} setProv={setProv} prov={prov}/>}
@@ -32556,7 +31359,6 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
              {tab==='youtube'&&<YouTubeTab toast={toast}/>}
              {tab==='todo'&&<TodoTab toast={toast}/>}
              {tab==='wallet'&&<WalletTab toast={toast}/>}
-             {tab==='tuttuni'&&<TuttUniTab uid={user?.uid||''} toast={toast} apiKeys={apiKeys}/>}
              {tab==='reminders'&&<RemindersTab toast={toast}/>}
              {tab==='extra'&&<ExtraTab toast={toast}/>}
              {tab==='games'&&<GamesTab toast={toast}/>}
@@ -32666,7 +31468,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
               
               <div style={{borderTop:'1px solid var(--border)',padding:'8px 0'}}>
                 <div style={{fontSize:'.7rem',fontWeight:700,textTransform:'uppercase',letterSpacing:'.1em',color:'var(--text2)',padding:'8px 20px 6px'}}>Strumenti</div>
-                {[{id:'youtube',label:'YouTube',icon:'▶️'},{id:'todo',label:'To-Do',icon:'✅'},{id:'tuttuni',label:"TUTT'UNI",icon:'🎓'},{id:'games',label:'Giochi',icon:'🎮'},{id:'extra',label:'Extra',icon:'🧩'}].map(t=>(
+                {[{id:'youtube',label:'YouTube',icon:'▶️'},{id:'todo',label:'To-Do',icon:'✅'},{id:'games',label:'Giochi',icon:'🎮'},{id:'extra',label:'Extra',icon:'🧩'}].map(t=>(
                   <div key={t.id} onClick={()=>{setTab(t.id);setMobileMenuOpen(false);playSound('tab-'+t.id);}} style={{display:'flex',alignItems:'center',gap:14,padding:'13px 20px',cursor:'pointer',color:tab===t.id?'var(--accent)':'var(--text)',background:tab===t.id?'rgba(255,77,109,.1)':'transparent',borderLeft:tab===t.id?'3px solid var(--accent)':'3px solid transparent',transition:'all .15s',minHeight:48}}>
                     <TabIcon id={t.id} active={tab===t.id} size={22}/>
                     <span style={{fontWeight:tab===t.id?700:500,fontSize:'.95rem'}}>{t.label}</span>
