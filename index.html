@@ -26070,363 +26070,278 @@ function SettingsTab({toast}) {
 
 function TodoTab({toast}) {
   const {addEvent, delEvent, todos, addTodo, delTodo, updateTodo} = useContext(DataCtx);
-  const [cats, setCats] = useState(()=>{try{return JSON.parse(localStorage.getItem('todo_cats')||'null')||[{id:1,name:'Personale',color:'#4CC9F0',open:true},{id:2,name:'Studio',color:'#FFD166',open:true},{id:3,name:'Lavoro',color:'#06D6A0',open:true}];}catch(e){return [];}});
-  const [archived, setArchived] = useState(()=>{try{return JSON.parse(localStorage.getItem('todo_archived')||'[]');}catch(e){return [];}});
-  const [showArchived, setShowArchived] = useState(false);
-  const [catMod, setCatMod] = useState(false);
-  const [editCatMod, setEditCatMod] = useState(null);
-  const [newCatName, setNewCatName] = useState('');
-  const [newCatColor, setNewCatColor] = useState('#4CC9F0');
-  const [addingTo, setAddingTo] = useState(null);
-  const [newItemText, setNewItemText] = useState('');
-  const [newItemDate, setNewItemDate] = useState('');
-  const [newItemTime, setNewItemTime] = useState('');
-  const [newItemCal, setNewItemCal] = useState(false);
-  const [newItemPriority, setNewItemPriority] = useState('medium');
-  const [editItem, setEditItem] = useState(null);
-  const [editItemText, setEditItemText] = useState('');
-  const [editItemDate, setEditItemDate] = useState('');
-  const [editItemTime, setEditItemTime] = useState('');
-  const [editItemPriority, setEditItemPriority] = useState('medium');
-  const [filterMode, setFilterMode] = useState('all');
-  const [priorityFilter, setPriorityFilter] = useState('all');
-  const [addToCalItem, setAddToCalItem] = useState(null);
-  const [calDate, setCalDate] = useState('');
-  const [calTime, setCalTime] = useState('');
-  const [calModalItem, setCalModalItem] = useState(null);
-  const [gtasksConnected, setGtasksConnected] = useState(() => localStorage.getItem('lmv_gtasks_token') ? true : false);
-  const [gtasksToken, setGtasksToken] = useState(() => localStorage.getItem('lmv_gtasks_token') || null);
-  const [gtasksLoading, setGtasksLoading] = useState(false);
-  const [gtasksLists, setGtasksLists] = useState([]);
-  const [gtasksTasks, setGtasksTasks] = useState([]);
-  const [gtasksExpanded, setGtasksExpanded] = useState(false);
-  const [gtasksSyncing, setGtasksSyncing] = useState(false);
-  const [gtasksNewTask, setGtasksNewTask] = useState('');
-  const [gtasksSelectedList, setGtasksSelectedList] = useState('@default');
-  const confirmAddToCalendar = () => {if(!calModalItem || !calDate) return;const item=todos.find(i=>i.id===calModalItem);if(!item) return;const cat=cats.find(c=>c.id===item.catId);const calEventId=Date.now();addEvent({id:calEventId,title:'[ToDo] '+item.text,date:calDate,time:calTime||'',color:cat?cat.color:'#4CC9F0',fromTodo:true});updateTodo(calModalItem,{calEventId,done:false});setCalModalItem(null);setCalDate('');setCalTime('');toast('Aggiunto al Calendario!','var(--blue)');};
-
-  // Google Tasks OAuth2
-  const connectGtasks = async () => {
-    const clientId = '56223523417-7c1j6d2d0t53vpcb8o8fmjpd17kuga6p.apps.googleusercontent.com'; // Google Tasks Client ID
-    const redirectUri = window.location.origin + window.location.pathname;
-    const scope = 'https://www.googleapis.com/auth/tasks';
-    const responseType = 'token';
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=${responseType}&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
-    
-    // Simple OAuth2 popup
-    const width = 500, height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-    const popup = window.open(url, 'Google Auth', `width=${width},height=${height},left=${left},top=${top}`);
-    
-    return new Promise((resolve) => {
-      const checkClosed = setInterval(() => {
-        try {
-          const hash = popup.location.hash;
-          if (hash) {
-            clearInterval(checkClosed);
-            popup.close();
-            const params = new URLSearchParams(hash.substring(1));
-            const token = params.get('access_token');
-            if (token) {
-              localStorage.setItem('lmv_gtasks_token', token);
-              setGtasksToken(token);
-              setGtasksConnected(true);
-              toast('Google Tasks collegato! ✅', 'var(--green)');
-              fetchGtasksLists();
-              resolve(true);
-            } else {
-              resolve(false);
-            }
-          }
-        } catch (e) {
-          // Cross-origin, wait
-        }
-      }, 500);
-      
-      const timeout = setTimeout(() => {
-        clearInterval(checkClosed);
-        if (!popup.closed) popup.close();
-        resolve(false);
-      }, 120000);
-      
-      popup.onbeforeunload = () => {
-        clearInterval(checkClosed);
-        clearTimeout(timeout);
-      };
-    });
-  };
-
-  const disconnectGtasks = () => {
-    if (window.confirm('Scollegare Google Tasks?')) {
-      localStorage.removeItem('lmv_gtasks_token');
-      setGtasksToken(null);
-      setGtasksConnected(false);
-      setGtasksLists([]);
-      setGtasksTasks([]);
-      toast('Google Tasks scollegato');
-    }
-  };
-
-  const fetchGtasksLists = async () => {
-    if (!gtasksToken) return;
-    setGtasksLoading(true);
-    try {
-      const res = await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists', {
-        headers: { 'Authorization': 'Bearer ' + gtasksToken }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setGtasksLists(data.items || []);
-      } else if (res.status === 401) {
-        disconnectGtasks();
-      }
-    } catch (e) {
-      console.error('GTasks error:', e);
-    }
-    setGtasksLoading(false);
-  };
-
-  const fetchGtasksTasks = async (listId = '@default') => {
-    if (!gtasksToken) return;
-    setGtasksLoading(true);
-    setGtasksSelectedList(listId);
-    try {
-      const res = await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${listId}/tasks?showCompleted=true`, {
-        headers: { 'Authorization': 'Bearer ' + gtasksToken }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setGtasksTasks(data.items || []);
-      }
-    } catch (e) {
-      console.error('GTasks tasks error:', e);
-    }
-    setGtasksLoading(false);
-  };
-
-  const createGtask = async () => {
-    if (!gtasksNewTask.trim() || !gtasksToken) return;
-    try {
-      const res = await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${gtasksSelectedList}/tasks`, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + gtasksToken,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          title: gtasksNewTask.trim(),
-          status: 'needsAction'
-        })
-      });
-      if (res.ok) {
-        setGtasksNewTask('');
-        fetchGtasksTasks(gtasksSelectedList);
-        toast('Task creato in Google! ✅', 'var(--green)');
-      }
-    } catch (e) {
-      toast('Errore creazione task', 'var(--red)');
-    }
-  };
-
-  const toggleGtask = async (taskId, currentStatus) => {
-    if (!gtasksToken) return;
-    const newStatus = currentStatus === 'needsAction' ? 'completed' : 'needsAction';
-    try {
-      await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${gtasksSelectedList}/tasks/${taskId}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': 'Bearer ' + gtasksToken,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
-      fetchGtasksTasks(gtasksSelectedList);
-    } catch (e) {
-      toast('Errore aggiornamento', 'var(--red)');
-    }
-  };
-
-  const deleteGtask = async (taskId) => {
-    if (!gtasksToken) return;
-    try {
-      await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${gtasksSelectedList}/tasks/${taskId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer ' + gtasksToken }
-      });
-      fetchGtasksTasks(gtasksSelectedList);
-      toast('Task eliminato', 'var(--yellow)');
-    } catch (e) {
-      toast('Errore eliminazione', 'var(--red)');
-    }
-  };
-
-  // Auto-fetch when connected
-  useEffect(() => {
-    if (gtasksConnected && gtasksToken) {
-      fetchGtasksLists();
-    }
-  }, [gtasksConnected]);
   const CAT_COLORS = ['#4CC9F0','#FFD166','#06D6A0','#FF4D6D','#7B5EA7','#FF6B9D','#FF8C42','#1ED760'];
   const today = new Date().toISOString().split('T')[0];
-  const saveCats = (c) => {setCats(c);localStorage.setItem('todo_cats',JSON.stringify(c));};
-  const saveArchived = (a) => {setArchived(a);localStorage.setItem('todo_archived',JSON.stringify(a));};
-  const updateCat = (id,name,color) => {saveCats(cats.map(c=>c.id===id?{...c,name,color}:c));setEditCatMod(null);toast('Aggiornata!');};
-  const updateItem = (id,text,date,time,priority) => {if(!text.trim()) return;updateTodo(id,{text:text.trim(),dueDate:date||null,dueTime:time||null,priority:priority||'medium'});setEditItem(null);setEditItemText('');setEditItemDate('');setEditItemTime('');setEditItemPriority('medium');toast('Task aggiornato!');};
-  const moveItem = (id,newCatId) => updateTodo(id,{catId:parseInt(newCatId)});
-  const toggleStar = (id) => {const item=todos.find(i=>i.id===id);if(item)updateTodo(id,{starred:!item.starred});};
-  const archiveItem = (id) => {const item=todos.find(i=>i.id===id);if(item){saveArchived([...archived,{...item,archivedAt:new Date().toISOString()}]);delTodo(id);toast('Archiviato!');playSound('save');}};
-  const restoreArchived = (id) => {const item=archived.find(i=>i.id===id);if(item){addTodo({...item,archivedAt:undefined});saveArchived(archived.filter(i=>i.id!==id));toast('Ripristinato!');}};
-  const deleteArchived = (id) => {saveArchived(archived.filter(i=>i.id!==id));toast('Eliminato!','var(--red)');};
-  const addCat = () => {if(!newCatName.trim()){toast('Inserisci un nome','var(--red)');return;}saveCats([...cats,{id:Date.now(),name:newCatName.trim(),color:newCatColor,open:true}]);setNewCatName('');setCatMod(false);toast('Categoria aggiunta!');playSound('save');};
-  const delCat = (id) => {if(!window.confirm('Eliminare la categoria?')) return;todos.filter(i=>i.catId===id&&i.calEventId).forEach(i=>{try{delEvent(i.calEventId);}catch(e){}});saveCats(cats.filter(c=>c.id!==id));todos.filter(i=>i.catId===id).forEach(i=>delTodo(i.id));toast('Eliminata','var(--red)');playSound('delete');};
-  const toggleCat = (id) => saveCats(cats.map(c=>c.id===id?{...c,open:!c.open}:c));
-  const addItem = (catId) => {if(!newItemText.trim()) return;const cat = cats.find(c=>c.id===catId);let calEventId = null;if(newItemCal && newItemDate) {calEventId = Date.now();addEvent({id:calEventId,title:'[ToDo] '+newItemText.trim(),date:newItemDate,time:newItemTime||'',color:cat?cat.color:'#4CC9F0',fromTodo:true});}addTodo({catId,text:newItemText.trim(),dueDate:newItemDate||null,dueTime:newItemTime||null,calEventId,priority:newItemPriority,starred:false});setNewItemText('');setNewItemDate('');setNewItemTime('');setNewItemCal(false);setNewItemPriority('medium');setAddingTo(null);toast('Task aggiunto!','var(--blue)');playSound('save');};
-  const toggleItem = (id) => {const item=todos.find(i=>i.id===id);if(item)updateTodo(id,{done:!item.done});playSound('click');};
-  const delItem = (id) => {const item = todos.find(i=>i.id===id);if(item&&item.calEventId){try{delEvent(item.calEventId);}catch(e){}}delTodo(id);playSound('delete');};
-  const getDueStatus = (item) => {if(!item.dueDate) return null;const diff = Math.ceil((new Date(item.dueDate+' 23:59')-new Date())/(1000*60*60*24));if(diff<0) return {label:'Scaduto',color:'var(--red)'};if(diff===0) return {label:'Oggi!',color:'var(--red)'};if(diff<=2) return {label:diff+'gg',color:'var(--yellow)'};return {label:diff+'gg',color:'var(--text2)'};};
-  const getPriorityIcon = (priority) => {if(priority==='high') return '🔴';if(priority==='medium') return '🟡';return '🟢';};
-  const totalDone = todos.filter(i=>i.done).length;
+
+  const [cats, setCats] = useState(()=>{try{return JSON.parse(localStorage.getItem('todo_cats')||'null')||[{id:1,name:'Personale',color:'#4CC9F0',open:true},{id:2,name:'Studio',color:'#FFD166',open:true},{id:3,name:'Lavoro',color:'#06D6A0',open:true}];}catch(e){return [];}});
+  const [archived, setArchived] = useState(()=>{try{return JSON.parse(localStorage.getItem('todo_archived')||'[]');}catch(e){return [];}});
+  const [filter, setFilter] = useState('all');
+  const [prioFilter, setPrioFilter] = useState('all');
+  const [showArchived, setShowArchived] = useState(false);
+  const [addCatMod, setAddCatMod] = useState(false);
+  const [editCatMod, setEditCatMod] = useState(null);
+  const [catName, setCatName] = useState('');
+  const [catColor, setCatColor] = useState('#4CC9F0');
+
+  const [addCat, setAddCat] = useState(null);
+  const [addText, setAddText] = useState('');
+  const [addDate, setAddDate] = useState('');
+  const [addTime, setAddTime] = useState('');
+  const [addPrio, setAddPrio] = useState('medium');
+  const [addCal, setAddCal] = useState(false);
+
+  const [editId, setEditId] = useState(null);
+  const [edText, setEdText] = useState('');
+  const [edDate, setEdDate] = useState('');
+  const [edTime, setEdTime] = useState('');
+  const [edPrio, setEdPrio] = useState('medium');
+
+  const [calItem, setCalItem] = useState(null);
+  const [calDate, setCalDate] = useState('');
+  const [calTime, setCalTime] = useState('');
+
+  const [gtConnected, setGtConnected] = useState(()=>!!localStorage.getItem('lmv_gtasks_token'));
+  const [gtToken, setGtToken] = useState(()=>localStorage.getItem('lmv_gtasks_token')||null);
+  const [gtLists, setGtLists] = useState([]);
+  const [gtTasks, setGtTasks] = useState([]);
+  const [gtExpanded, setGtExpanded] = useState(false);
+  const [gtLoading, setGtLoading] = useState(false);
+  const [gtNew, setGtNew] = useState('');
+  const [gtList, setGtList] = useState('@default');
+
+  const save = (k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+  useEffect(()=>{if(gtConnected&&gtToken) fetchGtLists();},[gtConnected]);
+
+  const getDiff = (d) => {if(!d) return null;const x=Math.ceil((new Date(d+'T23:59:59')-new Date())/(864e5));if(x<0) return {t:'Scaduto',c:'var(--red)'};if(x===0) return {t:'Oggi',c:'var(--red)'};if(x<=2) return {t:x+'gg',c:'var(--yellow)'};return {t:x+'gg',c:'var(--text2)'};};
+  const getPrioC = (p) => p==='high'?'#FF4D6D':p==='medium'?'#FFD166':'#06D6A0';
+  const getPrioDot = (p) => p==='high'?'🔴':p==='medium'?'🟡':'🟢';
+  const getPL = (p) => p==='high'?'Alta':p==='medium'?'Media':'Bassa';
+
   const total = todos.length;
-  const getFilteredItems = (catItems) => {let filtered = catItems;if(filterMode==='active') filtered = filtered.filter(i=>!i.done);if(filterMode==='done') filtered = filtered.filter(i=>i.done);if(filterMode==='due') filtered = filtered.filter(i=>i.dueDate).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));if(filterMode==='starred') filtered = filtered.filter(i=>i.starred);if(priorityFilter!=='all') filtered = filtered.filter(i=>i.priority===priorityFilter);return filtered;};
-  const getPriorityLabel = (p) => p==='high'?'Alta':p==='medium'?'Media':'Bassa';
-  const getPriorityColor = (p) => p==='high'?'var(--red)':p==='medium'?'var(--yellow)':'var(--green)';
-  const exportTodos = () => {
-    const lines = cats.map(cat => {
-      const items = todos.filter(i=>i.catId===cat.id);
-      return `## ${cat.name}\n${items.map(i=>`- [${i.done?'x':' '}] ${i.text}${i.dueDate?' (📅 '+i.dueDate+(i.dueTime?' '+i.dueTime:'')+')':''}${i.priority!=='medium'?' (⚡'+getPriorityLabel(i.priority)+')':''}`).join('\n')}`;
-    }).join('\n\n');
-    const blob = new Blob([`# To-Do List - LaMiaVita\n\n${lines}\n\nCompletati: ${totalDone}/${total}`], {type:'text/markdown'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download='todo_list.md'; a.click();
-    URL.revokeObjectURL(url);
-    toast('Lista esportata! 📋', 'var(--green)');
-    playSound('save');
+  const done = todos.filter(i=>i.done).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  const filterItems = (items) => {
+    let r = items;
+    if(filter==='active') r=r.filter(i=>!i.done);
+    if(filter==='done') r=r.filter(i=>i.done);
+    if(filter==='due') r=r.filter(i=>i.dueDate&&!i.done).sort((a,b)=>a.dueDate.localeCompare(b.dueDate));
+    if(filter==='starred') r=r.filter(i=>i.starred);
+    if(prioFilter!=='all') r=r.filter(i=>i.priority===prioFilter);
+    return r;
   };
+
+  const addTask = (catId) => {
+    if(!addText.trim()) return;
+    const cat=cats.find(c=>c.id===catId);
+    let cid=null;
+    if(addCal&&addDate){cid=Date.now();addEvent({id:cid,title:'[ToDo] '+addText.trim(),date:addDate,time:addTime||'',color:cat?cat.color:'#4CC9F0',fromTodo:true});}
+    addTodo({catId,text:addText.trim(),dueDate:addDate||null,dueTime:addTime||null,calEventId:cid,priority:addPrio,starred:false});
+    setAddText('');setAddDate('');setAddTime('');setAddPrio('medium');setAddCal(false);setAddCat(null);
+    toast('Task aggiunto!','var(--blue)');playSound('save');
+  };
+  const toggleDone = (id) => {const i=todos.find(x=>x.id===id);if(i)updateTodo(id,{done:!i.done});playSound('click');};
+  const toggleStar = (id) => {const i=todos.find(x=>x.id===id);if(i)updateTodo(id,{starred:!i.starred});};
+  const delTask = (id) => {const i=todos.find(x=>x.id===id);if(i&&i.calEventId){try{delEvent(i.calEventId);}catch(e){}}delTodo(id);playSound('delete');};
+  const saveEdit = (id) => {if(!edText.trim())return;updateTodo(id,{text:edText.trim(),dueDate:edDate||null,dueTime:edTime||null,priority:edPrio});setEditId(null);toast('Aggiornato!');};
+  const archiveTask = (id) => {const i=todos.find(x=>x.id===id);if(i){setArchived(a=>{const n=[...a,{...i,archivedAt:new Date().toISOString()}];save('todo_archived',n);return n;});delTodo(id);toast('Archiviato!');playSound('save');}};
+  const restoreTask = (id) => {const i=archived.find(x=>x.id===id);if(i){addTodo({...i,archivedAt:undefined});setArchived(a=>{const n=a.filter(x=>x.id!==id);save('todo_archived',n);return n;});toast('Ripristinato!');}};
+  const deleteArch = (id) => {setArchived(a=>{const n=a.filter(x=>x.id!==id);save('todo_archived',n);return n;});toast('Eliminato!','var(--red)');};
+  const confirmCal = () => {if(!calItem||!calDate)return;const i=todos.find(x=>x.id===calItem);if(!i)return;const cat=cats.find(c=>c.id===i.catId);const eid=Date.now();addEvent({id:eid,title:'[ToDo] '+i.text,date:calDate,time:calTime||'',color:cat?cat.color:'#4CC9F0',fromTodo:true});updateTodo(calItem,{calEventId:eid});setCalItem(null);toast('Aggiunto al Calendario!','var(--blue)');};
+  const newCat = () => {if(!catName.trim()){toast('Inserisci un nome','var(--red)');return;}const nc={id:Date.now(),name:catName.trim(),color:catColor,open:true};setCats(c=>{const n=[...c,nc];save('todo_cats',n);return n;});setCatName('');setAddCatMod(false);toast('Categoria creata!');playSound('save');};
+  const delCat = (id) => {if(!window.confirm('Eliminare la categoria e tutti i suoi task?'))return;todos.filter(i=>i.catId===id&&i.calEventId).forEach(i=>{try{delEvent(i.calEventId);}catch(e){}});todos.filter(i=>i.catId===id).forEach(i=>delTodo(i.id));setCats(c=>{const n=c.filter(x=>x.id!==id);save('todo_cats',n);return n;});toast('Eliminata','var(--red)');playSound('delete');};
+  const toggleCat = (id) => setCats(c=>{const n=c.map(x=>x.id===id?{...x,open:!x.open}:x);save('todo_cats',n);return n;});
+  const updateCatFn = (id,name,color) => {setCats(c=>{const n=c.map(x=>x.id===id?{...x,name,color}:x);save('todo_cats',n);return n;});setEditCatMod(null);toast('Aggiornata!');};
+  const exportTodos = () => {const md=cats.map(cat=>{const items=todos.filter(i=>i.catId===cat.id);return '## '+cat.name+'\n'+items.map(i=>'- ['+(i.done?'x':' ')+'] '+i.text+(i.dueDate?' ('+i.dueDate+(i.dueTime?' '+i.dueTime:'')+')':'')+(i.priority!=='medium'?' ['+getPL(i.priority)+']':'')).join('\n');}).join('\n\n');const b=new Blob(['# To-Do - LaMiaVita\n\n'+md+'\n\nCompletati: '+done+'/'+total],{type:'text/markdown'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download='todo_list.md';a.click();URL.revokeObjectURL(u);toast('Esportato!','var(--green)');playSound('save');};
+
+  // Google Tasks
+  const connectGt = async () => {const cid='56223523417-7c1j6d2d0t53vpcb8o8fmjpd17kuga6p.apps.googleusercontent.com';const redir=window.location.origin+window.location.pathname;const url=`https://accounts.google.com/o/oauth2/v2/auth?client_id=${cid}&redirect_uri=${encodeURIComponent(redir)}&response_type=token&scope=${encodeURIComponent('https://www.googleapis.com/auth/tasks')}&include_granted_scopes=true`;const w=500,h=600;const pop=window.open(url,'Google Auth',`width=${w},height=${h},left=${window.screenX+(window.outerWidth-w)/2},top=${window.screenY+(window.outerHeight-h)/2}`);return new Promise(res=>{const iv=setInterval(()=>{try{const hash=pop.location.hash;if(hash){clearInterval(iv);pop.close();const p=new URLSearchParams(hash.substring(1));const t=p.get('access_token');if(t){localStorage.setItem('lmv_gtasks_token',t);setGtToken(t);setGtConnected(true);toast('Google Tasks collegato!','var(--green)');fetchGtLists();res(true);}else res(false);}}catch(e){}},500);const to=setTimeout(()=>{clearInterval(iv);if(!pop.closed)pop.close();res(false);},120000);pop.onbeforeunload=()=>{clearInterval(iv);clearTimeout(to);};});};
+  const disconnectGt = () => {if(!window.confirm('Scollegare Google Tasks?'))return;localStorage.removeItem('lmv_gtasks_token');setGtToken(null);setGtConnected(false);setGtLists([]);setGtTasks([]);toast('Google Tasks scollegato');};
+  const fetchGtLists = async () => {if(!gtToken)return;setGtLoading(true);try{const r=await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists',{headers:{'Authorization':'Bearer '+gtToken}});if(r.ok){const d=await r.json();setGtLists(d.items||[]);}else if(r.status===401)disconnectGt();}catch(e){}setGtLoading(false);};
+  const fetchGtTasks = async (lid='@default') => {if(!gtToken)return;setGtLoading(true);setGtList(lid);try{const r=await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${lid}/tasks?showCompleted=true`,{headers:{'Authorization':'Bearer '+gtToken}});if(r.ok){const d=await r.json();setGtTasks(d.items||[]);}}catch(e){}setGtLoading(false);};
+  const createGt = async () => {if(!gtNew.trim()||!gtToken)return;try{const r=await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${gtList}/tasks`,{method:'POST',headers:{'Authorization':'Bearer '+gtToken,'Content-Type':'application/json'},body:JSON.stringify({title:gtNew.trim(),status:'needsAction'})});if(r.ok){setGtNew('');fetchGtTasks(gtList);toast('Task creato!','var(--green)');}}catch(e){toast('Errore','var(--red)');}};
+  const toggleGt = async (tid,st) => {if(!gtToken)return;const ns=st==='needsAction'?'completed':'needsAction';try{await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${gtList}/tasks/${tid}`,{method:'PATCH',headers:{'Authorization':'Bearer '+gtToken,'Content-Type':'application/json'},body:JSON.stringify({status:ns})});fetchGtTasks(gtList);}catch(e){toast('Errore','var(--red)');}};
+  const delGt = async (tid) => {if(!gtToken)return;try{await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${gtList}/tasks/${tid}`,{method:'DELETE',headers:{'Authorization':'Bearer '+gtToken}});fetchGtTasks(gtList);toast('Eliminato','var(--yellow)');}catch(e){toast('Errore','var(--red)');}};
+
+  const renderAddForm = (catId, onClose) => (
+    <div style={{marginTop:8,padding:'12px 14px',background:'rgba(255,255,255,.03)',borderRadius:12,border:'1px solid rgba(255,255,255,.06)'}}>
+      <input className="todo-add-input" placeholder="Nuovo task..." autoFocus value={addText} onChange={e=>setAddText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addTask(catId);if(e.key==='Escape'){onClose();setAddText('');}}}/>
+      <div style={{display:'flex',gap:8,marginTop:8,flexWrap:'wrap',alignItems:'center'}}>
+        <input className="todo-add-input" type="date" min={today} value={addDate} onChange={e=>setAddDate(e.target.value)} style={{width:140,flex:'unset'}}/>
+        <input className="todo-add-input" type="time" value={addTime} onChange={e=>setAddTime(e.target.value)} style={{width:100,flex:'unset'}}/>
+        <div style={{display:'flex',gap:3}}>
+          {[['high','🔴'],['medium','🟡'],['low','🟢']].map(([p,l])=><div key={p} onClick={()=>setAddPrio(p)} style={{width:26,height:26,borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',background:addPrio===p?'rgba(255,255,255,.1)':'transparent',border:'1px solid '+(addPrio===p?'rgba(255,255,255,.2)':'transparent'),fontSize:'.72rem',transition:'all .15s'}}>{l}</div>)}
+        </div>
+        {addDate&&<label style={{display:'flex',alignItems:'center',gap:6,fontSize:'.75rem',color:'var(--text2)',cursor:'pointer',userSelect:'none'}}><input type="checkbox" checked={addCal} onChange={e=>setAddCal(e.target.checked)} style={{accentColor:'var(--blue)'}}/>Calendario</label>}
+      </div>
+      <div style={{display:'flex',gap:6,marginTop:10}}>
+        <button className="btn bt bs" style={{padding:'6px 16px',fontSize:'.8rem'}} onClick={()=>addTask(catId)}>Aggiungi</button>
+        <button className="btn bg bs" style={{padding:'6px 16px',fontSize:'.8rem'}} onClick={()=>{onClose();setAddText('');setAddDate('');setAddTime('');setAddPrio('medium');setAddCal(false);}}>Annulla</button>
+      </div>
+    </div>
+  );
+
+  const renderTask = (item) => {
+    const due=getDiff(item.dueDate);const prio=item.priority||'medium';
+    return (
+      <div key={item.id} className="todo-item">
+        <div className={'todo-check'+(item.done?' done':'')} style={{borderColor:item.done?cats.find(c=>c.id===item.catId)?.color:'',background:item.done?cats.find(c=>c.id===item.catId)?.color:''}} onClick={()=>toggleDone(item.id)}>
+          {item.done&&<span style={{color:'#fff',fontSize:'.55rem',fontWeight:700}}>ok</span>}
+        </div>
+        {editId===item.id?(
+          <div style={{flex:1,display:'flex',flexDirection:'column',gap:6}}>
+            <input className="todo-add-input" autoFocus value={edText} onChange={e=>setEdText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')saveEdit(item.id);if(e.key==='Escape')setEditId(null);}}/>
+            <div style={{display:'flex',gap:6}}><input className="todo-add-input" type="date" value={edDate} onChange={e=>setEdDate(e.target.value)} style={{flex:1}}/><input className="todo-add-input" type="time" value={edTime} onChange={e=>setEdTime(e.target.value)} style={{width:90}}/></div>
+            <div style={{display:'flex',gap:3}}>{[['high','🔴'],['medium','🟡'],['low','🟢']].map(([p,l])=><div key={p} onClick={()=>setEdPrio(p)} style={{width:26,height:26,borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',background:edPrio===p?'rgba(255,255,255,.1)':'transparent',border:'1px solid '+(edPrio===p?'rgba(255,255,255,.2)':'transparent'),fontSize:'.72rem',transition:'all .15s'}}>{l}</div>)}</div>
+            <div style={{display:'flex',gap:6}}><button className="btn bt bs" onClick={()=>saveEdit(item.id)}>Salva</button><button className="btn bg bs" onClick={()=>setEditId(null)}>Annulla</button></div>
+          </div>
+        ):(
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{display:'flex',alignItems:'center',gap:5}}>
+              <span style={{fontSize:'.6rem'}}>{getPrioDot(prio)}</span>
+              {item.starred&&<span style={{color:'#FFD166',fontSize:'.7rem'}}>⭐</span>}
+              <span className={'todo-text'+(item.done?' done':'')}>{item.text}</span>
+            </div>
+            {item.dueDate&&<div style={{fontSize:'.7rem',marginTop:2,display:'flex',alignItems:'center',gap:6}}>
+              <span style={{color:due?due.c:'var(--text2)',fontWeight:600}}>{due?due.t+' · ':''}{new Date(item.dueDate).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}{item.dueTime?' '+item.dueTime:''}</span>
+              {item.calEventId&&<span style={{fontSize:'.65rem',color:'var(--blue)',background:'rgba(76,201,240,.1)',padding:'1px 5px',borderRadius:4}}>cal</span>}
+            </div>}
+          </div>
+        )}
+        {editId!==item.id&&<div style={{display:'flex',gap:2,flexShrink:0}}>
+          <div className="ib" style={{width:26,height:26,fontSize:'.7rem'}} onClick={()=>toggleStar(item.id)}>{item.starred?'⭐':'☆'}</div>
+          {!item.calEventId&&<div className="ib" style={{width:26,height:26,fontSize:'.68rem',color:'var(--blue)'}} onClick={()=>{setCalItem(item.id);setCalDate(item.dueDate||today);setCalTime(item.dueTime||'');}}>📅</div>}
+          <div className="ib" style={{width:26,height:26,fontSize:'.68rem'}} onClick={()=>{setEditId(item.id);setEdText(item.text);setEdDate(item.dueDate||'');setEdTime(item.dueTime||'');setEdPrio(item.priority||'medium');}}>{'✎'}</div>
+          <div className="ib" style={{width:26,height:26,fontSize:'.68rem',color:'var(--yellow)'}} onClick={()=>archiveTask(item.id)}>{'📦'}</div>
+          <div className="ib" style={{width:26,height:26,fontSize:'.68rem',color:'var(--red)'}} onClick={()=>delTask(item.id)}>{'✕'}</div>
+        </div>}
+      </div>
+    );
+  };
+
   return (
     <div className="fi2">
       <div className="sh">
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
           <div className="sht" style={{margin:0}}>ok <em>To-Do</em></div>
           <div style={{display:'flex',gap:6}}>
-            <button className="btn bg bs" onClick={exportTodos} title="Esporta lista">📋 Esporta</button>
-            <button className="btn bt bs" onClick={()=>setCatMod(true)}>+ Categoria</button>
+            <button className="btn bg bs" onClick={exportTodos} style={{fontSize:'.78rem'}}>Esporta</button>
+            <button className="btn bt bs" onClick={()=>setAddCatMod(true)} style={{fontSize:'.78rem'}}>+ Categoria</button>
           </div>
         </div>
       </div>
-      {total>0&&(
-        <div className="card" style={{marginBottom:14,padding:'12px 16px'}}>
-          <div style={{display:'flex',alignItems:'center',gap:12}}>
-            <div style={{flex:1,height:6,background:'rgba(255,255,255,.06)',borderRadius:3,overflow:'hidden'}}>
-              <div style={{height:'100%',width:(totalDone/total*100)+'%',background:'linear-gradient(90deg,var(--blue),var(--green))',borderRadius:3,transition:'width .4s'}}/>
-            </div>
-            <div style={{fontSize:'.82rem',color:'var(--text2)',flexShrink:0,fontWeight:600}}>{totalDone}/{total}</div>
+
+      {total>0&&<div className="card" style={{marginBottom:14,padding:'14px 18px'}}>
+        <div style={{display:'flex',alignItems:'center',gap:14}}>
+          <div style={{position:'relative',width:44,height:44,flexShrink:0}}>
+            <svg width="44" height="44" style={{transform:'rotate(-90deg)'}}>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.06)" strokeWidth="3"/>
+              <circle cx="22" cy="22" r="18" fill="none" stroke="url(#pg)" strokeWidth="3" strokeLinecap="round" strokeDasharray={113.1} strokeDashoffset={113.1-(pct/100*113.1)} style={{transition:'stroke-dashoffset .5s'}}/>
+              <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="var(--blue)"/><stop offset="100%" stopColor="var(--green)"/></linearGradient></defs>
+            </svg>
+            <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.7rem',fontWeight:700,color:'var(--text)'}}>{pct}%</div>
+          </div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:'.82rem',fontWeight:600,color:'var(--text)'}}>{done} di {total} completati</div>
+            <div style={{fontSize:'.72rem',color:'var(--text2)',marginTop:2}}>{total-done>0?total-done+' task rimanenti':'Tutto fatto!'}</div>
           </div>
         </div>
-      )}
+      </div>}
+
       <div style={{display:'flex',gap:5,marginBottom:14,flexWrap:'wrap',alignItems:'center'}}>
-        {[['all','Tutti'],['active','Attivi'],['done','Completati'],['due','Scadenza'],['starred','⭐']].map(([v,l])=>(
-          <button key={v} className={'btn bs'+(filterMode===v?' br':' bg')} onClick={()=>setFilterMode(v)}>{l}</button>
-        ))}
-        <div style={{marginLeft:'auto',display:'flex',gap:5}}>
-          {[['all','🎯'],['high','🔴'],['medium','🟡'],['low','🟢']].map(([p,l])=>(
-            <button key={p} className={'btn bs'+(priorityFilter===p?' br':' bg')} style={{padding:'5px 10px',fontSize:'.72rem'}} onClick={()=>setPriorityFilter(p)}>{l}</button>
-          ))}
-        </div>
+        {[['all','Tutti'],['active','Attivi'],['done','Fatti'],['due','Scadenza'],['starred','Favoriti']].map(([v,l])=><div key={v} onClick={()=>setFilter(v)} style={{padding:'5px 12px',borderRadius:8,fontSize:'.75rem',fontWeight:600,cursor:'pointer',background:filter===v?'var(--accent)':'rgba(255,255,255,.05)',color:filter===v?'#fff':'var(--text2)',transition:'all .15s',userSelect:'none'}}>{l}</div>)}
+        <div style={{flex:1}}/>
+        {[['all','🎯'],['high','🔴'],['medium','🟡'],['low','🟢']].map(([p,l])=><div key={p} onClick={()=>setPrioFilter(p)} style={{width:26,height:26,borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',background:prioFilter===p?'rgba(255,255,255,.1)':'transparent',fontSize:'.72rem',transition:'all .15s'}}>{l}</div>)}
       </div>
-      {archived.length>0&&<button className="btn bg bs" style={{marginBottom:14,color:'#7B5EA7',borderColor:'rgba(123,94,167,.3)'}} onClick={()=>setShowArchived(!showArchived)}>📦 Archvio ({archived.length})</button>}
-      {showArchived&&<div className="card" style={{marginBottom:14,padding:12,background:'rgba(123,94,167,.05)'}}>
-        {archived.map(a=><div key={a.id} style={{display:'flex',alignItems:'center',gap:8,padding:'6px 0'}}>
+
+      {archived.length>0&&<div onClick={()=>setShowArchived(!showArchived)} style={{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',marginBottom:12,cursor:'pointer',background:'rgba(123,94,167,.06)',borderRadius:12,border:'1px solid rgba(123,94,167,.15)',fontSize:'.82rem',color:'#B39DDB',userSelect:'none'}}>
+        <span style={{transform:showArchived?'rotate(90deg)':'rotate(0)',transition:'transform .2s',fontSize:'.7rem'}}>{'>'}</span>
+        Archivio <span style={{opacity:.6}}>({archived.length})</span>
+      </div>}
+      {showArchived&&<div className="card" style={{marginBottom:14,padding:12,background:'rgba(123,94,167,.04)'}}>
+        {archived.map(a=><div key={a.id} style={{display:'flex',alignItems:'center',gap:8,padding:'7px 0',borderBottom:'1px solid rgba(255,255,255,.03)'}}>
           <span style={{flex:1,fontSize:'.82rem',textDecoration:'line-through',color:'var(--text2)'}}>{a.text}</span>
-          <button className="btn bg bs" style={{padding:'4px 8px',fontSize:'.7rem'}} onClick={()=>restoreArchived(a.id)}>↩</button>
-          <button className="btn bg bs" style={{padding:'4px 8px',fontSize:'.7rem',color:'var(--red)'}} onClick={()=>deleteArchived(a.id)}>x</button>
+          <div className="ib" style={{width:26,height:26,fontSize:'.68rem'}} onClick={()=>restoreTask(a.id)}>{'↩'}</div>
+          <div className="ib" style={{width:26,height:26,fontSize:'.68rem',color:'var(--red)'}} onClick={()=>deleteArch(a.id)}>{'✕'}</div>
         </div>)}
       </div>}
+
       {cats.length===0&&<Empty icon="ok" text="Nessuna categoria" sub="Crea una categoria per iniziare"/>}
+
       {cats.map(cat=>{
-        const catItems = getFilteredItems(todos.filter(i=>i.catId===cat.id));
-        const allCatItems = todos.filter(i=>i.catId===cat.id);
-        const catDone = allCatItems.filter(i=>i.done).length;
-        const nextDue = allCatItems.filter(i=>i.dueDate&&!i.done).sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0];
+        const all=filterItems(todos.filter(i=>i.catId===cat.id));
+        const totalCat=todos.filter(i=>i.catId===cat.id);
+        const doneCat=totalCat.filter(i=>i.done).length;
+        const nextDue=totalCat.filter(i=>i.dueDate&&!i.done).sort((a,b)=>a.dueDate.localeCompare(b.dueDate))[0];
         return (
           <div key={cat.id} className="todo-cat">
             <div className="todo-cat-head" onClick={()=>toggleCat(cat.id)}>
               <div className="todo-cat-dot" style={{background:cat.color}}/>
               <div className="todo-cat-name">{cat.name}</div>
-              {nextDue&&<div style={{fontSize:'.7rem',color:'var(--yellow)',background:'rgba(255,209,102,.08)',padding:'2px 7px',borderRadius:6,flexShrink:0}}>{new Date(nextDue.dueDate).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</div>}
-              <div className="todo-cat-count">{catDone}/{allCatItems.length}</div>
-              <div style={{fontSize:'.78rem',color:'var(--text2)',marginLeft:4}}>{cat.open?'v':'>'}</div>
-              <div className="ib" style={{flexShrink:0,fontSize:'.72rem'}} onClick={e=>{e.stopPropagation();setEditCatMod({id:cat.id,name:cat.name,color:cat.color});}}>ed</div>
-              <div className="ib" style={{color:'var(--red)',marginLeft:2,flexShrink:0}} onClick={e=>{e.stopPropagation();delCat(cat.id);}}>x</div>
+              {nextDue&&<div style={{fontSize:'.68rem',color:'var(--yellow)',background:'rgba(255,209,102,.08)',padding:'2px 8px',borderRadius:6,flexShrink:0}}>{new Date(nextDue.dueDate).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</div>}
+              <div className="todo-cat-count">{doneCat}/{totalCat.length}</div>
+              <div style={{fontSize:'.7rem',color:'var(--text2)',marginLeft:2,transition:'transform .2s',transform:cat.open?'rotate(90deg)':'rotate(0deg)'}}>{'>'}</div>
+              <div className="ib" style={{width:26,height:26,fontSize:'.65rem',flexShrink:0}} onClick={e=>{e.stopPropagation();setEditCatMod({id:cat.id,name:cat.name,color:cat.color});}}/>
+              <div className="ib" style={{width:26,height:26,fontSize:'.65rem',color:'var(--red)',marginLeft:2,flexShrink:0}} onClick={e=>{e.stopPropagation();delCat(cat.id);}}/>
             </div>
-            {cat.open&&(
-              <div className="todo-items">
-                {catItems.length===0&&addingTo!==cat.id&&<div style={{fontSize:'.82rem',color:'var(--text2)',padding:'6px 0',opacity:.6}}>{filterMode!=='all'?'Nessun task in questa vista':'Nessun task - aggiungine uno!'}</div>}
-                {catItems.map(item=>{
-                  const due = getDueStatus(item);
-                  const priority = item.priority||'medium';
-                  return (
-                    <div key={item.id} className="todo-item">
-                      <div className={'todo-check'+(item.done?' done':'')} style={{borderColor:item.done?cat.color:'',background:item.done?cat.color:''}} onClick={()=>toggleItem(item.id)}>
-                        {item.done&&<span style={{color:'#fff',fontSize:'.6rem',fontWeight:700}}>ok</span>}
-                      </div>
-                      {editItem===item.id?(
-                        <div style={{flex:1,display:'flex',flexDirection:'column',gap:6}}>
-                          <input className="todo-add-input" autoFocus value={editItemText} onChange={e=>setEditItemText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')updateItem(item.id,editItemText,editItemDate,editItemTime,editItemPriority);if(e.key==='Escape')setEditItem(null);}}/>
-                          <div style={{display:'flex',gap:6}}><input className="todo-add-input" type="date" value={editItemDate} onChange={e=>setEditItemDate(e.target.value)} style={{flex:1}}/><input className="todo-add-input" type="time" value={editItemTime} onChange={e=>setEditItemTime(e.target.value)} style={{width:90}}/></div>
-                          <div style={{display:'flex',gap:4}}>{[['high','🔴 Alta'],['medium','🟡 Media'],['low','🟢 Bassa']].map(([p,l])=><button key={p} className={'btn bs'+(editItemPriority===p?' br':' bg')} style={{padding:'3px 6px',fontSize:'.68rem'}} onClick={()=>setEditItemPriority(p)}>{l}</button>)}</div>
-                          <div style={{display:'flex',gap:6}}><button className="btn bt bs" onClick={()=>updateItem(item.id,editItemText,editItemDate,editItemTime,editItemPriority)}>Salva</button><button className="btn bg bs" onClick={()=>setEditItem(null)}>Annulla</button></div>
-                        </div>
-                      ):(
-                        <div style={{flex:1,minWidth:0}}>
-                          <div style={{display:'flex',alignItems:'center',gap:4,marginBottom:2}}><span style={{fontSize:'.6rem',fontWeight:700,padding:'1px 4px',borderRadius:3,background:priority==='high'?'rgba(255,77,109,.2)':priority==='medium'?'rgba(255,209,102,.2)':'rgba(6,214,160,.2)',color:priority==='high'?'#FF4D6D':priority==='medium'?'#FFD166':'#06D6A0'}}>{getPriorityIcon(priority)}</span>{item.starred&&<span style={{color:'#FFD166',fontSize:'.75rem'}}>⭐</span>}</div>
-                          <div className={'todo-text'+(item.done?' done':'')}>{item.text}</div>
-                          {item.dueDate&&<div style={{fontSize:'.71rem',display:'flex',alignItems:'center',gap:6,marginTop:3}}><span style={{color:due?due.color:'var(--text2)',fontWeight:600}}>{due?due.label+' - ':''}{new Date(item.dueDate).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}{item.dueTime?' '+item.dueTime:''}</span>{item.calEventId&&<span style={{fontSize:'.68rem',color:'var(--blue)',background:'rgba(76,201,240,.1)',padding:'1px 5px',borderRadius:4}}>cal</span>}</div>}
-                        </div>
-                      )}
-                      {editItem!==item.id&&<div style={{display:'flex',gap:3,flexShrink:0}}>
-                        <div className="ib" style={{fontSize:'.75rem'}} onClick={()=>toggleStar(item.id)}>{item.starred?'⭐':'☆'}</div>
-                        {!item.calEventId&&<div className="ib" style={{fontSize:'.72rem',color:'var(--blue)'}} onClick={()=>{setCalModalItem(item.id);setCalDate(item.dueDate||new Date().toISOString().split('T')[0]);setCalTime(item.dueTime||'');}}>📅</div>}
-                        <div className="ib" style={{fontSize:'.72rem'}} onClick={()=>{setEditItem(item.id);setEditItemText(item.text);setEditItemDate(item.dueDate||'');setEditItemTime(item.dueTime||'');setEditItemPriority(item.priority||'medium');}}>ed</div>
-                        <div className="ib" style={{fontSize:'.72rem',color:'var(--yellow)'}} onClick={()=>archiveItem(item.id)}>📦</div>
-                        <div className="ib" style={{color:'var(--red)'}} onClick={()=>delItem(item.id)}>x</div>
-                      </div>}
-                    </div>
-                  );
-                })}
-                {addingTo===cat.id?(
-                  <div style={{marginTop:10,display:'flex',flexDirection:'column',gap:8}}>
-                    <input className="todo-add-input" placeholder="Scrivi il task..." autoFocus value={newItemText} onChange={e=>setNewItemText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addItem(cat.id);if(e.key==='Escape'){setAddingTo(null);setNewItemText('');}}}/>
-                    <div style={{display:'flex',gap:6,flexWrap:'wrap'}}><input className="todo-add-input" type="date" min={today} value={newItemDate} onChange={e=>setNewItemDate(e.target.value)} style={{flex:1}}/><input className="todo-add-input" type="time" value={newItemTime} onChange={e=>setNewItemTime(e.target.value)} style={{width:90}}/></div>
-                    <div style={{display:'flex',gap:4,flexWrap:'wrap'}}>{[['high','🔴'],['medium','🟡'],['low','🟢']].map(([p,l])=><button key={p} className={'btn bs'+(newItemPriority===p?' br':' bg')} style={{padding:'4px 8px',fontSize:'.7rem'}} onClick={()=>setNewItemPriority(p)}>{l}</button>)}</div>
-                    {newItemDate&&<label style={{display:'flex',alignItems:'center',gap:8,fontSize:'.8rem',color:'var(--text2)',cursor:'pointer'}}><input type="checkbox" checked={newItemCal} onChange={e=>setNewItemCal(e.target.checked)} style={{accentColor:'var(--blue)'}}/>Aggiungi anche al Calendario</label>}
-                    <div style={{display:'flex',gap:6}}><button className="btn bt bs" onClick={()=>addItem(cat.id)}>Aggiungi</button><button className="btn bg bs" onClick={()=>{setAddingTo(null);setNewItemText('');setNewItemDate('');setNewItemTime('');setNewItemCal(false);setNewItemPriority('medium');}}>Annulla</button></div>
-                  </div>
-                ):(
-                  <div style={{marginTop:8,cursor:'pointer',color:cat.color,fontSize:'.82rem',fontWeight:600,opacity:.8}} onClick={()=>{setAddingTo(cat.id);setNewItemText('');}}>+ Aggiungi task</div>
-                )}
-              </div>
-            )}
+            {cat.open&&<div className="todo-items">
+              {all.length===0&&addCat!==cat.id&&<div style={{fontSize:'.8rem',color:'var(--text2)',padding:'6px 0',opacity:.5}}>{filter!=='all'||prioFilter!=='all'?'Nessun task per questo filtro':'Nessun task'}</div>}
+              {all.map(renderTask)}
+              {addCat===cat.id?renderAddForm(cat.id,()=>setAddCat(null)):<div style={{marginTop:6,cursor:'pointer',color:cat.color,fontSize:'.8rem',fontWeight:600,opacity:.7,padding:'4px 0'}} onClick={()=>{setAddCat(cat.id);setAddText('');}}>+ Aggiungi task</div>}
+            </div>}
           </div>
         );
       })}
-      <Modal open={catMod} onClose={()=>setCatMod(false)} title="Nuova Categoria" footer={<><button className="btn bg" onClick={()=>setCatMod(false)}>Annulla</button><button className="btn bt" onClick={addCat}>Crea</button></>}>
-        <div className="fl"><label>Nome</label><input className="field" placeholder="Es. Spesa, Progetto..." value={newCatName} onChange={e=>setNewCatName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addCat()}/></div>
-        <div className="fl"><label>Colore</label><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{CAT_COLORS.map(c=><div key={c} onClick={()=>setNewCatColor(c)} style={{width:28,height:28,borderRadius:'50%',background:c,cursor:'pointer',border:newCatColor===c?'3px solid #fff':'3px solid transparent',transition:'all .2s'}}/>)}</div></div>
+
+      <div className="card" style={{marginTop:4,overflow:'hidden'}}>
+        <div onClick={()=>setGtExpanded(!gtExpanded)} style={{display:'flex',alignItems:'center',gap:10,padding:'14px 18px',cursor:'pointer',userSelect:'none'}}>
+          <span style={{fontSize:'.85rem'}}>{'>'}</span>
+          <span style={{fontSize:'.82rem',fontWeight:600,flex:1}}>Google Tasks</span>
+          {gtConnected&&<span style={{fontSize:'.7rem',color:'var(--green)',background:'rgba(6,214,160,.1)',padding:'2px 8px',borderRadius:6}}>Connesso</span>}
+        </div>
+        {gtExpanded&&<div style={{padding:'0 18px 14px',borderTop:'1px solid rgba(255,255,255,.05)'}}>
+          {!gtConnected?<div style={{padding:'14px 0',textAlign:'center'}}>
+            <div style={{fontSize:'.82rem',color:'var(--text2)',marginBottom:10}}>Collega Google Tasks per sincronizzare</div>
+            <button className="btn bt bs" onClick={connectGt}>Collega Google Tasks</button>
+          </div>:<div style={{paddingTop:12}}>
+            <div style={{display:'flex',gap:6,marginBottom:10,flexWrap:'wrap',alignItems:'center'}}>
+              {gtLists.map(l=><div key={l.id} onClick={()=>fetchGtTasks(l.id)} style={{padding:'4px 10px',borderRadius:8,fontSize:'.72rem',cursor:'pointer',background:gtList===l.id?'var(--accent)':'rgba(255,255,255,.05)',color:gtList===l.id?'#fff':'var(--text2)',fontWeight:600,transition:'all .15s'}}>{l.title}</div>)}
+              <div style={{flex:1}}/>
+              <div className="ib" style={{width:28,height:28,fontSize:'.65rem',color:'var(--red)'}} onClick={disconnectGt}>{'✕'}</div>
+            </div>
+            <div style={{display:'flex',gap:6,marginBottom:10}}>
+              <input className="todo-add-input" placeholder="Nuovo task Google..." value={gtNew} onChange={e=>setGtNew(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')createGt();}}/>
+              <button className="btn bt bs" style={{padding:'6px 14px',fontSize:'.78rem',flexShrink:0}} onClick={createGt}>+</button>
+            </div>
+            {gtLoading&&<div style={{fontSize:'.78rem',color:'var(--text2)',padding:'8px 0'}}>Caricamento...</div>}
+            {!gtLoading&&gtTasks.length===0&&<div style={{fontSize:'.78rem',color:'var(--text2)',padding:'8px 0',opacity:.5}}>Nessun task</div>}
+            {gtTasks.map(t=><div key={t.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid rgba(255,255,255,.03)'}}>
+              <div className={'todo-check'+(t.status==='completed'?' done':'')} style={{width:20,height:20,borderRadius:6}} onClick={()=>toggleGt(t.id,t.status)}>
+                {t.status==='completed'&&<span style={{color:'#fff',fontSize:'.5rem',fontWeight:700}}>ok</span>}
+              </div>
+              <span style={{flex:1,fontSize:'.82rem',textDecoration:t.status==='completed'?'line-through':'none',color:t.status==='completed'?'var(--text2)':'var(--text)',opacity:t.status==='completed'?.6:1}}>{t.title}</span>
+              <div className="ib" style={{width:24,height:24,fontSize:'.6rem',color:'var(--red)'}} onClick={()=>delGt(t.id)}>{'✕'}</div>
+            </div>)}
+          </div>}
+        </div>}
+      </div>
+
+      <Modal open={addCatMod} onClose={()=>setAddCatMod(false)} title="Nuova Categoria" footer={<><button className="btn bg" onClick={()=>setAddCatMod(false)}>Annulla</button><button className="btn bt" onClick={newCat}>Crea</button></>}>
+        <div className="fl"><label>Nome</label><input className="field" placeholder="Es. Spesa, Progetto..." value={catName} onChange={e=>setCatName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&newCat()}/></div>
+        <div className="fl"><label>Colore</label><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{CAT_COLORS.map(c=><div key={c} onClick={()=>setCatColor(c)} style={{width:28,height:28,borderRadius:'50%',background:c,cursor:'pointer',border:catColor===c?'3px solid #fff':'3px solid transparent',transition:'all .2s'}}/>)}</div></div>
       </Modal>
-      <Modal open={!!editCatMod} onClose={()=>setEditCatMod(null)} title="Modifica Categoria" footer={<><button className="btn bg" onClick={()=>setEditCatMod(null)}>Annulla</button><button className="btn bt" onClick={()=>updateCat(editCatMod.id,editCatMod.name,editCatMod.color)}>Salva</button></>}>
+      <Modal open={!!editCatMod} onClose={()=>setEditCatMod(null)} title="Modifica Categoria" footer={<><button className="btn bg" onClick={()=>setEditCatMod(null)}>Annulla</button><button className="btn bt" onClick={()=>updateCatFn(editCatMod.id,editCatMod.name,editCatMod.color)}>Salva</button></>}>
         {editCatMod&&<>
           <div className="fl"><label>Nome</label><input className="field" value={editCatMod.name} onChange={e=>setEditCatMod(m=>({...m,name:e.target.value}))}/></div>
           <div className="fl"><label>Colore</label><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{CAT_COLORS.map(c=><div key={c} onClick={()=>setEditCatMod(m=>({...m,color:c}))} style={{width:28,height:28,borderRadius:'50%',background:c,cursor:'pointer',border:editCatMod.color===c?'3px solid #fff':'3px solid transparent',transition:'all .2s'}}/>)}</div></div>
         </>}
       </Modal>
-      <Modal open={!!calModalItem} onClose={()=>setCalModalItem(null)} title="Aggiungi al Calendario" footer={<><button className="btn bg" onClick={()=>setCalModalItem(null)}>Annulla</button><button className="btn bt" onClick={confirmAddToCalendar} disabled={!calDate}>Aggiungi</button></>}>
-        {calModalItem&&<div style={{display:'flex',flexDirection:'column',gap:12}}>
-          <div style={{padding:'8px 12px',background:'rgba(76,201,240,.1)',borderRadius:8,fontSize:'.88rem',color:'var(--text2)'}}>
-            {todos.find(i=>i.id===calModalItem)?.text}
-          </div>
+      <Modal open={!!calItem} onClose={()=>setCalItem(null)} title="Aggiungi al Calendario" footer={<><button className="btn bg" onClick={()=>setCalItem(null)}>Annulla</button><button className="btn bt" onClick={confirmCal} disabled={!calDate}>Aggiungi</button></>}>
+        {calItem&&<div style={{display:'flex',flexDirection:'column',gap:12}}>
+          <div style={{padding:'8px 12px',background:'rgba(76,201,240,.1)',borderRadius:8,fontSize:'.85rem',color:'var(--text2)'}}>{todos.find(i=>i.id===calItem)?.text}</div>
           <div className="fl"><label>Data</label><input className="field" type="date" value={calDate} onChange={e=>setCalDate(e.target.value)}/></div>
-          <div className="fl"><label>Orario (opzionale)</label><input className="field" type="time" value={calTime} onChange={e=>setCalTime(e.target.value)}/></div>
+          <div className="fl"><label>Orario</label><input className="field" type="time" value={calTime} onChange={e=>setCalTime(e.target.value)}/></div>
         </div>}
       </Modal>
     </div>
