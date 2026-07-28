@@ -17316,178 +17316,214 @@ function SnakeGame({onBack, level, onWin, toast}) {
 
 // ── WORDLE COMPONENT ──
 function WordleGame({onBack, toast}) {
-  const [wordLength, setWordLength] = useState(null);
+  const [wordLen, setWordLen] = useState(null);
   const [usedWords, setUsedWords] = useState(() => { try { return JSON.parse(localStorage.getItem('lmv_wordle_used') || '[]'); } catch { return []; } });
-  
-  const ALL_WORDS_RAW = ['AMORE', 'VERDE', 'MUSICA', 'TORTA', 'LIBRO', 'TAVOLO', 'STELLA', 'FIUME', 'PONTE', 'DOLCE', 'FRESCO', 'CALDO', 'NOTTE', 'LUNGO', 'MARE', 'VENTO', 'FIORE', 'ERBA', 'ALBERO', 'CIELO', 'PIETRA', 'FUOCO', 'ACQUA', 'TERRA', 'TEMPO', 'MONDO', 'VITA', 'CASA', 'MANO', 'BOCCA', 'DENTE', 'GAMBA', 'PIEDE', 'TESTA', 'CUORE', 'SANGUE', 'OSSO', 'PELLE', 'CARNE', 'NASO', 'GOLA', 'COLLO', 'DITO', 'LUNA', 'SOLE', 'NEVE', 'ALBA', 'SERENO', 'PIOGGIA', 'FREDDO', 'BUIO', 'LUCE', 'FONTE', 'STRADA', 'PORTA', 'CHIESA', 'FORTE', 'PIANO', 'ALTO', 'BASSO', 'LARGO', 'STRETTO', 'CORTO', 'GRANDE', 'PICCOLO', 'BELLO', 'BUONO', 'MORBIDO', 'PIENO', 'VUOTO', 'APERTO', 'CHIUSO', 'VECCHIO', 'GIOVANE', 'RICCO', 'POVERO', 'FELICE', 'TRISTE', 'ALLEGRO', 'STANCO', 'PRONTO', 'SAGGIO', 'GENTILE', 'ONESTO', 'GIUSTO', 'VERO', 'REALE', 'IDEALE', 'FINALE', 'PRIMA', 'DOPO', 'SEMPRE', 'TANTO', 'POCO', 'MOLTO', 'FORSE', 'CERTO', 'SICURO', 'PROPRIO', 'NOSTRO', 'VOSTRO', 'PRANZO', 'CENA', 'PASTO', 'SALA', 'CAMERA', 'LETTO', 'DIVANO', 'POLTRONA', 'SCRIVANIA', 'LIBRERIA', 'CUCINA', 'FORNO', 'FRIGO', 'LAVARE', 'STIRARE', 'PULIRE', 'SPAZZARE', 'CUCINARE', 'MANGIARE', 'BERE', 'DORMIRE', 'VEGLIARE', 'LAVORARE', 'GIOCARE', 'STUDIARE', 'LEGGERE', 'SCRIVERE', 'PARLARE', 'ASCOLTARE', 'GUARDARE', 'VEDERE', 'SENTIRE', 'TOCCARE', 'PENSARE', 'SOGNARE', 'SPERARE', 'AMARE', 'ODIARE', 'TEMERE', 'RIDERE', 'PIANGERE', 'SORRIDERE', 'SALIRE', 'SCENDERE', 'ENTRARE', 'USCIRE', 'ANDARE', 'VENIRE', 'TORNARE', 'RESTARE', 'PARTIRE', 'ARRIVARE', 'CORRERE', 'CAMMINARE', 'SALTARE', 'NUOTARE', 'VOLARE', 'CADERE', 'ALZARE', 'ABBASSARE', 'APRIRE', 'CHIUDERE', 'ACCENDERE', 'SPEGNERE', 'COMPRARE', 'VENDERE', 'PAGARE', 'SPENDERE', 'RISPARMIARE', 'GUADAGNARE', 'PERDERE', 'TROVARE', 'CERCARE', 'DOMANDARE', 'RISPONDERE', 'CHIEDERE', 'DIRE', 'FARE', 'DARE', 'PRENDERE', 'METTERE', 'PORTARE', 'LASCIARE', 'TENERE', 'AVERE', 'ESSERE', 'STARE', 'DOVERE', 'POTERE', 'VOLERE', 'SAPERE', 'CONOSCERE', 'CREDERE', 'IMPARARE', 'INSEGNARE', 'CAPIRE', 'SPIEGARE', 'MOSTRARE', 'NASCONDERE', 'VINCERE', 'COMINCIARE', 'FINIRE', 'CONTINUARE', 'SMETTERE', 'PROVARE', 'RIUSCIRE', 'SBAGLIARE', 'INDOVINARE', 'CORREGGERE', 'MIGLIORARE', 'PEGGIORARE', 'CAMBIARE', 'DIVENTARE', 'SEMBRARE', 'PARERE', 'RIMANERE', 'RITORNARE', 'RIPETERE', 'RICORDARE', 'DIMENTICARE', 'RIFLETTERE', 'IMMAGINARE', 'FANTASIA', 'REALTA', 'VERITA', 'BUGIA', 'SEGRETO', 'MISTERO', 'SORPRESA', 'MERAVIGLIA', 'STUPORE', 'CURIOSITA', 'INTERESSE', 'NOIA', 'PIACERE', 'DOLORE', 'GIOIA', 'TRISTEZZA', 'PAURA', 'CORAGGIO', 'FORZA', 'DEBOLEZZA', 'SALUTE', 'MALATTIA', 'CURA', 'MEDICINA', 'DOTTORE', 'PAZIENTE', 'OSPEDALE', 'FARMACIA', 'SOCORSO', 'EMERGENZA', 'PERICOLO', 'SICUREZZA', 'DIFESA', 'ATTACCO', 'DIFENDERE', 'PROTEGGERE', 'AIUTARE', 'SALVARE', 'LIBERARE', 'PRIGIONE', 'CARCERE', 'LIBERTA', 'GIUSTIZIA', 'LEGGE', 'REGOLA', 'NORMA', 'DIRITTO', 'OBBLIGO', 'PERMESSO', 'VIETO', 'CONSENTIRE', 'IMPEDIRE', 'PERMETTERE', 'VIETARE', 'ORDINARE', 'COMANDARE', 'UBBIDIRE', 'RIBELLARE', 'PROTESTARE', 'LOTTARE', 'COMBATTERE', 'TRIONFO', 'SCONFITTA', 'SUCCESSO', 'INSUCCESSO', 'ESITO', 'FINE', 'INIZIO', 'PARTENZA', 'ARRIVO', 'META', 'DESTINO', 'SORTE', 'FORTUNA', 'SFORTUNA', 'CASO', 'EVENTO', 'FATTO', 'SITUAZIONE', 'CONDIZIONE', 'STATO', 'CIRCOSTANZA', 'CONTESTO', 'AMBIENTE', 'LUOGO', 'POSTO', 'POSIZIONE', 'DISTANZA', 'VICINANZA', 'LONTANANZA', 'PROSSIMITA', 'CENTRO', 'PERIFERIA', 'BORDO', 'MARGINE', 'LIMITE', 'CONFINE', 'FRONTIERA', 'PASSAGGIO', 'VIA', 'VIALE', 'PIAZZA', 'CORSO', 'TRAVERSA', 'INCROCIO', 'SEMAFORO', 'ROTATORIA', 'AUTOSTRADA', 'TANGENZIALE', 'IMPATTO', 'URTO', 'COLPO', 'BOTTO', 'RUMORE', 'SUONO', 'MELODIA', 'ARMONIA', 'RITMO', 'BATTITO', 'PULSAZIONE', 'FREQUENZA', 'VELOCITA', 'LENTEZZA', 'RAPIDITA', 'PRONTEZZA', 'AGILITA', 'DESTREZZA', 'ABILITA', 'CAPACITA', 'COMPETENZA', 'ESPERIENZA', 'PRATICA', 'TEORIA', 'PRINCIPIO', 'CRITERIO', 'METODO', 'SISTEMA', 'PROCEDURA', 'TECNICA', 'ARTE', 'SCIENZA', 'CULTURA', 'LETTERATURA', 'POESIA', 'NARRATIVA', 'ROMANZO', 'RACCONTO', 'NOVELLA', 'FAVOLA', 'MITO', 'LEGGENDA', 'STORIA', 'PASSATO', 'PRESENTE', 'FUTURO', 'DOMANI', 'IERI', 'OGGI', 'STAMATTINA', 'STASERA', 'NOTTATA', 'MEZZOGIORNO', 'MEZZANOTTE', 'MATTINO', 'POMERIGGIO', 'SERATA', 'CREPUSCOLO', 'AURORA', 'TRAMONTO', 'PRIMAVERA', 'ESTATE', 'AUTUNNO', 'INVERNO', 'GENNAIO', 'FEBBRAIO', 'MARZO', 'APRILE', 'MAGGIO', 'GIUGNO', 'LUGLIO', 'AGOSTO', 'SETTEMBRE', 'OTTOBRE', 'NOVEMBRE', 'DICEMBRE', 'LUNEDI', 'MARTEDI', 'MERCOLEDI', 'GIOVEDI', 'VENERDI', 'SABATO', 'DOMENICA', 'SETTIMANA', 'MESE', 'ANNO', 'SECOLO', 'MILLENNIO', 'ISTANTE', 'MOMENTO', 'ATTIMO', 'MINUTO', 'GIORNO', 'IERISERA', 'DOPODOMANI', 'FESTIVO', 'FERIALE', 'LAVORATIVO', 'RIPOSO', 'VACANZA', 'FESTA', 'CELEBRAZIONE', 'COMMEMORAZIONE', 'ANNIVERSARIO', 'COMPLEANNO', 'MATRIMONIO', 'BATTESIMO', 'CRESCIMA', 'FUNERALE', 'SEPOLTURA', 'CREMAZIONE', 'LUTTO', 'FELICITA', 'CONTENTO', 'ALLEGRIA', 'SOFFERENZA', 'PENSIERO', 'PREOCCUPAZIONE', 'ANSIA', 'TERRORE', 'SPAVENTO', 'ORRORE', 'ANGOSCIA', 'DISPERAZIONE', 'SPERANZA', 'FIDUCIA', 'VIGORE', 'ENERGIA', 'VITALITA', 'BENESSERE', 'MALESSERE', 'FATICA', 'STANCHEZZA', 'SONNO', 'VEGLIA', 'INSONNIA', 'SOGNO', 'INCUBO', 'FANTASMA', 'SPIRITO', 'ANIMA', 'CORPO', 'MENTE', 'CERVELLO', 'POLMONE', 'STOMACO', 'FEGATO', 'RENE', 'INTESTINO', 'MUSCOLO', 'NERVO', 'VENA', 'ARTERIA', 'TENDINE', 'LEGAMENTO', 'ARTICOLAZIONE', 'BRACCIO', 'SPALLA', 'GOMITO', 'POLSO', 'GINOCCHIO', 'COSCI', 'TEST', 'CIGLI', 'VISTA', 'SENSO', 'TALENT', 'DONO', 'VIRTU', 'ERRORE', 'TRAGEDI', 'COMMEDI', 'IRONI', 'ALLEGRI', 'PRODUZIONE', 'DESIGN', 'FAMA', 'GLORI', 'PREMI', 'MULTA', 'TASSA', 'IMPOSTA', 'QUOTA', 'PARTE', 'ENTE', 'UFFICI', 'SERVIZI', 'STUDI', 'GUARDI', 'TESI', 'IDEA', 'SEGNO', 'INDIZI', 'COLLOQUI', 'CONTESA', 'DISPUTA', 'GARA', 'TORNEO', 'SPORT', 'CALCIO', 'TENNIS', 'BOXE', 'LUCCI', 'CORTE', 'INNOCE', 'NOTAI', 'POLIZI', 'AGENTE', 'COMMISSARI', 'RE', 'PRINCIPE', 'DUCA', 'CONTE', 'POPOLO', 'FAMIGLI', 'FIGLI', 'NIPO', 'OPERAI', 'MANAGER', 'COMPRA', 'SCAMBI', 'GIUDIZI', 'FORMA', 'MATERIA', 'ATOMO', 'PROTON', 'NEUTRON', 'FOTON', 'QUANTO', 'ENERGI', 'CAMPO', 'COLORE', 'LENTE', 'SPECCHI', 'VETRO', 'DIAMANT', 'ZAFFIR', 'SMERALD', 'TOPAZI', 'OPAL', 'CORALL', 'AMBR', 'GRAFIT', 'ANTRACIT', 'LIGNIT', 'PETROLI', 'GASOLI', 'CHEROSEN', 'GAS', 'METAN', 'PROPAN', 'BUTAN', 'ELIO', 'NEON', 'ARGON', 'KRIPTON', 'XENON', 'RADON', 'IODI', 'ZOLFO', 'SILICI', 'ALLUMINI', 'MAGNESI', 'SODI', 'POTASSI', 'CALCI', 'FERRO', 'RAME', 'TITANI', 'VANADI', 'URANI', 'PLUTONI', 'TORI', 'RADI', 'POLONI', 'FRANCI', 'CESI', 'RUBIDI', 'LITI', 'BERILLI', 'SCANDI', 'GALLI', 'GERMANI', 'SELENI', 'STRONZI', 'ITTRI', 'ZIRCONI', 'NIOBI', 'TECNEZI', 'RUTENI', 'RODI', 'PALLADI', 'CADMI', 'INDI', 'ANTIMONI', 'TELLURI', 'BARI', 'LANTANI', 'CERI', 'PRASEODIMI', 'NEODIMI', 'PROMETI', 'SAMARI', 'EUROPI', 'GADOLINI', 'TERBI', 'DISPROSI', 'OLMI', 'ERBIO', 'TULI', 'ITTEBRI', 'LUTETI', 'AFNI', 'TANTALI', 'RENI', 'OSMI', 'IRIDI', 'MERCURI', 'TALLI', 'ATTINI', 'PROTATTINI', 'NETTUNI', 'AMERICI', 'CURI', 'BERKELI', 'CALIFORNI', 'EINSTEINI', 'FERMI', 'MENDELEVI', 'NOBELI', 'LAURENZI', 'RUTERFORI', 'DUBNI', 'SEABORGI', 'BOHRI', 'ASSI', 'MEITNERI', 'DARMSTADTI', 'ROENTGENI', 'COPERNICI', 'NIHONI', 'FLEROVI', 'MOSCOVI', 'LIVERMORI', 'TENNESSI', 'OGANESSON'];
-  
-  const ALL_WORDS = {
-    4: [...new Set(ALL_WORDS_RAW.filter(w => w.length === 4))],
-    5: [...new Set(ALL_WORDS_RAW.filter(w => w.length === 5))],
-    6: [...new Set(ALL_WORDS_RAW.filter(w => w.length === 6))],
-    7: [...new Set(ALL_WORDS_RAW.filter(w => w.length === 7))],
-  };
-  
-  const WORDS = ALL_WORDS[wordLength] || ALL_WORDS[5];
+
+  const ALL_WORDS_RAW = ['AMORE','VERDE','MUSICA','TORTA','LIBRO','TAVOLO','STELLA','FIUME','PONTE','DOLCE','FRESCO','CALDO','NOTTE','LUNGO','MARE','VENTO','FIORE','ERBA','ALBERO','CIELO','PIETRA','FUOCO','ACQUA','TERRA','TEMPO','MONDO','VITA','CASA','MANO','BOCCA','DENTE','GAMBA','PIEDE','TESTA','CUORE','SANGUE','OSSO','PELLE','CARNE','NASO','GOLA','COLLO','DITO','LUNA','SOLE','NEVE','ALBA','SERENO','PIOGGIA','FREDDO','BUIO','LUCE','FONTE','STRADA','PORTA','CHIESA','FORTE','PIANO','ALTO','BASSO','LARGO','STRETTO','CORTO','GRANDE','PICCOLO','BELLO','BUONO','MORBIDO','PIENO','VUOTO','APERTO','CHIUSO','VECCHIO','GIOVANE','RICCO','POVERO','FELICE','TRISTE','ALLEGRO','STANCO','PRONTO','SAGGIO','GENTILE','ONESTO','GIUSTO','VERO','REALE','IDEALE','FINALE','PRIMA','DOPO','SEMPRE','TANTO','POCO','MOLTO','FORSE','CERTO','SICURO','PROPRIO','NOSTRO','VOSTRO','PRANZO','CENA','PASTO','SALA','CAMERA','LETTO','DIVANO','POLTRONA','SCRIVANIA','LIBRERIA','CUCINA','FORNO','FRIGO','LAVARE','STIRARE','PULIRE','SPAZZARE','CUCINARE','MANGIARE','BERE','DORMIRE','VEGLIARE','LAVORARE','GIOCARE','STUDIARE','LEGGERE','SCRIVERE','PARLARE','ASCOLTARE','GUARDARE','VEDERE','SENTIRE','TOCCARE','PENSARE','SOGNARE','SPERARE','AMARE','ODIARE','TEMERE','RIDERE','PIANGERE','SORRIDERE','SALIRE','SCENDERE','ENTRARE','USCIRE','ANDARE','VENIRE','TORNARE','RESTARE','PARTIRE','ARRIVARE','CORRERE','CAMMINARE','SALTARE','NUOTARE','VOLARE','CADERE','ALZARE','ABBASSARE','APRIRE','CHIUDERE','ACCENDERE','SPEGNERE','COMPRARE','VENDERE','PAGARE','SPENDERE','RISPARMIARE','GUADAGNARE','PERDERE','TROVARE','CERCARE','DOMANDARE','RISPONDERE','CHIEDERE','DIRE','FARE','DARE','PRENDERE','METTERE','PORTARE','LASCIARE','TENERE','AVERE','ESSERE','STARE','DOVERE','POTERE','VOLERE','SAPERE','CONOSCERE','CREDERE','IMPARARE','INSEGNARE','CAMBIARE','SPINGERE','TIRARE','PRODUCERE','COSTRUIRE','DISTRUGGERE','CREARE','ANALIZZARE','IMMAGINARE','RICORDARE','DIMENTICARE','RICONOSCERE','DESCRIVERE','RACCONTARE','SPIEGARE','RISPOSTA','SALUTARE','BUONGIORNO','BUNANOTTE','GRAZIE','PREGO','SCUSI','PERFAVORE','SI','NO','MAI','OGGI','IERI','DOMANI','ADesso','PRESTO','TARDI','QUANDO','DOVE','CHI','COSA','COME','PERCHE','QUANTO','ALTRI','QUALCUNO','QUALCHE','OGNI','TUTTI','NESSUNO','ALTRO','STESSO','DIVERSO','SIMILE','OPPOSTO','PRIMO','ULTIMO','MEDIO','PROSSIMO','LONTANO','INTERNO','ESTERNO'];
+
+  const WORDS = {};
+  [4,5,6,7].forEach(l => { WORDS[l] = [...new Set(ALL_WORDS_RAW.filter(w => w.length === l))]; });
+
   const [target, setTarget] = useState('');
   const [guesses, setGuesses] = useState([]);
-  const [currentGuess, setCurrentGuess] = useState('');
-  const [gameOver, setGameOver] = useState(false);
+  const [cur, setCur] = useState('');
+  const [over, setOver] = useState(false);
   const [won, setWon] = useState(false);
-  const maxGuesses = wordLength <= 4 ? 5 : wordLength <= 5 ? 6 : wordLength <= 6 ? 7 : 8;
-  
-  // Generate new target when wordLength changes
-  useEffect(() => {
-    if (!wordLength) return;
-    const w = ALL_WORDS[wordLength] || ALL_WORDS[5];
+  const [shakeRow, setShakeRow] = useState(-1);
+  const [revealRow, setRevealRow] = useState(-1);
+  const [keyColors, setKeyColors] = useState({});
+  const maxG = wordLen <= 4 ? 5 : wordLen <= 5 ? 6 : wordLen <= 6 ? 7 : 8;
+
+  const newGame = (wl) => {
+    const w = WORDS[wl] || WORDS[5];
     const unused = w.filter(ww => !usedWords.includes(ww));
     const pool = unused.length > 0 ? unused : w;
     setTarget(pool[Math.floor(Math.random() * pool.length)]);
-    setGuesses([]);
-    setCurrentGuess('');
-    setGameOver(false);
-    setWon(false);
-  }, [wordLength]);
-  
-  const getTileColors = (guess) => {
-    const colors = Array(wordLength).fill('rgba(255,255,255,.1)');
-    const targetArr = target.split('');
-    const guessArr = guess.split('');
-    
-    // First pass: find exact matches (green)
-    for (let i = 0; i < wordLength; i++) {
-      if (guessArr[i] === targetArr[i]) {
-        colors[i] = '#06D6A0';
-        targetArr[i] = null; // Mark as used
-        guessArr[i] = null;
-      }
-    }
-    
-    // Second pass: find misplaced letters (yellow)
-    for (let i = 0; i < wordLength; i++) {
-      if (guessArr[i] === null) continue;
-      const idx = targetArr.indexOf(guessArr[i]);
-      if (idx !== -1) {
-        colors[i] = '#FBBF24';
-        targetArr[idx] = null; // Mark as used
-      }
-    }
-    
-    return colors;
+    setGuesses([]); setCur(''); setOver(false); setWon(false);
+    setShakeRow(-1); setRevealRow(-1); setKeyColors({});
+    setWordLen(wl);
   };
-  
-  const submitGuess = () => {
-    if (currentGuess.length !== wordLength) { 
-      toast(`Inserisci ${wordLength} lettere`, 'var(--yellow)'); 
-      return; 
-    }
-    if (guesses.length >= maxGuesses) return;
-    const newGuesses = [...guesses, currentGuess.toUpperCase()];
-    setGuesses(newGuesses);
-    setCurrentGuess('');
-    if (currentGuess.toUpperCase() === target) { 
-      setWon(true); 
-      setGameOver(true); 
-      setUsedWords(prev => [...prev, target]);
-      localStorage.setItem('lmv_wordle_used', JSON.stringify([...usedWords, target]));
-      toast('Hai vinto! 🎉', 'var(--green)'); 
-    } else if (newGuesses.length >= maxGuesses) { 
-      setGameOver(true); 
-      toast('Hai perso! La parola era: ' + target, 'var(--red)'); 
+
+  const getColors = (guess) => {
+    const c = Array(wordLen).fill('absent');
+    const ta = target.split(''), ga = guess.split('');
+    for (let i = 0; i < wordLen; i++) { if (ga[i] === ta[i]) { c[i] = 'correct'; ta[i] = null; ga[i] = null; } }
+    for (let i = 0; i < wordLen; i++) { if (ga[i] === null) continue; const idx = ta.indexOf(ga[i]); if (idx !== -1) { c[i] = 'present'; ta[idx] = null; } }
+    return c;
+  };
+
+  const submit = () => {
+    if (over) return;
+    if (cur.length !== wordLen) { setShakeRow(guesses.length); setTimeout(() => setShakeRow(-1), 400); toast(`Parola di ${wordLen} lettere`, 'var(--yellow)'); return; }
+    const colors = getColors(cur);
+    const ng = [...guesses, cur.toUpperCase()];
+    setGuesses(ng); setCur(''); setRevealRow(ng.length - 1);
+
+    const nk = { ...keyColors };
+    cur.toUpperCase().split('').forEach((l, i) => {
+      const prev = nk[l];
+      if (colors[i] === 'correct') nk[l] = 'correct';
+      else if (colors[i] === 'present' && prev !== 'correct') nk[l] = 'present';
+      else if (!prev) nk[l] = 'absent';
+    });
+    setKeyColors(nk);
+
+    setTimeout(() => setRevealRow(-1), wordLen * 150 + 400);
+
+    if (cur.toUpperCase() === target) {
+      setWon(true); setOver(true);
+      const nu = [...usedWords, target]; setUsedWords(nu);
+      localStorage.setItem('lmv_wordle_used', JSON.stringify(nu));
+      toast('Hai vinto!', 'var(--green)');
+    } else if (ng.length >= maxG) {
+      setOver(true);
+      toast('La parola era: ' + target, 'var(--red)');
     }
   };
-  
-  const resetGame = () => { 
-    const unused = WORDS.filter(w => !usedWords.includes(w) && w !== target);
-    const pool = unused.length > 0 ? unused : WORDS;
-    setTarget(pool[Math.floor(Math.random() * pool.length)]); 
-    setGuesses([]); 
-    setCurrentGuess(''); 
-    setGameOver(false); 
-    setWon(false); 
+
+  const handleKey = (k) => {
+    if (over) return;
+    if (k === 'ENTER') { submit(); return; }
+    if (k === 'DEL') { setCur(c => c.slice(0, -1)); return; }
+    if (cur.length < wordLen) setCur(c => c + k);
   };
-  
-  // Selection screen
-  if (wordLength === null) {
+
+  useEffect(() => {
+    if (!wordLen) return;
+    const h = (e) => {
+      if (e.key === 'Backspace') handleKey('DEL');
+      else if (e.key === 'Enter') handleKey('ENTER');
+      else if (/^[a-zA-Z\u00C0-\u024F]{1}$/.test(e.key)) handleKey(e.key.toUpperCase());
+    };
+    window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h);
+  }, [wordLen, cur, over, target]);
+
+  if (!wordLen) {
     return (
       <div style={{padding:'0 16px 100px'}}>
         <div className="sh" style={{marginBottom:16}}>
-          <button className="ib" onClick={onBack}>← Indietro</button>
-          <div style={{fontWeight:600}}>📝 Wordle Italiano</div>
+          <button className="ib" onClick={onBack}>{'\u2190'} Indietro</button>
+          <div style={{fontWeight:600}}>Wordle Italiano</div>
         </div>
-        <div style={{textAlign:'center',padding:'40px 0'}}>
-          <div style={{fontSize:'3rem',marginBottom:16}}>📝</div>
-          <div style={{fontWeight:700,fontSize:'1.3rem',marginBottom:8}}>Scegli la difficoltà</div>
-          <div style={{fontSize:'.85rem',color:'var(--text2)',marginBottom:32}}>Quante lettere deve avere la parola?</div>
-          <div style={{display:'flex',flexDirection:'column',gap:12,maxWidth:280,margin:'0 auto'}}>
-            {[
-              {len:4,label:'Facile',icon:'🟢',desc:'4 lettere • 5 tentativi'},
-              {len:5,label:'Medio',icon:'🟡',desc:'5 lettere • 6 tentativi'},
-              {len:6,label:'Difficile',icon:'🟠',desc:'6 lettere • 7 tentativi'},
-              {len:7,label:'Esperto',icon:'🔴',desc:'7 lettere • 8 tentativi'},
-            ].map(opt => (
-              <button key={opt.len} onClick={()=>setWordLength(opt.len)} style={{display:'flex',alignItems:'center',gap:14,padding:'16px 20px',borderRadius:16,border:'1px solid var(--border)',background:'rgba(255,255,255,.04)',cursor:'pointer',transition:'all .2s'}}>
-                <div style={{fontSize:'1.5rem'}}>{opt.icon}</div>
+        <div style={{textAlign:'center',padding:'30px 0'}}>
+          <div style={{fontSize:'3.2rem',marginBottom:12,filter:'drop-shadow(0 4px 12px rgba(102,126,234,.4))'}}>📝</div>
+          <div style={{fontWeight:700,fontSize:'1.3rem',marginBottom:6}}>Indovina la Parola</div>
+          <div style={{fontSize:'.82rem',color:'var(--text2)',marginBottom:28}}>Scegli la lunghezza</div>
+          <div style={{display:'flex',flexDirection:'column',gap:12,maxWidth:300,margin:'0 auto'}}>
+            {[{l:4,lb:'Facile',ic:'🟢',d:'4 lettere · 5 tentativi'},{l:5,lb:'Medio',ic:'🟡',d:'5 lettere · 6 tentativi'},{l:6,lb:'Difficile',ic:'🟠',d:'6 lettere · 7 tentativi'},{l:7,lb:'Esperto',ic:'🔴',d:'7 lettere · 8 tentativi'}].map(o => (
+              <button key={o.l} onClick={() => newGame(o.l)} style={{display:'flex',alignItems:'center',gap:14,padding:'16px 20px',borderRadius:16,border:'1px solid rgba(102,126,234,.2)',background:'linear-gradient(135deg,rgba(102,126,234,.08),rgba(118,75,162,.08))',cursor:'pointer',transition:'all .2s',WebkitTapHighlightColor:'transparent'}}
+                onMouseDown={e => e.currentTarget.style.transform = 'scale(.97)'}
+                onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+                onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <div style={{fontSize:'1.5rem'}}>{o.ic}</div>
                 <div style={{textAlign:'left',flex:1}}>
-                  <div style={{fontWeight:700,fontSize:'.95rem'}}>{opt.label}</div>
-                  <div style={{fontSize:'.75rem',color:'var(--text2)'}}>{opt.desc}</div>
+                  <div style={{fontWeight:700,fontSize:'.95rem'}}>{o.lb}</div>
+                  <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{o.d}</div>
                 </div>
-                <div style={{fontSize:'.85rem',color:'var(--text3)'}}>→</div>
               </button>
             ))}
           </div>
-          <div style={{display:'flex',gap:4,justifyContent:'center',marginTop:32}}>
-            <span style={{display:'inline-block',width:14,height:14,borderRadius:3,background:'#06D6A0'}}/> <span style={{fontSize:'.7rem',color:'var(--text2)'}}>Giusta posizione</span>
-            <span style={{display:'inline-block',width:14,height:14,borderRadius:3,background:'#FBBF24',marginLeft:8}}/> <span style={{fontSize:'.7rem',color:'var(--text2)'}}>Posizione sbagliata</span>
+          <div style={{display:'flex',gap:8,justifyContent:'center',marginTop:28}}>
+            <div style={{display:'flex',alignItems:'center',gap:4}}><div style={{width:16,height:16,borderRadius:4,background:'#06D6A0'}}/><span style={{fontSize:'.7rem',color:'var(--text2)'}}>Giusta</span></div>
+            <div style={{display:'flex',alignItems:'center',gap:4,marginLeft:8}}><div style={{width:16,height:16,borderRadius:4,background:'#FBBF24'}}/><span style={{fontSize:'.7rem',color:'var(--text2)'}}>Spostata</span></div>
+            <div style={{display:'flex',alignItems:'center',gap:4,marginLeft:8}}><div style={{width:16,height:16,borderRadius:4,background:'rgba(255,255,255,.12)'}}/><span style={{fontSize:'.7rem',color:'var(--text2)'}}>Assente</span></div>
           </div>
         </div>
       </div>
     );
   }
-  
+
+  const tileColorMap = { correct: '#06D6A0', present: '#FBBF24', absent: 'rgba(255,255,255,.08)' };
+  const tileBorderMap = { correct: '#06D6A0', present: '#FBBF24', absent: 'rgba(255,255,255,.12)' };
+  const kbRows = [['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['\u23CE','Z','X','C','V','B','N','M','DEL']];
+  const kbKeyStyle = (k) => {
+    const c = keyColors[k];
+    return {
+      minWidth: 28, height: 44, borderRadius: 6, border: 'none',
+      background: c ? tileColorMap[c] : 'rgba(255,255,255,.1)',
+      color: c ? '#000' : '#fff', fontWeight: 700, fontSize: k === '\u23CE' || k === 'DEL' ? '.7rem' : '.85rem',
+      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      transition: 'all .15s', WebkitTapHighlightColor: 'transparent', userSelect: 'none',
+      opacity: c === 'absent' ? .45 : 1, flex: k.length === 1 ? 1 : k === 'DEL' ? 1.3 : 1.5,
+    };
+  };
+
+  const tileSize = Math.min(56, (window.innerWidth - 40 - (wordLen - 1) * 6) / wordLen);
+
   return (
-    <div style={{padding:'0 16px 100px'}}>
-      <div className="sh" style={{marginBottom:16}}>
-        <button className="ib" onClick={onBack}>← Indietro</button>
-        <div style={{fontWeight:600}}>📝 Wordle - {wordLength} lettere</div>
-        <button className="btn bt bs" style={{fontSize:'.72rem',padding:'4px 10px'}} onClick={()=>{setWordLength(null);setGuesses([]);setCurrentGuess('');setGameOver(false);setWon(false);}}>Cambia</button>
+    <div style={{padding:'0 12px 100px',display:'flex',flexDirection:'column',alignItems:'center',userSelect:'none'}}>
+      <style>{`
+        @keyframes tileShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+        @keyframes popIn{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
+      `}</style>
+      <div className="sh" style={{marginBottom:12,width:'100%',maxWidth:500}}>
+        <button className="ib" onClick={onBack}>{'\u2190'}</button>
+        <div style={{fontWeight:600,fontSize:'.9rem'}}>Wordle {'\u2022'} {wordLen} lettere</div>
+        <button className="btn bt bs" style={{fontSize:'.68rem',padding:'4px 8px'}} onClick={() => setWordLen(null)}>Cambia</button>
       </div>
-      <div style={{textAlign:'center',marginBottom:16}}>
-        <div style={{fontSize:'.78rem',color:'var(--text2)',marginBottom:8}}>{maxGuesses} tentativi per indovinare</div>
-        <div style={{display:'flex',gap:4,justifyContent:'center'}}>
-          <span style={{display:'inline-block',width:14,height:14,borderRadius:3,background:'#06D6A0'}}/> <span style={{fontSize:'.7rem',color:'var(--text2)'}}>Giusta</span>
-          <span style={{display:'inline-block',width:14,height:14,borderRadius:3,background:'#FBBF24',marginLeft:8}}/> <span style={{fontSize:'.7rem',color:'var(--text2)'}}>Posizione sbagliata</span>
-        </div>
+
+      <div style={{marginBottom:12,display:'flex',gap:4,alignItems:'center'}}>
+        <span style={{fontSize:'.7rem',color:'var(--text3)'}}>{guesses.length}/{maxG}</span>
       </div>
-      <div style={{display:'flex',flexDirection:'column',gap:6,alignItems:'center',marginBottom:16}}>
-        {[...Array(maxGuesses)].map((_,row) => {
+
+      <div style={{display:'flex',flexDirection:'column',gap:5,marginBottom:14,perspective:600}}>
+        {[...Array(maxG)].map((_, row) => {
           const guess = guesses[row];
-          const colors = guess ? getTileColors(guess) : Array(wordLength).fill('rgba(255,255,255,.1)');
+          const colors = guess ? getColors(guess) : Array(wordLen).fill(null);
+          const isShake = shakeRow === row;
+          const isReveal = revealRow === row;
           return (
-            <div key={row} style={{display:'flex',gap:6}}>
-              {[...Array(wordLength)].map((_,col) => {
-                const letter = guess ? guess[col] : (row === guesses.length ? currentGuess[col] || '' : '');
-                return <div key={col} style={{width:56,height:56,display:'flex',alignItems:'center',justifyContent:'center',borderRadius:8,background:colors[col],fontWeight:700,fontSize:'1.2rem',color:letter?'#fff':'transparent',border:'2px solid '+ (guess ? colors[col] : 'rgba(255,255,255,.15)'),transition:'all .3s'}}>{letter}</div>;
+            <div key={row} style={{display:'flex',gap:5,animation:isShake ? 'tileShake .4s ease' : undefined}}>
+              {[...Array(wordLen)].map((_, col) => {
+                const letter = guess ? guess[col] : (row === guesses.length && !over ? cur[col] || '' : '');
+                const filled = !!letter;
+                const colorKey = guess ? colors[col] : null;
+                const bg = colorKey ? tileColorMap[colorKey] : 'rgba(255,255,255,.04)';
+                const border = colorKey ? tileBorderMap[colorKey] : filled ? 'rgba(255,255,255,.25)' : 'rgba(255,255,255,.1)';
+                return (
+                  <div key={col} style={{
+                    width: tileSize, height: tileSize,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: 8, fontWeight: 800, fontSize: tileSize * .42,
+                    background: bg, border: `2px solid ${border}`,
+                    color: colorKey === 'absent' ? 'rgba(255,255,255,.5)' : '#fff',
+                    textTransform: 'uppercase', letterSpacing: 1,
+                    transition: 'all .15s',
+                    transform: guess ? 'scale(1)' : filled ? 'scale(1.05)' : 'scale(1)',
+                    boxShadow: colorKey === 'correct' ? '0 2px 8px rgba(6,214,160,.3)' : colorKey === 'present' ? '0 2px 8px rgba(251,191,36,.2)' : 'none',
+                  }}>{letter}</div>
+                );
               })}
             </div>
           );
         })}
       </div>
-      {!gameOver && (
-        <div style={{display:'flex',gap:8,justifyContent:'center',marginBottom:16}}>
-          <input className="field" placeholder={`Parola di ${wordLength} lettere...`} value={currentGuess} onChange={e=>setCurrentGuess(e.target.value.toUpperCase().slice(0,wordLength))} onKeyDown={e=>{if(e.key==='Enter')submitGuess();}} style={{width:200,textTransform:'uppercase',textAlign:'center',fontWeight:700,letterSpacing:'.2em'}}/>
-          <button className="btn br" onClick={submitGuess}>Invia</button>
+
+      {over && (
+        <div style={{textAlign:'center',marginBottom:12,animation:'popIn .3s ease'}}>
+          <div style={{fontSize:'1.1rem',fontWeight:700,marginBottom:8,color:won ? '#06D6A0' : 'var(--red)'}}>
+            {won ? 'Complimenti!' : 'La parola era: ' + target}
+          </div>
+          <button className="btn br" onClick={() => newGame(wordLen)} style={{fontSize:'.82rem'}}>Nuova Partita</button>
         </div>
       )}
-      {gameOver && (
-        <div style={{textAlign:'center',marginBottom:16}}>
-          <div style={{fontSize:'1.2rem',fontWeight:700,marginBottom:8,color:won?'var(--green)':'var(--red)'}}>{won?'🎉 Complimenti!':'😔 La parola era: '+target}</div>
-          <button className="btn bt" onClick={resetGame}>🔄 Nuova Partita</button>
-        </div>
-      )}
+
+      <div style={{width:'100%',maxWidth:420}}>
+        {kbRows.map((row, ri) => (
+          <div key={ri} style={{display:'flex',gap:4,justifyContent:'center',marginBottom:4}}>
+            {row.map(k => (
+              <button key={k} onClick={() => handleKey(k)} style={kbKeyStyle(k)}>
+                {k === '\u23CE' ? '\u21B5' : k === 'DEL' ? '\u232B' : k}
+              </button>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
+
 
 // ── CHESS COMPONENT ──
 function ChessGame({onBack, level, onWin, toast}) {
