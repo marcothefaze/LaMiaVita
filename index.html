@@ -18250,160 +18250,195 @@ function TrisGame({onBack, toast}) {
   const [winner, setWinner] = useState(null);
   const [winLine, setWinLine] = useState(null);
   const [mode, setMode] = useState('ai');
-  const [scores, setScores] = useState({X:0,O:0,draws:0});
-  const [moveCount, setMoveCount] = useState(0);
-  
+  const [scores, setScores] = useState(() => { try { return JSON.parse(localStorage.getItem('lmv_tris_scores') || '{"X":0,"O":0,"draws":0}'); } catch { return { X:0, O:0, draws:0 }; } });
+  const [aiThinking, setAiThinking] = useState(false);
+  const [lastMove, setLastMove] = useState(-1);
+  const [winLineSvg, setWinLineSvg] = useState(null);
+  const lockRef = useRef(false);
+
   const checkWinner = (b) => {
     const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
     for (const line of lines) {
       const [a,b2,c] = line;
-      if (b[a] && b[a] === b[b2] && b[a] === b[c]) return {winner: b[a], line};
+      if (b[a] && b[a] === b[b2] && b[a] === b[c]) return { winner: b[a], line };
     }
-    if (b.every(c => c)) return {winner: 'draw', line: null};
+    if (b.every(c => c)) return { winner: 'draw', line: null };
     return null;
   };
-  
+
   const minimaxTris = (b, isMax, depth = 0) => {
     const result = checkWinner(b);
     if (result) return result.winner === 'O' ? 10 - depth : result.winner === 'X' ? depth - 10 : 0;
     if (isMax) {
       let best = -Infinity;
-      for (let i = 0; i < 9; i++) {
-        if (b[i] !== '') continue;
-        b[i] = 'O';
-        best = Math.max(best, minimaxTris(b, false, depth + 1));
-        b[i] = '';
-      }
+      for (let i = 0; i < 9; i++) { if (b[i] !== '') continue; b[i] = 'O'; best = Math.max(best, minimaxTris(b, false, depth + 1)); b[i] = ''; }
       return best;
     } else {
       let best = Infinity;
-      for (let i = 0; i < 9; i++) {
-        if (b[i] !== '') continue;
-        b[i] = 'X';
-        best = Math.min(best, minimaxTris(b, true, depth + 1));
-        b[i] = '';
-      }
+      for (let i = 0; i < 9; i++) { if (b[i] !== '') continue; b[i] = 'X'; best = Math.min(best, minimaxTris(b, true, depth + 1)); b[i] = ''; }
       return best;
     }
   };
-  
-  const makeAIMove = () => {
-    const empty = board.map((c,i) => c === '' ? i : -1).filter(i => i >= 0);
-    if (empty.length === 0) return;
-    const nb = [...board];
-    let bestScore = -Infinity, bestMove = empty[0];
-    for (const i of empty) {
-      nb[i] = 'O';
-      const score = minimaxTris(nb, false);
-      nb[i] = '';
-      if (score > bestScore) { bestScore = score; bestMove = i; }
+
+  const finishGame = (nb, result) => {
+    setWinner(result.winner);
+    setWinLine(result.line);
+    if (result.line) {
+      const [a,,c] = result.line;
+      setWinLineSvg({from: a, to: c});
     }
-    nb[bestMove] = 'O';
-    setBoard(nb);
-    setMoveCount(mc => mc + 1);
-    const result = checkWinner(nb);
-    if (result) {
-      setWinner(result.winner);
-      setWinLine(result.line);
-      if (result.winner !== 'draw') setScores(s => ({...s, [result.winner]: s[result.winner] + 1}));
-      else setScores(s => ({...s, draws: s.draws + 1}));
-    }
-    setTurn('X');
+    const ns = {...scores};
+    if (result.winner !== 'draw') ns[result.winner]++; else ns.draws++;
+    setScores(ns);
+    localStorage.setItem('lmv_tris_scores', JSON.stringify(ns));
   };
-  
+
+  const makeAIMove = () => {
+    setAiThinking(true);
+    setTimeout(() => {
+      const nb = [...board];
+      const empty = nb.map((c,i) => c === '' ? i : -1).filter(i => i >= 0);
+      if (empty.length === 0) { setAiThinking(false); return; }
+      let bestScore = -Infinity, bestMove = empty[0];
+      for (const i of empty) { nb[i] = 'O'; const score = minimaxTris(nb, false); nb[i] = ''; if (score > bestScore) { bestScore = score; bestMove = i; } }
+      nb[bestMove] = 'O';
+      setBoard(nb); setLastMove(bestMove); setMoveCount(mc => mc + 1);
+      const result = checkWinner(nb);
+      if (result) finishGame(nb, result);
+      setTurn('X'); setAiThinking(false);
+    }, 350 + Math.random() * 300);
+  };
+
+  const [moveCount, setMoveCount] = useState(0);
+
   useEffect(() => {
-    if (mode === 'ai' && turn === 'O' && !winner) {
-      const t = setTimeout(makeAIMove, 400);
-      return () => clearTimeout(t);
+    if (mode === 'ai' && turn === 'O' && !winner && !lockRef.current) {
+      lockRef.current = true;
+      makeAIMove();
     }
   }, [turn, winner, mode]);
-  
+
   const handleClick = (i) => {
-    if (board[i] || winner) return;
+    if (board[i] || winner || aiThinking) return;
     if (mode === 'ai' && turn === 'O') return;
-    const nb = [...board];
-    nb[i] = turn;
-    setBoard(nb);
-    setMoveCount(mc => mc + 1);
+    const nb = [...board]; nb[i] = turn;
+    setBoard(nb); setLastMove(i); setMoveCount(mc => mc + 1);
     const result = checkWinner(nb);
-    if (result) {
-      setWinner(result.winner);
-      setWinLine(result.line);
-      if (result.winner !== 'draw') setScores(s => ({...s, [result.winner]: s[result.winner] + 1}));
-      else setScores(s => ({...s, draws: s.draws + 1}));
-    } else {
-      setTurn(turn === 'X' ? 'O' : 'X');
-    }
+    if (result) finishGame(nb, result);
+    else { lockRef.current = false; setTurn(turn === 'X' ? 'O' : 'X'); }
   };
-  
-  const resetGame = () => { setBoard(Array(9).fill('')); setTurn('X'); setWinner(null); setWinLine(null); setMoveCount(0); };
-  
-  const cellSize = Math.min(100, (window.innerWidth - 80) / 3);
-  
+
+  const resetGame = () => { setBoard(Array(9).fill('')); setTurn('X'); setWinner(null); setWinLine(null); setWinLineSvg(null); setMoveCount(0); setLastMove(-1); setAiThinking(false); lockRef.current = false; };
+
+  const S = Math.min(100, (window.innerWidth - 76) / 3);
+
+  const winLineCoords = () => {
+    if (!winLineSvg) return null;
+    const [a,,c] = [winLineSvg.from, 0, winLineSvg.to];
+    const ax = (a%3)*(S+10)+S/2+16, ay = Math.floor(a/3)*(S+10)+S/2+16;
+    const cx = (c%3)*(S+10)+S/2+16, cy = Math.floor(c/3)*(S+10)+S/2+16;
+    return {x1:ax,y1:ay,x2:cx,y2:cy};
+  };
+  const wl = winLineCoords();
+
   return (
-    <div style={{padding:'0 16px 100px'}}>
+    <div style={{padding:'0 16px 100px',userSelect:'none'}}>
+      <style>{`
+        @keyframes trisPop{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.15) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+        @keyframes trisWin{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+        @keyframes trisDraw{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+        @keyframes thinkingDot{0%,80%,100%{transform:scale(.6);opacity:.3}40%{transform:scale(1);opacity:1}}
+        @keyframes winLineDraw{0%{stroke-dashoffset:300}100%{stroke-dashoffset:0}}
+      `}</style>
       <div className="sh" style={{marginBottom:16}}>
-        <button className="ib" onClick={onBack}>← Indietro</button>
-        <div style={{fontWeight:600}}>⭕ Tris</div>
+        <button className="ib" onClick={onBack}>{'\u2190'} Indietro</button>
+        <div style={{fontWeight:600}}>Tris</div>
       </div>
-      
+
       <div style={{display:'flex',gap:8,justifyContent:'center',marginBottom:16}}>
-        <button className={`btn bs ${mode==='ai'?'br':'bg'}`} onClick={()=>{setMode('ai');resetGame();}}>🤖 vs AI</button>
-        <button className={`btn bs ${mode==='local'?'br':'bg'}`} onClick={()=>{setMode('local');resetGame();}}>👥 Locale</button>
+        {[{m:'ai',l:'vs AI',ic:'🤖'},{m:'local',l:'Locale',ic:'👥'}].map(o => (
+          <button key={o.m} onClick={() => { setMode(o.m); resetGame(); }}
+            style={{padding:'8px 18px',borderRadius:12,border:`1.5px solid ${mode===o.m?'rgba(139,92,246,.5)':'rgba(255,255,255,.08)'}`,background:mode===o.m?'rgba(139,92,246,.15)':'rgba(255,255,255,.04)',color:mode===o.m?'#a78bfa':'var(--text2)',fontWeight:600,fontSize:'.82rem',cursor:'pointer',transition:'all .2s',WebkitTapHighlightColor:'transparent'}}>
+            {o.ic} {o.l}
+          </button>
+        ))}
       </div>
-      
-      <div style={{display:'flex',justifyContent:'center',gap:16,marginBottom:20}}>
-        <div style={{padding:'8px 16px',borderRadius:12,background:'rgba(76,201,240,.1)',border:'1px solid rgba(76,201,240,.2)',textAlign:'center'}}>
-          <div style={{fontSize:'.65rem',color:'var(--text3)'}}>⭕ X</div>
-          <div style={{fontSize:'1.4rem',fontWeight:800,color:'#4CC9F0'}}>{scores.X}</div>
-        </div>
-        <div style={{padding:'8px 16px',borderRadius:12,background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.08)',textAlign:'center'}}>
-          <div style={{fontSize:'.65rem',color:'var(--text3)'}}>🤝</div>
-          <div style={{fontSize:'1.4rem',fontWeight:800,color:'var(--yellow)'}}>{scores.draws}</div>
-        </div>
-        <div style={{padding:'8px 16px',borderRadius:12,background:'rgba(255,77,109,.1)',border:'1px solid rgba(255,77,109,.2)',textAlign:'center'}}>
-          <div style={{fontSize:'.65rem',color:'var(--text3)'}}>⬜ O</div>
-          <div style={{fontSize:'1.4rem',fontWeight:800,color:'#FF4D6D'}}>{scores.O}</div>
-        </div>
+
+      <div style={{display:'flex',justifyContent:'center',gap:10,marginBottom:16}}>
+        {[{k:'X',c:'#4CC9F0',bg:'rgba(76,201,240,.1)',bd:'rgba(76,201,240,.2)',l:'X'},{k:'draws',c:'var(--yellow)',bg:'rgba(255,255,255,.04)',bd:'rgba(255,255,255,.08)',l:'='},{k:'O',c:'#FF4D6D',bg:'rgba(255,77,109,.1)',bd:'rgba(255,77,109,.2)',l:'O'}].map(s => (
+          <div key={s.k} style={{padding:'10px 18px',borderRadius:14,background:s.bg,border:`1px solid ${s.bd}`,textAlign:'center',minWidth:64}}>
+            <div style={{fontSize:'.55rem',color:'var(--text3)',textTransform:'uppercase',letterSpacing:.5}}>{s.l}</div>
+            <div style={{fontSize:'1.5rem',fontWeight:900,color:s.c,marginTop:2}}>{scores[s.k]}</div>
+          </div>
+        ))}
       </div>
-      
+
       {!winner && (
-        <div style={{textAlign:'center',marginBottom:16,padding:'6px 14px',borderRadius:10,background:turn==='X'?'rgba(76,201,240,.08)':'rgba(255,77,109,.08)',border:`1px solid ${turn==='X'?'rgba(76,201,240,.2)':'rgba(255,77,109,.2)'}`,display:'inline-block',margin:'0 auto 16px',width:'fit-content'}}>
-          <span style={{fontSize:'.85rem',color:'var(--text2)'}}>Turno: <strong style={{color:turn==='X'?'#4CC9F0':'#FF4D6D'}}>{turn==='X'?'⭕ X':'⬜ O'}</strong></span>
+        <div style={{textAlign:'center',marginBottom:14}}>
+          {aiThinking ? (
+            <div style={{display:'inline-flex',alignItems:'center',gap:8,padding:'6px 16px',borderRadius:10,background:'rgba(255,77,109,.08)',border:'1px solid rgba(255,77,109,.2)'}}>
+              <span style={{fontSize:'.82rem',color:'var(--text2)'}}>L'AI pensa</span>
+              <span style={{display:'flex',gap:3}}>
+                {[0,1,2].map(i => <span key={i} style={{width:5,height:5,borderRadius:'50%',background:'#FF4D6D',animation:`thinkingDot 1.2s ease ${i*.2}s infinite`}}/>)}
+              </span>
+            </div>
+          ) : (
+            <div style={{display:'inline-block',padding:'6px 16px',borderRadius:10,background:turn==='X'?'rgba(76,201,240,.08)':'rgba(255,77,109,.08)',border:`1px solid ${turn==='X'?'rgba(76,201,240,.2)':'rgba(255,77,109,.2)'}`,transition:'all .3s'}}>
+              <span style={{fontSize:'.82rem',color:'var(--text2)'}}>Turno: <strong style={{color:turn==='X'?'#4CC9F0':'#FF4D6D'}}>{turn}</strong></span>
+            </div>
+          )}
         </div>
       )}
-      
+
       {winner && (
-        <div style={{textAlign:'center',marginBottom:20,padding:16,borderRadius:16,background:winner==='draw'?'rgba(255,255,255,.05)':winner==='X'?'rgba(76,201,240,.1)':'rgba(255,77,109,.1)',border:`1px solid ${winner==='draw'?'rgba(255,255,255,.1)':winner==='X'?'rgba(76,201,240,.3)':'rgba(255,77,109,.3)'}`}}>
-          <div style={{fontSize:'2rem',marginBottom:4}}>{winner==='draw'?'🤝 Pareggio!':winner==='X'?'🎉 X Vince!':'🎉 O Vince!'}</div>
+        <div style={{textAlign:'center',marginBottom:16,padding:16,borderRadius:18,background:winner==='draw'?'rgba(255,255,255,.05)':winner==='X'?'rgba(76,201,240,.1)':'rgba(255,77,109,.1)',border:`1px solid ${winner==='draw'?'rgba(255,255,255,.1)':winner==='X'?'rgba(76,201,240,.3)':'rgba(255,77,109,.3)'}`,animation:'trisDraw .4s ease'}}>
+          <div style={{fontSize:'1.6rem',fontWeight:800,marginBottom:4,color:winner==='draw'?'#fff':winner==='X'?'#4CC9F0':'#FF4D6D'}}>
+            {winner==='draw'?'Pareggio!':winner+' Vince!'}
+          </div>
         </div>
       )}
-      
-      <div style={{display:'grid',gridTemplateColumns:`repeat(3,${cellSize}px)`,gap:10,justifyContent:'center',marginBottom:20,padding:16,background:'rgba(255,255,255,.03)',borderRadius:20,border:'1px solid rgba(255,255,255,.06)'}}>
-        {board.map((cell,i) => {
-          const isWinCell = winLine && winLine.includes(i);
+
+      <div style={{position:'relative',display:'grid',gridTemplateColumns:`repeat(3,${S}px)`,gap:10,justifyContent:'center',marginBottom:20,padding:16,background:'linear-gradient(135deg,rgba(255,255,255,.03),rgba(139,92,246,.03))',borderRadius:20,border:'1px solid rgba(255,255,255,.06)'}}>
+        {board.map((cell, i) => {
+          const isWin = winLine && winLine.includes(i);
+          const isLast = lastMove === i && !winner;
           return (
-            <div key={i} onClick={()=>handleClick(i)} style={{
-              width:cellSize,height:cellSize,
-              display:'flex',alignItems:'center',justifyContent:'center',
-              background: isWinCell ? (cell==='X'?'rgba(76,201,240,.2)':'rgba(255,77,109,.2)') : 'rgba(255,255,255,.04)',
-              border:`2px solid ${isWinCell ? (cell==='X'?'rgba(76,201,240,.5)':'rgba(255,77,109,.5)') : 'rgba(255,255,255,.08)'}`,
-              borderRadius:16,fontSize:cellSize*0.55,fontWeight:800,
-              cursor:cell?'default':'pointer',
-              color:cell==='X'?'#4CC9F0':'#FF4D6D',
-              transition:'all .25s cubic-bezier(.4,0,.2,1)',
-              transform:isWinCell?'scale(1.05)':'scale(1)',
-              boxShadow:isWinCell?`0 0 20px ${cell==='X'?'rgba(76,201,240,.3)':'rgba(255,77,109,.3)'}`:'none',
-              textShadow:cell?`0 0 10px ${cell==='X'?'rgba(76,201,240,.5)':'rgba(255,77,109,.5)'}`:'none'
+            <div key={i} onClick={() => handleClick(i)} style={{
+              width: S, height: S,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: isWin ? (cell==='X'?'rgba(76,201,240,.15)':'rgba(255,77,109,.15)') : 'rgba(255,255,255,.03)',
+              border: `2px solid ${isWin ? (cell==='X'?'rgba(76,201,240,.4)':'rgba(255,77,109,.4)') : 'rgba(255,255,255,.06)'}`,
+              borderRadius: 16, cursor: cell || winner || aiThinking ? 'default' : 'pointer',
+              transition: 'all .2s', position: 'relative',
+              animation: isWin ? 'trisWin .5s ease' : undefined,
             }}>
-              {cell}
+              {cell && (
+                <span style={{
+                  fontSize: S * .52, fontWeight: 900,
+                  color: cell === 'X' ? '#4CC9F0' : '#FF4D6D',
+                  textShadow: `0 0 12px ${cell==='X'?'rgba(76,201,240,.5)':'rgba(255,77,109,.5)'}`,
+                  animation: isLast ? 'trisPop .35s cubic-bezier(.34,1.56,.64,1)' : undefined,
+                }}>{cell}</span>
+              )}
+              {!cell && !winner && !aiThinking && (
+                <div style={{width: S*.3, height: S*.3, borderRadius: '50%', background: 'rgba(255,255,255,.04)', transition: 'all .2s', opacity: 0}}
+                  className="tris-hover"/>
+              )}
             </div>
           );
         })}
+        {wl && (
+          <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',padding:16}}>
+            <line x1={wl.x1} y1={wl.y1} x2={wl.x2} y2={wl.y2}
+              stroke={winner==='X'?'#4CC9F0':'#FF4D6D'} strokeWidth="4" strokeLinecap="round"
+              style={{strokeDasharray:300,animation:'winLineDraw .5s ease forwards',filter:`drop-shadow(0 0 6px ${winner==='X'?'rgba(76,201,240,.6)':'rgba(255,77,109,.6)'})`}}/>
+          </svg>
+        )}
       </div>
-      
+
       <div style={{display:'flex',gap:8,justifyContent:'center'}}>
-        <button className="btn bg" onClick={resetGame} style={{fontSize:'.9rem'}}>🔄 Nuova Partita</button>
+        <button className="btn bg" onClick={resetGame} style={{fontSize:'.85rem'}}>Nuova Partita</button>
+        <button className="btn bt" onClick={() => { resetGame(); setScores({X:0,O:0,draws:0}); localStorage.setItem('lmv_tris_scores', JSON.stringify({X:0,O:0,draws:0})); }} style={{fontSize:'.85rem'}}>Reset Score</button>
       </div>
     </div>
   );
