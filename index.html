@@ -21049,990 +21049,322 @@ function AIPlusTab({user, toast, events, notes, todos}) {
 
 // - WALLET TAB -
 function WalletTab({toast}) {
-  const {wallet, addTransaction, delTransaction, updateWallet, addEvent} = useContext(DataCtx);
-  const [recurring, setRecurring] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('lmv_recurring') || '[]'); } 
-    catch (e) { return []; }
-  });
-  const [sub, setSub] = useState('overview');
-  const [predictTimeframe, setPredictTimeframe] = useState('month');
-  const [mod, setMod] = useState(null);
-  const [editItem, setEditItem] = useState(null);
-  const [newTrans, setNewTrans] = useState({title:'', amount:'', type:'expense', category:'', date:new Date().toISOString().split('T')[0], recurring:'none', notify:3, addToCalendar:false});
-  const [subscriptions, setSubscriptions] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('lmv_subscriptions') || '[]'); }
-    catch (e) { return []; }
-  });
-  const [subMod, setSubMod] = useState(false);
-  const [subForm, setSubForm] = useState({name:'',cost:'',cycle:'monthly',renewalDate:'',category:'streaming',notify:true,active:true, addToCalendar:false});
-  const transactions = wallet.transactions || [];
-  
-  const categories = {
+  const {wallet, addTransaction, updateWallet, addEvent} = useContext(DataCtx);
+  const today = new Date().toISOString().split('T')[0];
+  const CATS = {
     expense: [
-      {key:'housing', icon:'🏠', name:'Casa', color:'#FF6B6B'},
-      {key:'bills', icon:'📄', name:'Bollette', color:'#FF8C42'},
-      {key:'food', icon:'🍔', name:'Cibo', color:'#FFD166'},
-      {key:'transport', icon:'🚗', name:'Trasporti', color:'#06D6A0'},
-      {key:'health', icon:'💊', name:'Salute', color:'#4CC9F0'},
-      {key:'shopping', icon:'🛒', name:'Shopping', color:'#FF4D6D'},
-      {key:'entertainment', icon:'🎬', name:'Intrattenimento', color:'#7B5EA7'},
-      {key:'education', icon:'📚', name:'Istruzione', color:'#3A86FF'},
-      {key:'personal', icon:'👤', name:'Personale', color:'#8338EC'},
-      {key:'subscriptions', icon:'📱', name:'Abbonamenti', color:'#FB5607'},
-      {key:'other', icon:'📌', name:'Altro', color:'#6B7494'},
+      {key:'housing',icon:'🏠',name:'Casa',color:'#FF6B6B'},{key:'bills',icon:'📄',name:'Bollette',color:'#FF8C42'},
+      {key:'food',icon:'🍔',name:'Cibo',color:'#FFD166'},{key:'transport',icon:'🚗',name:'Trasporti',color:'#06D6A0'},
+      {key:'health',icon:'💊',name:'Salute',color:'#4CC9F0'},{key:'shopping',icon:'🛒',name:'Shopping',color:'#FF4D6D'},
+      {key:'entertainment',icon:'🎬',name:'Intratt.',color:'#7B5EA7'},{key:'education',icon:'📚',name:'Istruzione',color:'#3A86FF'},
+      {key:'personal',icon:'👤',name:'Personale',color:'#8338EC'},{key:'subscriptions',icon:'📱',name:'Abbonamenti',color:'#FB5607'},
+      {key:'other',icon:'📌',name:'Altro',color:'#6B7494'},
     ],
     income: [
-      {key:'salary', icon:'💰', name:'Stipendio', color:'#06D6A0'},
-      {key:'freelance', icon:'💻', name:'Freelance', color:'#4CC9F0'},
-      {key:'investment', icon:'📈', name:'Investimenti', color:'#7B5EA7'},
-      {key:'gift', icon:'🎁', name:'Regali', color:'#FFD166'},
-      {key:'refund', icon:'💵', name:'Rimborsi', color:'#06D6A0'},
-      {key:'bonus', icon:'🎉', name:'Bonus', color:'#FF4D6D'},
-      {key:'other', icon:'📌', name:'Altro', color:'#6B7494'},
+      {key:'salary',icon:'💰',name:'Stipendio',color:'#06D6A0'},{key:'freelance',icon:'💻',name:'Freelance',color:'#4CC9F0'},
+      {key:'investment',icon:'📈',name:'Investimenti',color:'#7B5EA7'},{key:'gift',icon:'🎁',name:'Regali',color:'#FFD166'},
+      {key:'refund',icon:'💵',name:'Rimborsi',color:'#06D6A0'},{key:'bonus',icon:'🎉',name:'Bonus',color:'#FF4D6D'},
+      {key:'other',icon:'📌',name:'Altro',color:'#6B7494'},
     ]
   };
-
-  const saveTrans = () => {
-    if (!newTrans.title || !newTrans.amount) {
-      toast('Compila titolo e importo', 'var(--red)');
-      return;
-    }
-    const amount = parseFloat(newTrans.amount);
-    if (isNaN(amount) || amount <= 0) {
-      toast('Importo non valido', 'var(--red)');
-      return;
-    }
-    
-    const trans = {
-      title: newTrans.title,
-      amount: newTrans.type === 'expense' ? -Math.abs(amount) : Math.abs(amount),
-      type: newTrans.type,
-      category: newTrans.category,
-      recurring: newTrans.recurring,
-      notify: newTrans.notify || 0,
-      note: newTrans.note || '',
-    };
-    
-    addTransaction(trans);
-    
-    if (newTrans.recurring !== 'none') {
-      const recItem = {
-        id: Date.now(),
-        title: newTrans.title,
-        amount: trans.amount,
-        type: newTrans.type,
-        category: newTrans.category,
-        recurring: newTrans.recurring,
-        notify: newTrans.notify || 0,
-        nextDate: getNextRecurringDate(newTrans.date, newTrans.recurring),
-        active: true
-      };
-      const updatedRec = [...recurring, recItem];
-      setRecurring(updatedRec);
-      localStorage.setItem('lmv_recurring', JSON.stringify(updatedRec));
-    }
-    
-    if (newTrans.notify > 0 && newTrans.type === 'expense') {
-      scheduleReminder(trans);
-    }
-    
-    // Add to calendar if checked
-    if (newTrans.addToCalendar) {
-      const calEvent = {
-        id: Date.now(),
-        title: '💰 ' + newTrans.title,
-        desc: 'Pagamento: €' + Math.abs(amount).toFixed(2) + (newTrans.note ? '\n' + newTrans.note : ''),
-        date: newTrans.date,
-        time: '09:00',
-        color: '#FF4D6D',
-        type: 'payment'
-      };
-      addEvent(calEvent);
-    }
-    
-    setMod(null);
-    setNewTrans({title:'', amount:'', type:'expense', category:'', date:new Date().toISOString().split('T')[0], recurring:'none', notify:3, addToCalendar:false});
-    toast(newTrans.type === 'expense' ? 'Uscita aggiunta! 💸' : 'Entrata aggiunta! 💰', 'var(--green)');
-    if (newTrans.addToCalendar) {
-      toast('📅 Evento aggiunto al calendario!', 'var(--blue)');
-    }
-  };
-
-  const getNextRecurringDate = (startDate, type) => {
-    const date = new Date(startDate);
-    const today = new Date();
-    while (date <= today) {
-      if (type === 'weekly') date.setDate(date.getDate() + 7);
-      else if (type === 'monthly') date.setMonth(date.getMonth() + 1);
-      else if (type === 'yearly') date.setFullYear(date.getFullYear() + 1);
-    }
-    return date.toISOString().split('T')[0];
-  };
-
-  const scheduleReminder = (trans) => {
-    if (!window._pushNotifications || Notification.permission !== 'granted') return;
-    
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() - (trans.notify || 0));
-    
-    if (dueDate > new Date()) {
-      const delay = dueDate.getTime() - Date.now();
-      setTimeout(() => {
-        window._pushNotifications.show('💰 Pagamento in scadenza', {
-          body: `${trans.title}: €${Math.abs(trans.amount).toFixed(2)} tra ${trans.notify} giorni`,
-          tag: 'lmv-payment-' + Date.now()
-        });
-      }, delay);
-    }
-  };
-
-  const delTrans = (id) => {
-    const newTrans = wallet.transactions.filter(t => t.id !== id);
-    const newBalance = newTrans.reduce((sum, t) => sum + t.amount, 0);
-    const newWallet = {balance: newBalance, transactions: newTrans};
-    updateWallet(newWallet);
-    toast('Eliminata', 'var(--red)');
-  };
-
-  const updateTrans = () => {
-    if (!editItem) return;
-    const newTrans = wallet.transactions.map(t => t.id === editItem.id ? {...t, ...editItem} : t);
-    const newBalance = newTrans.reduce((sum, t) => sum + t.amount, 0);
-    updateWallet({balance: newBalance, transactions: newTrans});
-    setMod(null);
-    setEditItem(null);
-    toast('Aggiornata!', 'var(--green)');
-  };
-
-  // Calculate stats
-  const now = new Date();
-  const thisMonth = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  });
-  
-  const thisWeek = transactions.filter(t => {
-    const d = new Date(t.date);
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    return d >= weekAgo;
-  });
-
-  const monthlyIncome = thisMonth.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-  const monthlyExpense = Math.abs(thisMonth.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-  const balance = transactions.reduce((sum, t) => sum + t.amount, 0);
-  const weeklyExpense = Math.abs(thisWeek.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0));
-
-  const calculatePredictiveBalance = () => {
-    let predicted = balance;
-    const now = new Date();
-    let end = new Date();
-    if (predictTimeframe === 'week') end.setDate(now.getDate() + 7);
-    else if (predictTimeframe === 'month') end.setMonth(now.getMonth() + 1);
-    else if (predictTimeframe === 'year') end.setFullYear(now.getFullYear() + 1);
-
-    // recurring payments
-    recurring.filter(r => r.active).forEach(r => {
-      let current = new Date(r.nextDate);
-      while (current <= end) {
-        predicted += r.amount;
-        if (r.recurring === 'weekly') current.setDate(current.getDate() + 7);
-        else if (r.recurring === 'monthly') current.setMonth(current.getMonth() + 1);
-        else if (r.recurring === 'yearly') current.setFullYear(current.getFullYear() + 1);
-        else break;
-      }
-    });
-
-    // subscriptions
-    subscriptions.filter(s => s.active).forEach(s => {
-      let current = new Date(s.renewalDate);
-      while (current <= end) {
-        predicted -= s.cost;
-        if (s.cycle === 'weekly') current.setDate(current.getDate() + 7);
-        else if (s.cycle === 'monthly') current.setMonth(current.getMonth() + 1);
-        else if (s.cycle === 'yearly') current.setFullYear(current.getFullYear() + 1);
-        else break;
-      }
-    });
-
-    return predicted;
-  };
-
-  const predBalance = calculatePredictiveBalance();
-
-  // Category breakdown for chart
-  const categoryStats = {};
-  thisMonth.filter(t => t.amount < 0).forEach(t => {
-    if (!categoryStats[t.category]) categoryStats[t.category] = 0;
-    categoryStats[t.category] += Math.abs(t.amount);
-  });
-
-  // Upcoming payments
-  const upcomingPayments = recurring.filter(r => r.active && r.amount < 0).sort((a, b) => new Date(a.nextDate) - new Date(b.nextDate)).slice(0, 5);
-
-  // Subscription management
-  const saveSubscription = () => {
-    if (!subForm.name.trim() || !subForm.cost) {
-      toast('Compila nome e costo', 'var(--red)');
-      return;
-    }
-    const cost = parseFloat(subForm.cost);
-    if (isNaN(cost) || cost <= 0) {
-      toast('Importo non valido', 'var(--red)');
-      return;
-    }
-    const newSub = {
-      id: Date.now(),
-      name: subForm.name.trim(),
-      cost: cost,
-      cycle: subForm.cycle,
-      renewalDate: subForm.renewalDate || new Date().toISOString().split('T')[0],
-      category: subForm.category,
-      notify: subForm.notify,
-      active: true,
-      addToCalendar: subForm.addToCalendar,
-      createdAt: new Date().toISOString()
-    };
-
-    // Calendar Integration
-    if (subForm.addToCalendar) {
-      const calEvent = {
-        id: Date.now() + 1,
-        title: '📱 ' + subForm.name.trim(),
-        desc: 'Rinnovo abbonamento: €' + cost.toFixed(2),
-        date: subForm.renewalDate || new Date().toISOString().split('T')[0],
-        time: '09:00',
-        color: SUB_CATEGORIES.find(c=>c.key===subForm.category)?.color || '#8B5CF6',
-        type: 'subscription'
-      };
-      addEvent(calEvent);
-    }
-
-    const updated = [...subscriptions, newSub];
-    setSubscriptions(updated);
-    localStorage.setItem('lmv_subscriptions', JSON.stringify(updated));
-    setSubMod(false);
-    setSubForm({name:'',cost:'',cycle:'monthly',renewalDate:'',category:'streaming',notify:true,active:true, addToCalendar:false});
-    toast('Abbonamento aggiunto! 📱', 'var(--green)');
-    if (subForm.addToCalendar) toast('📅 Evento aggiunto al calendario!', 'var(--blue)');
-  };
-
-
-
-  const deleteSubscription = (id) => {
-    const updated = subscriptions.filter(s => s.id !== id);
-    setSubscriptions(updated);
-    localStorage.setItem('lmv_subscriptions', JSON.stringify(updated));
-    toast('Abbonamento rimosso', 'var(--red)');
-  };
-
-  const toggleSubscription = (id) => {
-    const updated = subscriptions.map(s => s.id === id ? {...s, active: !s.active} : s);
-    setSubscriptions(updated);
-    localStorage.setItem('lmv_subscriptions', JSON.stringify(updated));
-  };
-
-  // Check subscription renewals and notify
-  useEffect(() => {
-    const checkSubscriptions = () => {
-      const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
-      
-      subscriptions.filter(s => s.active).forEach(s => {
-        const renewal = new Date(s.renewalDate);
-        const renewalStr = renewal.toISOString().split('T')[0];
-        
-        // CONCRETIZATION: If today is renewal date, add transaction
-        if (renewalStr === todayStr) {
-          const transId = 'sub_' + s.id + '_' + todayStr;
-          const existing = wallet.transactions.find(t => t.id === transId);
-          if (!existing) {
-            const trans = {
-              id: transId,
-              title: '📱 ' + s.name,
-              amount: -s.cost,
-              type: 'expense',
-              category: 'subscriptions',
-              date: todayStr,
-              note: 'Rinnovo automatico abbonamento'
-            };
-            addTransaction(trans);
-            toast(`Abbonamento ${s.name} concretizzato: -€${s.cost.toFixed(2)}`, 'var(--red)');
-            
-            // Update next renewal date
-            const updatedSub = {...s};
-            if (s.cycle === 'weekly') renewal.setDate(renewal.getDate() + 7);
-            else if (s.cycle === 'monthly') renewal.setMonth(renewal.getMonth() + 1);
-            else if (s.cycle === 'yearly') renewal.setFullYear(renewal.getFullYear() + 1);
-            updatedSub.renewalDate = renewal.toISOString().split('T')[0];
-            
-            const updatedSubs = subscriptions.map(sub => sub.id === s.id ? updatedSub : sub);
-            setSubscriptions(updatedSubs);
-            localStorage.setItem('lmv_subscriptions', JSON.stringify(updatedSubs));
-          }
-        }
-
-        if (s.notify) {
-          const diffDays = Math.ceil((renewal - today) / (1000 * 60 * 60 * 24));
-          if (diffDays === 3 || diffDays === 1 || diffDays === 0) {
-            const notifiedKey = 'lmv_sub_notified_' + s.id + '_' + today.toDateString();
-            if (!localStorage.getItem(notifiedKey)) {
-              localStorage.setItem(notifiedKey, 'true');
-              toast(`⚠️ ${s.name} rinnova tra ${diffDays === 0 ? 'OGGI' : diffDays + ' giorni'} — €${s.cost.toFixed(2)}`, 'var(--yellow)');
-              if (Notification.permission === 'granted') {
-                new Notification('📱 Abbonamento in scadenza', {
-                  body: `${s.name} rinnova tra ${diffDays === 0 ? 'OGGI' : diffDays + ' giorni'} — €${s.cost.toFixed(2)}`,
-                  icon: 'https://i.ibb.co/6JYFJ2hQ/un-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg'
-                });
-              }
-            }
-          }
-        }
-      });
-    };
-    checkSubscriptions();
-    const interval = setInterval(checkSubscriptions, 60 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, [subscriptions, toast]);
-
-  const SUB_CATEGORIES = [
-    {key:'streaming', icon:'🎬', name:'Streaming', color:'#FF4D6D'},
-    {key:'music', icon:'🎵', name:'Musica', color:'#1DB954'},
-    {key:'cloud', icon:'☁️', name:'Cloud', color:'#4CC9F0'},
-    {key:'software', icon:'💻', name:'Software', color:'#8B5CF6'},
-    {key:'gaming', icon:'🎮', name:'Gaming', color:'#F97316'},
-    {key:'fitness', icon:'💪', name:'Fitness', color:'#06D6A0'},
-    {key:'news', icon:'📰', name:'News', color:'#FBBF24'},
-    {key:'other', icon:'📌', name:'Altro', color:'#6B7494'},
+  const SUBCATS = [
+    {key:'streaming',icon:'🎬',name:'Streaming',color:'#FF4D6D'},{key:'music',icon:'🎵',name:'Musica',color:'#1DB954'},
+    {key:'cloud',icon:'☁️',name:'Cloud',color:'#4CC9F0'},{key:'software',icon:'💻',name:'Software',color:'#8B5CF6'},
+    {key:'gaming',icon:'🎮',name:'Gaming',color:'#F97316'},{key:'fitness',icon:'💪',name:'Fitness',color:'#06D6A0'},
+    {key:'news',icon:'📰',name:'News',color:'#FBBF24'},{key:'other',icon:'📌',name:'Altro',color:'#6B7494'},
   ];
 
-  const totalMonthlySubs = subscriptions.filter(s => s.active).reduce((sum, s) => {
-    if (s.cycle === 'monthly') return sum + s.cost;
-    if (s.cycle === 'yearly') return sum + (s.cost / 12);
-    if (s.cycle === 'weekly') return sum + (s.cost * 4.33);
-    return sum + s.cost;
-  }, 0);
+  const [recurring, setRecurring] = useState(()=>{try{return JSON.parse(localStorage.getItem('lmv_recurring')||'[]');}catch(e){return[];}});
+  const [subscriptions, setSubscriptions] = useState(()=>{try{return JSON.parse(localStorage.getItem('lmv_subscriptions')||'[]');}catch(e){return[];}});
+  const [filter, setFilter] = useState('all');
+  const [search, setSearch] = useState('');
+  const [showAdd, setShowAdd] = useState(false);
+  const [editItem, setEditItem] = useState(null);
+  const [form, setForm] = useState({title:'',amount:'',type:'expense',category:'',date:today,recurring:'none',notify:3,addToCalendar:false});
+  const [subMod, setSubMod] = useState(false);
+  const [subForm, setSubForm] = useState({name:'',cost:'',cycle:'monthly',renewalDate:'',category:'streaming',notify:true,addToCalendar:false});
+  const [expSubs, setExpSubs] = useState(false);
+  const [expRecurring, setExpRecurring] = useState(false);
+  const [expCalendar, setExpCalendar] = useState(false);
+  const [calDays, setCalDays] = useState(14);
 
-  const totalYearlySubs = subscriptions.filter(s => s.active).reduce((sum, s) => {
-    if (s.cycle === 'monthly') return sum + (s.cost * 12);
-    if (s.cycle === 'yearly') return sum + s.cost;
-    if (s.cycle === 'weekly') return sum + (s.cost * 52);
-    return sum + s.cost;
-  }, 0);
+  const transactions = wallet.transactions||[];
+  const now = new Date();
+  const thisMonth = transactions.filter(t=>{const d=new Date(t.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+  const thisWeek = transactions.filter(t=>{const d=new Date(t.date);const w=new Date();w.setDate(w.getDate()-7);return d>=w;});
+  const monthlyIncome = thisMonth.filter(t=>t.amount>0).reduce((s,t)=>s+t.amount,0);
+  const monthlyExpense = Math.abs(thisMonth.filter(t=>t.amount<0).reduce((s,t)=>s+t.amount,0));
+  const balance = transactions.reduce((s,t)=>s+t.amount,0);
+  const weeklyExpense = Math.abs(thisWeek.filter(t=>t.amount<0).reduce((s,t)=>s+t.amount,0));
 
-  // Draw mini chart
-  const drawBarChart = () => {
-    const last7Days = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      const dayExpenses = transactions.filter(t => t.date === dateStr && t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-      last7Days.push({date: dateStr, amount: dayExpenses});
-    }
-    const max = Math.max(...last7Days.map(d => d.amount), 1);
-    return last7Days.map((d, i) => (
-      <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-        <div style={{width:'100%',height:60,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
-          <div style={{
-            width:'70%',height:`${(d.amount / max) * 50 + 5}%`,
-            background: d.amount > 0 ? 'var(--green)' : 'var(--red)',
-            borderRadius:'4px 4px 0 0',
-            transition:'height .3s'
-          }}/>
-        </div>
-        <span style={{fontSize:'.65rem',color:'var(--text2)'}}>
-          {new Date(d.date).toLocaleDateString('it-IT',{weekday:'short'}).slice(0,2)}
-        </span>
-      </div>
-    ));
+  const catStats = {};
+  thisMonth.filter(t=>t.amount<0).forEach(t=>{catStats[t.category]=(catStats[t.category]||0)+Math.abs(t.amount);});
+  const upcomingPayments = recurring.filter(r=>r.active&&r.amount<0).sort((a,b)=>new Date(a.nextDate)-new Date(b.nextDate)).slice(0,5);
+  const activeSubs = subscriptions.filter(s=>s.active);
+  const totalMonthlySubs = activeSubs.reduce((s,sub)=>{if(sub.cycle==='monthly')return s+sub.cost;if(sub.cycle==='yearly')return s+sub.cost/12;if(sub.cycle==='weekly')return s+sub.cost*4.33;return s+sub.cost;},0);
+  const totalYearlySubs = activeSubs.reduce((s,sub)=>{if(sub.cycle==='monthly')return s+sub.cost*12;if(sub.cycle==='yearly')return s+sub.cost;if(sub.cycle==='weekly')return s+sub.cost*52;return s+sub.cost;},0);
+  const activeRecurring = recurring.filter(r=>r.active);
+
+  const getCatInfo = (key,type) => (type==='income'?CATS.income:CATS.expense).find(c=>c.key===key)||{icon:'📌',name:key||'Altro',color:'#6B7494'};
+
+  const getNextDate = (d,type) => {const x=new Date(d);const n=new Date();while(x<=n){if(type==='weekly')x.setDate(x.getDate()+7);else if(type==='monthly')x.setMonth(x.getMonth()+1);else if(type==='yearly')x.setFullYear(x.getFullYear()+1);else break;}return x.toISOString().split('T')[0];};
+  const scheduleReminder = (trans) => {if(!window._pushNotifications||Notification.permission!=='granted')return;const d=new Date();d.setDate(d.getDate()-(trans.notify||0));if(d>new Date()){setTimeout(()=>{window._pushNotifications.show('Pagamento in scadenza',{body:trans.title+': '+Math.abs(trans.amount).toFixed(2)+'EUR tra '+trans.notify+' giorni',tag:'lmv-payment-'+Date.now()});},d.getTime()-Date.now());}};
+
+  const saveTrans = () => {
+    if(!form.title||!form.amount){toast('Compila titolo e importo','var(--red)');return;}
+    const amt=parseFloat(form.amount);if(isNaN(amt)||amt<=0){toast('Importo non valido','var(--red)');return;}
+    const tx={title:form.title,amount:form.type==='expense'?-Math.abs(amt):Math.abs(amt),type:form.type,category:form.category,recurring:form.recurring,notify:form.notify||0,note:form.note||''};
+    addTransaction(tx);
+    if(form.recurring!=='none'){const ri={id:Date.now(),title:form.title,amount:tx.amount,type:form.type,category:form.category,recurring:form.recurring,notify:form.notify||0,nextDate:getNextDate(form.date,form.recurring),active:true};const ur=[...recurring,ri];setRecurring(ur);localStorage.setItem('lmv_recurring',JSON.stringify(ur));}
+    if(form.notify>0&&form.type==='expense')scheduleReminder(tx);
+    if(form.addToCalendar){addEvent({id:Date.now(),title:' '+form.title,desc:'Pagamento: '+Math.abs(amt).toFixed(2)+'EUR',date:form.date,time:'09:00',color:'#FF4D6D',type:'payment'});}
+    setShowAdd(false);setEditItem(null);setForm({title:'',amount:'',type:'expense',category:'',date:today,recurring:'none',notify:3,addToCalendar:false});
+    toast(form.type==='expense'?'Uscita aggiunta!':'Entrata aggiunta!','var(--green)');
   };
+  const delTrans = (id) => {const nt=transactions.filter(t=>t.id!==id);updateWallet({balance:nt.reduce((s,t)=>s+t.amount,0),transactions:nt});toast('Eliminata','var(--red)');};
+  const updateTrans = () => {if(!editItem)return;const nt=transactions.map(t=>t.id===editItem.id?{...t,...editItem}:t);updateWallet({balance:nt.reduce((s,t)=>s+t.amount,0),transactions:nt});setEditItem(null);setShowAdd(false);toast('Aggiornata!','var(--green)');};
+
+  const saveSubscription = () => {
+    if(!subForm.name.trim()||!subForm.cost){toast('Compila nome e costo','var(--red)');return;}
+    const c=parseFloat(subForm.cost);if(isNaN(c)||c<=0){toast('Importo non valido','var(--red)');return;}
+    const ns={id:Date.now(),name:subForm.name.trim(),cost:c,cycle:subForm.cycle,renewalDate:subForm.renewalDate||today,category:subForm.category,notify:subForm.notify,active:true,addToCalendar:subForm.addToCalendar,createdAt:new Date().toISOString()};
+    if(subForm.addToCalendar){addEvent({id:Date.now()+1,title:' '+subForm.name.trim(),desc:'Rinnovo: '+c.toFixed(2)+'EUR',date:subForm.renewalDate||today,time:'09:00',color:SUBCATS.find(sc=>sc.key===subForm.category)?.color||'#8B5CF6',type:'subscription'});}
+    const u=[...subscriptions,ns];setSubscriptions(u);localStorage.setItem('lmv_subscriptions',JSON.stringify(u));setSubMod(false);setSubForm({name:'',cost:'',cycle:'monthly',renewalDate:'',category:'streaming',notify:true,addToCalendar:false});toast('Abbonamento aggiunto!','var(--green)');
+  };
+  const delSubscription = (id) => {if(!window.confirm('Eliminare?'))return;const u=subscriptions.filter(s=>s.id!==id);setSubscriptions(u);localStorage.setItem('lmv_subscriptions',JSON.stringify(u));toast('Rimosso','var(--red)');};
+  const toggleSubscription = (id) => {const u=subscriptions.map(s=>s.id===id?{...s,active:!s.active}:s);setSubscriptions(u);localStorage.setItem('lmv_subscriptions',JSON.stringify(u));};
+
+  useEffect(()=>{
+    const check=()=>{const td=new Date().toISOString().split('T')[0];
+      subscriptions.filter(s=>s.active).forEach(s=>{const rn=new Date(s.renewalDate);const rs=rn.toISOString().split('T')[0];
+        if(rs===td){const tid='sub_'+s.id+'_'+td;if(!wallet.transactions.find(t=>t.id===tid)){addTransaction({id:tid,title:' '+s.name,amount:-s.cost,type:'expense',category:'subscriptions',date:td,note:'Rinnovo automatico'});toast(s.name+': -'+s.cost.toFixed(2)+'EUR','var(--red)');const us={...s};if(s.cycle==='weekly')rn.setDate(rn.getDate()+7);else if(s.cycle==='monthly')rn.setMonth(rn.getMonth()+1);else if(s.cycle==='yearly')rn.setFullYear(rn.getFullYear()+1);us.renewalDate=rn.toISOString().split('T')[0];const u2=subscriptions.map(x=>x.id===s.id?us:x);setSubscriptions(u2);localStorage.setItem('lmv_subscriptions',JSON.stringify(u2));}}
+        if(s.notify){const dd=Math.ceil((rn-new Date())/(864e5));if(dd===3||dd===1||dd===0){const nk='lmv_sub_notified_'+s.id+'_'+new Date().toDateString();if(!localStorage.getItem(nk)){localStorage.setItem(nk,'true');toast('Attenzione: '+s.name+' tra '+(dd===0?'OGGI':dd+'g')+' - '+s.cost.toFixed(2)+'EUR','var(--yellow)');if(Notification.permission==='granted')new Notification('Abbonamento in scadenza',{body:s.name+' - '+s.cost.toFixed(2)+'EUR'});}}}
+      });};
+    check();const iv=setInterval(check,36e5);return()=>clearInterval(iv);
+  },[subscriptions,toast]);
+
+  const filteredTx = transactions.filter(t=>{
+    if(filter==='income'&&t.amount<=0)return false;
+    if(filter==='expense'&&t.amount>=0)return false;
+    if(search){const q=search.toLowerCase();if(!t.title.toLowerCase().includes(q)&&!(t.category||'').toLowerCase().includes(q))return false;}
+    return true;
+  }).sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  const groupedTx = {};
+  filteredTx.forEach(t=>{const dk=new Date(t.date).toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'});if(!groupedTx[dk])groupedTx[dk]=[];groupedTx[dk].push(t);});
+
+  const barChart = (()=>{const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];days.push({date:ds,amount:transactions.filter(t=>t.date===ds&&t.amount<0).reduce((s,t)=>s+Math.abs(t.amount),0)});}const mx=Math.max(...days.map(d=>d.amount),1);return days;})();
+
+  const resetForm = (type) => {setForm({title:'',amount:'',type:type||'expense',category:'',date:today,recurring:'none',notify:3,addToCalendar:false});setEditItem(null);setShowAdd(true);};
+  const startEdit = (t) => {setForm({title:t.title,amount:Math.abs(t.amount).toString(),type:t.type,category:t.category||'',date:t.date?.split('T')[0]||today,recurring:t.recurring||'none',notify:t.notify||3,addToCalendar:false});setEditItem(t);setShowAdd(true);};
 
   return (
-    <div style={{padding:'0 16px 100px'}}>
-      <div className="sht">💰 <em>Wallet</em></div>
-      
-      {/* Balance Overview */}
-      <div style={{
-        background:'linear-gradient(135deg,rgba(6,214,160,.15),rgba(76,201,240,.1))',
-        border:'1px solid rgba(6,214,160,.2)',
-        borderRadius:16,
-        padding:20,
-        marginBottom:16
-      }}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-          <span style={{fontSize:'.82rem',color:'var(--text2)'}}>Saldo Attuale</span>
-          <span style={{fontSize:'.78rem',color:'var(--text2)'}}>{new Date().toLocaleDateString('it-IT',{month:'long',year:'numeric'})}</span>
-        </div>
-         <div style={{fontSize:'2rem',fontWeight:700,color:balance >= 0 ? 'var(--green)' : 'var(--red)'}}>
-           €{balance.toFixed(2)}
-         </div>
-         <div style={{marginTop:12,padding:12,background:'rgba(255,255,255,.05)',borderRadius:10,textAlign:'center'}}>
-           <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginBottom:6}}>
-             <span style={{fontSize:'.75rem',color:'var(--text2)'}}>Saldo Preventivo:</span>
-             <select style={{background:'transparent',color:'var(--text)',border:'none',fontSize:'.75rem',fontWeight:600,cursor:'pointer',outline:'none'}} value={predictTimeframe} onChange={e=>setPredictTimeframe(e.target.value)}>
-               <option value="week">Prossima Settimana</option>
-               <option value="month">Prossimo Mese</option>
-               <option value="year">Prossimo Anno</option>
-             </select>
-           </div>
-           <div style={{fontSize:'1.2rem',fontWeight:700,color:predBalance >= 0 ? 'var(--green)' : 'var(--red)'}}>
-             €{predBalance.toFixed(2)}
-           </div>
-         </div>
-
-        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginTop:16}}>
-          <div style={{background:'rgba(6,214,160,.1)',borderRadius:10,padding:12}}>
-            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4}}>
-              <span style={{fontSize:'.9rem'}}>📈</span>
-              <span style={{fontSize:'.75rem',color:'var(--green)'}}>Entrate</span>
-            </div>
-            <div style={{fontWeight:700,fontSize:'1.1rem',color:'var(--green)'}}>€{monthlyIncome.toFixed(2)}</div>
-          </div>
-          <div style={{background:'rgba(255,77,109,.1)',borderRadius:10,padding:12}}>
-            <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:4}}>
-              <span style={{fontSize:'.9rem'}}>📉</span>
-              <span style={{fontSize:'.75rem',color:'var(--red)'}}>Uscite</span>
-            </div>
-            <div style={{fontWeight:700,fontSize:'1.1rem',color:'var(--red)'}}>€{monthlyExpense.toFixed(2)}</div>
+    <div className="fi2">
+      <div className="sh">
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+          <div className="sht" style={{margin:0}}>Wallet</div>
+          <div style={{display:'flex',gap:6}}>
+            <button className="btn" style={{background:'rgba(6,214,160,.12)',color:'var(--green)',fontSize:'.78rem'}} onClick={()=>resetForm('income')}>+ Entrata</button>
+            <button className="btn" style={{background:'rgba(255,77,109,.12)',color:'var(--red)',fontSize:'.78rem'}} onClick={()=>resetForm('expense')}>- Uscita</button>
           </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div style={{display:'flex',gap:8,marginBottom:16}}>
-        <button className="btn bt" style={{flex:1,background:'rgba(6,214,160,.15)',color:'var(--green)'}} onClick={() => {setNewTrans(p => ({...p, type:'income'})); setMod('add');}}>
-          ➕ Entrata
-        </button>
-        <button className="btn" style={{flex:1,background:'rgba(255,77,109,.15)',color:'var(--red)'}} onClick={() => {setNewTrans(p => ({...p, type:'expense'})); setMod('add');}}>
-          ➖ Uscita
-        </button>
+      <div className="card" style={{marginBottom:14,padding:'18px 20px',background:'linear-gradient(135deg,rgba(6,214,160,.12),rgba(76,201,240,.08))',border:'1px solid rgba(6,214,160,.15)'}}>
+        <div style={{fontSize:'.78rem',color:'var(--text2)',marginBottom:4}}>Saldo</div>
+        <div style={{fontSize:'2rem',fontWeight:700,color:balance>=0?'var(--green)':'var(--red)',marginBottom:14}}>{'\u20AC'}{balance.toFixed(2)}</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+          <div style={{background:'rgba(6,214,160,.08)',borderRadius:10,padding:'10px 12px'}}>
+            <div style={{fontSize:'.7rem',color:'var(--green)',marginBottom:2}}>Entrate mese</div>
+            <div style={{fontWeight:700,fontSize:'.95rem',color:'var(--green)'}}>+{'\u20AC'}{monthlyIncome.toFixed(2)}</div>
+          </div>
+          <div style={{background:'rgba(255,77,109,.08)',borderRadius:10,padding:'10px 12px'}}>
+            <div style={{fontSize:'.7rem',color:'var(--red)',marginBottom:2}}>Uscite mese</div>
+            <div style={{fontWeight:700,fontSize:'.95rem',color:'var(--red)'}}>-{'\u20AC'}{monthlyExpense.toFixed(2)}</div>
+          </div>
+        </div>
       </div>
 
-      {/* Sub Navigation */}
-      <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:16}}>
-        <button className={`stab${sub==='overview'?' active':''}`} onClick={() => setSub('overview')}>📊 Panoramica</button>
-        <button className={`stab${sub==='transactions'?' active':''}`} onClick={() => setSub('transactions')}>📋 Movimenti</button>
-        <button className={`stab${sub==='categories'?' active':''}`} onClick={() => setSub('categories')}>🏷️ Categorie</button>
-        <button className={`stab${sub==='recurring'?' active':''}`} onClick={() => setSub('recurring')}>🔄 Ricorrenti</button>
-        <button className={`stab${sub==='calendar'?' active':''}`} onClick={() => setSub('calendar')}>📅 Calendario</button>
-        <button className={`stab${sub==='subscriptions'?' active':''}`} onClick={() => setSub('subscriptions')}>📱 Abbonamenti{subscriptions.filter(s=>s.active).length>0?` (${subscriptions.filter(s=>s.active).length})`:''}</button>
+      <div className="card" style={{marginBottom:14,padding:'12px 16px'}}>
+        <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:'.72rem',color:'var(--text2)',marginBottom:2}}>Spesa settimanale</div>
+            <div style={{fontWeight:700,fontSize:'1.1rem',color:'var(--text)'}}>{'\u20AC'}{weeklyExpense.toFixed(2)}</div>
+          </div>
+          <div style={{textAlign:'right'}}>
+            <div style={{fontSize:'.72rem',color:'var(--text2)',marginBottom:2}}>Media/giorno</div>
+            <div style={{fontWeight:600,fontSize:'.9rem',color:'var(--text2)'}}>{'\u20AC'}{(weeklyExpense/7).toFixed(2)}</div>
+          </div>
+        </div>
+        <div style={{display:'flex',gap:4,alignItems:'flex-end',height:50}}>
+          {barChart.map((d,i)=>{const mx=Math.max(...barChart.map(x=>x.amount),1);return(
+            <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',height:'100%',justifyContent:'flex-end'}}>
+              <div style={{width:'100%',height:Math.max(d.amount/mx*40+2,2),background:'var(--red)',borderRadius:'3px 3px 0 0',transition:'height .3s',opacity:d.amount>0?.8:.2}}/>
+              <div style={{fontSize:'.55rem',color:'var(--text2)',marginTop:3}}>{new Date(d.date).toLocaleDateString('it-IT',{weekday:'narrow'})}</div>
+            </div>
+          );})}
+        </div>
       </div>
 
-      {/* Overview */}
-      {sub === 'overview' && (
-        <div>
-          {/* Weekly Chart */}
-          <div style={{background:'var(--surface)',borderRadius:12,padding:16,marginBottom:16}}>
-            <div style={{fontWeight:700,marginBottom:12,fontSize:'.9rem'}}>📈 Ultimi 7 giorni</div>
-            <div style={{display:'flex',gap:6,alignItems:'flex-end',height:70}}>
-              {drawBarChart()}
+      {Object.keys(catStats).length>0&&<div className="card" style={{marginBottom:14,padding:'14px 16px'}}>
+        <div style={{fontWeight:700,fontSize:'.82rem',marginBottom:10}}>Categorie questo mese</div>
+        {Object.entries(catStats).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>{const ci=getCatInfo(cat,'expense');const pct=monthlyExpense>0?amt/monthlyExpense*100:0;return(
+          <div key={cat} style={{marginBottom:8}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+              <div style={{display:'flex',alignItems:'center',gap:6}}><span style={{fontSize:'.85rem'}}>{ci.icon}</span><span style={{fontSize:'.78rem'}}>{ci.name}</span></div>
+              <div style={{fontSize:'.78rem',fontWeight:600}}>{'\u20AC'}{amt.toFixed(2)} <span style={{color:'var(--text2)',fontWeight:400,fontSize:'.68rem'}}>{pct.toFixed(0)}%</span></div>
             </div>
-            <div style={{display:'flex',justifyContent:'space-between',marginTop:8,fontSize:'.75rem',color:'var(--text2)'}}>
-              <span>Totale settimana: €{weeklyExpense.toFixed(2)}</span>
-              <span>Media: €{(weeklyExpense / 7).toFixed(2)}/giorno</span>
-            </div>
+            <div style={{height:5,background:'rgba(255,255,255,.06)',borderRadius:3,overflow:'hidden'}}><div style={{width:pct+'%',height:'100%',background:ci.color,borderRadius:3,transition:'width .3s'}}/></div>
           </div>
+        );})}
+      </div>}
 
-          {/* Category Breakdown */}
-          <div style={{background:'var(--surface)',borderRadius:12,padding:16,marginBottom:16}}>
-            <div style={{fontWeight:700,marginBottom:12,fontSize:'.9rem'}}>🏷️ Spese per categoria</div>
-            {Object.entries(categoryStats).length === 0 && (
-              <div style={{color:'var(--text2)',fontSize:'.85rem',textAlign:'center',padding:'20px 0'}}>
-                Nessuna spesa questo mese
+      {upcomingPayments.length>0&&<div className="card" style={{marginBottom:14,padding:'14px 16px'}}>
+        <div style={{fontWeight:700,fontSize:'.82rem',marginBottom:10}}>Prossimi pagamenti</div>
+        {upcomingPayments.map(p=>{const ci=getCatInfo(p.category,'expense');return(
+          <div key={p.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 0',borderBottom:'1px solid rgba(255,255,255,.04)'}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}><span style={{fontSize:'.9rem'}}>{ci.icon}</span><div><div style={{fontSize:'.82rem',fontWeight:600}}>{p.title}</div><div style={{fontSize:'.68rem',color:'var(--text2)'}}>{new Date(p.nextDate).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</div></div></div>
+            <div style={{fontSize:'.82rem',fontWeight:700,color:'var(--red)'}}>-{'\u20AC'}{Math.abs(p.amount).toFixed(2)}</div>
+          </div>
+        );})}
+      </div>}
+
+      <div style={{display:'flex',gap:5,marginBottom:12,flexWrap:'wrap',alignItems:'center'}}>
+        {[['all','Tutti'],['income','Entrate'],['expense','Uscite']].map(([v,l])=><div key={v} onClick={()=>setFilter(v)} style={{padding:'5px 12px',borderRadius:8,fontSize:'.75rem',fontWeight:600,cursor:'pointer',background:filter===v?(v==='income'?'rgba(6,214,160,.2)':v==='expense'?'rgba(255,77,109,.2)':'var(--accent)'):'rgba(255,255,255,.05)',color:filter===v?(v==='income'?'var(--green)':v==='expense'?'var(--red)':'#fff'):'var(--text2)',transition:'all .15s',userSelect:'none'}}>{l}</div>)}
+        <div style={{flex:1}}/>
+        <input className="todo-add-input" placeholder="Cerca..." value={search} onChange={e=>setSearch(e.target.value)} style={{width:120,flex:'unset',padding:'5px 10px',fontSize:'.75rem'}}/>
+      </div>
+
+      {filteredTx.length===0&&<div style={{textAlign:'center',padding:'30px 0',color:'var(--text2)'}}><div style={{fontSize:'2rem',marginBottom:8}}>Nessun movimento</div><div style={{fontSize:'.82rem'}}>Aggiungi la tua prima transazione</div></div>}
+
+      {Object.entries(groupedTx).map(([date,items])=>(
+        <div key={date} style={{marginBottom:12}}>
+          <div style={{fontSize:'.7rem',fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.04em',marginBottom:6,paddingLeft:4}}>{date}</div>
+          {items.map(t=>{const ci=getCatInfo(t.category,t.type);return(
+            <div key={t.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:'var(--surface)',borderRadius:12,marginBottom:6}}>
+              <div style={{width:34,height:34,borderRadius:8,background:ci.color+'18',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1rem',flexShrink:0}}>{ci.icon}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'.82rem',fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{t.title}</div>
+                <div style={{fontSize:'.68rem',color:'var(--text2)',display:'flex',alignItems:'center',gap:4}}>{ci.name}{t.recurring!=='none'?' \u00B7 Ricorrente':''}</div>
               </div>
-            )}
-            {Object.entries(categoryStats).sort((a,b) => b[1] - a[1]).map(([cat, amount]) => {
-              const catInfo = categories.expense.find(c => c.key === cat) || {icon:'📌',name:cat,color:'#6B7494'};
-              const percentage = monthlyExpense > 0 ? (amount / monthlyExpense * 100) : 0;
-              return (
-                <div key={cat} style={{marginBottom:12}}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
-                    <div style={{display:'flex',alignItems:'center',gap:8}}>
-                      <span style={{fontSize:'1.1rem'}}>{catInfo.icon}</span>
-                      <span style={{fontSize:'.85rem'}}>{catInfo.name}</span>
-                    </div>
-                    <div style={{textAlign:'right'}}>
-                      <span style={{fontWeight:600,fontSize:'.85rem'}}>€{amount.toFixed(2)}</span>
-                      <span style={{fontSize:'.72rem',color:'var(--text2)',marginLeft:6}}>{percentage.toFixed(0)}%</span>
-                    </div>
-                  </div>
-                  <div style={{height:6,background:'rgba(255,255,255,.1)',borderRadius:3,overflow:'hidden'}}>
-                    <div style={{
-                      width:`${percentage}%`,
-                      height:'100%',
-                      background:catInfo.color,
-                      borderRadius:3,
-                      transition:'width .3s'
-                    }}/>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Upcoming Payments */}
-          {upcomingPayments.length > 0 && (
-            <div style={{background:'var(--surface)',borderRadius:12,padding:16}}>
-              <div style={{fontWeight:700,marginBottom:12,fontSize:'.9rem'}}>⏰ Prossimi pagamenti</div>
-              {upcomingPayments.map(p => (
-                <div key={p.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'1px solid rgba(255,255,255,.06)'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:10}}>
-                    <span style={{fontSize:'1.2rem'}}>{categories.expense.find(c => c.key === p.category)?.icon || '📌'}</span>
-                    <div>
-                      <div style={{fontWeight:600,fontSize:'.88rem'}}>{p.title}</div>
-                      <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{new Date(p.nextDate).toLocaleDateString('it-IT')}</div>
-                    </div>
-                  </div>
-                  <div style={{color:'var(--red)',fontWeight:600}}>€{Math.abs(p.amount).toFixed(2)}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Transactions List */}
-      {sub === 'transactions' && (
-        <div>
-          <div style={{marginBottom:12}}>
-            <input 
-              type="text" 
-              className="field" 
-              placeholder="🔍 Cerca movimenti..." 
-              style={{fontSize:'.85rem'}}
-            />
-          </div>
-          {transactions.length === 0 && (
-            <div style={{textAlign:'center',padding:'40px 0',color:'var(--text2)'}}>
-              <div style={{fontSize:'2.5rem',marginBottom:12}}>💸</div>
-              <div style={{fontSize:'.9rem'}}>Nessun movimento</div>
-              <div style={{fontSize:'.8rem',opacity:.7}}>Aggiungi la tua prima transazione</div>
-            </div>
-          )}
-          {transactions.map(t => {
-            const catInfo = (t.amount > 0 ? categories.income : categories.expense).find(c => c.key === t.category) || {icon:'📌',name:t.category || 'Altro',color:'#6B7494'};
-            return (
-              <div key={t.id} style={{
-                background:'var(--surface)',
-                borderRadius:12,
-                padding:14,
-                marginBottom:8,
-                display:'flex',
-                justifyContent:'space-between',
-                alignItems:'center'
-              }}>
-                <div style={{display:'flex',alignItems:'center',gap:12}}>
-                  <div style={{
-                    width:40,height:40,
-                    background:`${catInfo.color}20`,
-                    borderRadius:10,
-                    display:'flex',
-                    alignItems:'center',
-                    justifyContent:'center',
-                    fontSize:'1.2rem'
-                  }}>
-                    {catInfo.icon}
-                  </div>
-                  <div>
-                    <div style={{fontWeight:600,fontSize:'.88rem'}}>{t.title}</div>
-                    <div style={{display:'flex',alignItems:'center',gap:8,fontSize:'.75rem',color:'var(--text2)'}}>
-                      <span>{catInfo.name}</span>
-                      <span>•</span>
-                      <span>{new Date(t.date).toLocaleDateString('it-IT')}</span>
-                      {t.recurring !== 'none' && <span>🔄</span>}
-                    </div>
-                  </div>
-                </div>
-                <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:4}}>
-                  <div style={{fontWeight:700,fontSize:'.95rem',color:t.amount > 0 ? 'var(--green)' : 'var(--red)'}}>
-                    {t.amount > 0 ? '+' : ''}€{t.amount.toFixed(2)}
-                  </div>
-                  <div style={{display:'flex',gap:4}}>
-                    <button className="ib" style={{fontSize:'.8rem',color:'var(--blue)'}} onClick={() => {setEditItem(t); setMod('edit');}}>✏️</button>
-                    <button className="ib" style={{fontSize:'.8rem',color:'var(--red)'}} onClick={() => delTrans(t.id)}>🗑️</button>
-                  </div>
-                </div>
+              <div style={{textAlign:'right',flexShrink:0}}>
+                <div style={{fontSize:'.88rem',fontWeight:700,color:t.amount>0?'var(--green)':'var(--red)'}}>{t.amount>0?'+':''}{'\u20AC'}{Math.abs(t.amount).toFixed(2)}</div>
               </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Categories */}
-      {sub === 'categories' && (
-        <div>
-          <div style={{marginBottom:16}}>
-            <div style={{fontWeight:700,marginBottom:12,fontSize:'.9rem'}}>💸 Uscite</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
-              {categories.expense.map(c => {
-                const spent = thisMonth.filter(t => t.category === c.key && t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0);
-                return (
-                  <div key={c.key} style={{
-                    background:`${c.color}15`,
-                    border:`1px solid ${c.color}40`,
-                    borderRadius:12,
-                    padding:12,
-                    textAlign:'center',
-                    cursor:'pointer'
-                  }}>
-                    <div style={{fontSize:'1.5rem',marginBottom:6}}>{c.icon}</div>
-                    <div style={{fontSize:'.78rem',marginBottom:4,fontWeight:600}}>{c.name}</div>
-                    <div style={{fontSize:'.72rem',color:'var(--text2)'}}>€{spent.toFixed(2)}</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div>
-            <div style={{fontWeight:700,marginBottom:12,fontSize:'.9rem'}}>💰 Entrate</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
-              {categories.income.map(c => {
-                const earned = thisMonth.filter(t => t.category === c.key && t.amount > 0).reduce((sum, t) => sum + t.amount, 0);
-                return (
-                  <div key={c.key} style={{
-                    background:`${c.color}15`,
-                    border:`1px solid ${c.color}40`,
-                    borderRadius:12,
-                    padding:12,
-                    textAlign:'center',
-                    cursor:'pointer'
-                  }}>
-                    <div style={{fontSize:'1.5rem',marginBottom:6}}>{c.icon}</div>
-                    <div style={{fontSize:'.78rem',marginBottom:4,fontWeight:600}}>{c.name}</div>
-                    <div style={{fontSize:'.72rem',color:'var(--text2)'}}>€{earned.toFixed(2)}</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Recurring */}
-      {sub === 'recurring' && (
-        <div>
-          <div style={{background:'var(--surface)',borderRadius:12,padding:16,marginBottom:16}}>
-            <div style={{fontWeight:700,marginBottom:12}}>🔄 Pagamenti Ricorrenti</div>
-            {recurring.filter(r => r.active).length === 0 && (
-              <div style={{color:'var(--text2)',fontSize:'.85rem',textAlign:'center',padding:'20px 0'}}>
-                Nessun pagamento ricorrente configurato
+              <div style={{display:'flex',gap:2,flexShrink:0}}>
+                <div className="ib" style={{width:26,height:26,fontSize:'.65rem'}} onClick={()=>startEdit(t)}>{'✎'}</div>
+                <div className="ib" style={{width:26,height:26,fontSize:'.65rem',color:'var(--red)'}} onClick={()=>delTrans(t.id)}>{'✕'}</div>
               </div>
-            )}
-            {recurring.filter(r => r.active).map(r => (
-              <div key={r.id} style={{
-                display:'flex',
-                justifyContent:'space-between',
-                alignItems:'center',
-                padding:'12px 0',
-                borderBottom:'1px solid rgba(255,255,255,.06)'
-              }}>
-                <div style={{display:'flex',alignItems:'center',gap:10}}>
-                  <div style={{
-                    padding:'6px 10px',
-                    background:r.amount > 0 ? 'rgba(6,214,160,.15)' : 'rgba(255,77,109,.15)',
-                    borderRadius:8,
-                    fontSize:'.72rem',
-                    fontWeight:600,
-                    textTransform:'uppercase'
-                  }}>
-                    {r.recurring}
-                  </div>
-                  <div>
-                    <div style={{fontWeight:600,fontSize:'.88rem'}}>{r.title}</div>
-                    <div style={{fontSize:'.72rem',color:'var(--text2)'}}>
-                      Prossimo: {new Date(r.nextDate).toLocaleDateString('it-IT')}
-                    </div>
-                  </div>
-                </div>
-                <div style={{display:'flex',alignItems:'center',gap:8}}>
-                  <div style={{fontWeight:700,color:r.amount > 0 ? 'var(--green)' : 'var(--red)'}}>
-                    €{Math.abs(r.amount).toFixed(2)}
-                  </div>
-                  <button onClick={()=>{
-                    if(!window.confirm('Eliminare questa ricorrenza?')) return;
-                    const updated = recurring.map(x => x.id === r.id ? {...x, active: false} : x);
-                    setRecurring(updated);
-                    localStorage.setItem('lmv_recurring', JSON.stringify(updated));
-                    toast('Ricorrenza eliminata','var(--yellow)');
-                  }} style={{background:'rgba(255,77,109,.15)',border:'none',borderRadius:6,cursor:'pointer',color:'var(--red)',padding:'4px 8px',fontSize:'.75rem'}}>🗑️</button>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <button className="btn bt" style={{width:'100%',opacity:0.6}} disabled>
-            🚧 Aggiungi ricorrenza - Presto disponibile
-          </button>
-        </div>
-      )}
-
-      {/* Calendar View */}
-      {sub === 'calendar' && (
-        <div>
-          <div style={{background:'var(--surface)',borderRadius:12,padding:16,marginBottom:16}}>
-            <div style={{fontWeight:700,marginBottom:12}}>📅 Calendario Pagamenti</div>
-            {(() => {
-              const today = new Date();
-              const days = [];
-              for (let i = 0; i < 14; i++) {
-                const d = new Date(today);
-                d.setDate(d.getDate() + i);
-                const dateStr = d.toISOString().split('T')[0];
-                const dayTrans = transactions.filter(t => t.date === dateStr);
-                const dayRecurring = recurring.filter(r => r.nextDate === dateStr);
-                days.push({date: d, dateStr, transactions: dayTrans, recurring: dayRecurring});
-              }
-              return days.map((day, idx) => (
-                <div key={idx} style={{
-                  padding:'12px',
-                  borderBottom:'1px solid rgba(255,255,255,.06)',
-                  background: day.date.toDateString() === today.toDateString() ? 'rgba(255,77,109,.08)' : 'transparent',
-                  borderRadius: day.date.toDateString() === today.toDateString() ? 8 : 0
-                }}>
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-                    <div style={{display:'flex',alignItems:'center',gap:8}}>
-                      <span style={{fontWeight:700,fontSize:'.88rem'}}>
-                        {day.date.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})}
-                      </span>
-                      {day.date.toDateString() === today.toDateString() && (
-                        <span style={{background:'var(--red)',color:'#fff',padding:'2px 6px',borderRadius:4,fontSize:'.65rem',fontWeight:600}}>OGGI</span>
-                      )}
-                    </div>
-                  </div>
-                  {day.transactions.map(t => (
-                    <div key={t.id} style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'.82rem'}}>
-                      <span style={{color:'var(--text2)'}}>{t.title}</span>
-                      <span style={{fontWeight:600,color:t.amount > 0 ? 'var(--green)' : 'var(--red)'}}>
-                        {t.amount > 0 ? '+' : ''}€{Math.abs(t.amount).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                  {day.recurring.map(r => (
-                    <div key={r.id} style={{display:'flex',justifyContent:'space-between',padding:'4px 0',fontSize:'.82rem'}}>
-                      <span style={{color:'var(--yellow)'}}>🔄 {r.title}</span>
-                      <span style={{fontWeight:600,color:r.amount > 0 ? 'var(--green)' : 'var(--red)'}}>
-                        €{Math.abs(r.amount).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                  {day.transactions.length === 0 && day.recurring.length === 0 && (
-                    <div style={{fontSize:'.78rem',color:'var(--text2)',opacity:.5}}>Nessun movimento</div>
-                  )}
-                </div>
-              ));
-            })()}
-          </div>
-        </div>
-      )}
-
-      {/* Subscriptions */}
-      {sub === 'subscriptions' && (
-        <div>
-          <div style={{background:'linear-gradient(135deg,rgba(251,86,7,.12),rgba(139,92,246,.08))',border:'1px solid rgba(251,86,7,.2)',borderRadius:16,padding:18,marginBottom:16}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-              <span style={{fontSize:'.82rem',color:'var(--text2)'}}>Spesa Mensile Abbonamenti</span>
-              <span style={{fontSize:'.72rem',color:'var(--text2)'}}>{subscriptions.filter(s=>s.active).length} attivi</span>
             </div>
-            <div style={{fontSize:'1.8rem',fontWeight:700,color:'var(--accent2)'}}>€{totalMonthlySubs.toFixed(2)}<span style={{fontSize:'.85rem',fontWeight:400,color:'var(--text2)'}}>/mese</span></div>
-            <div style={{fontSize:'.78rem',color:'var(--text2)',marginTop:4}}>€{totalYearlySubs.toFixed(2)}/anno</div>
-          </div>
-
-          <button className="btn" style={{width:'100%',background:'linear-gradient(135deg,rgba(251,86,7,.2),rgba(139,92,246,.15))',color:'#fff',border:'1px solid rgba(251,86,7,.3)',marginBottom:16}} onClick={()=>setSubMod(true)}>
-            + Aggiungi Abbonamento
-          </button>
-
-          {subscriptions.length === 0 && (
-            <div style={{textAlign:'center',padding:'30px 0',color:'var(--text2)'}}>
-              <div style={{fontSize:'2.5rem',marginBottom:8}}>📱</div>
-              <div style={{fontSize:'.88rem'}}>Nessun abbonamento configurato</div>
-            </div>
-          )}
-
-          {subscriptions.map(s => {
-            const catInfo = SUB_CATEGORIES.find(c => c.key === s.category) || SUB_CATEGORIES[SUB_CATEGORIES.length-1];
-            const renewal = new Date(s.renewalDate);
-            const today = new Date();
-            const diffDays = Math.ceil((renewal - today) / (1000 * 60 * 60 * 24));
-            const isUrgent = diffDays <= 3 && diffDays >= 0 && s.active;
-            return (
-              <div key={s.id} style={{
-                background: s.active ? 'var(--surface)' : 'rgba(255,255,255,.02)',
-                border: isUrgent ? '1px solid rgba(255,209,102,.4)' : '1px solid var(--border)',
-                borderRadius: 14,
-                padding: 14,
-                marginBottom: 10,
-                opacity: s.active ? 1 : 0.5,
-                transition: 'all .2s'
-              }}>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:10}}>
-                    <div style={{width:40,height:40,borderRadius:10,background:catInfo.color+'25',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.2rem'}}>{catInfo.icon}</div>
-                    <div>
-                      <div style={{fontWeight:700,fontSize:'.92rem'}}>{s.name}</div>
-                      <div style={{fontSize:'.72rem',color:'var(--text2)'}}>
-                        {s.cycle === 'monthly' ? 'Mensile' : s.cycle === 'yearly' ? 'Annuale' : s.cycle === 'weekly' ? 'Settimanale' : 'Una tantum'} · {catInfo.name}
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{textAlign:'right'}}>
-                    <div style={{fontWeight:700,fontSize:'1rem',color:'var(--red)'}}>€{s.cost.toFixed(2)}</div>
-                    {s.active && (
-                      <div style={{fontSize:'.68rem',color: isUrgent ? 'var(--yellow)' : 'var(--text2)'}}>
-                        {isUrgent ? `⚠️ Tra ${diffDays === 0 ? 'OGGI' : diffDays + ' giorni'}` : `Rinnovo: ${renewal.toLocaleDateString('it-IT')}`}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div style={{display:'flex',gap:6,marginTop:10}}>
-                  <button className="btn bg bs" onClick={()=>toggleSubscription(s.id)} style={{fontSize:'.7rem'}}>
-                    {s.active ? '⏸️ Pausa' : '▶️ Attiva'}
-                  </button>
-                  <button className="btn bg bs" onClick={()=>deleteSubscription(s.id)} style={{fontSize:'.7rem',background:'rgba(255,77,109,.15)',color:'var(--red)'}}>
-                    🗑️ Rimuovi
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+          );})}
         </div>
-      )}
+      ))}
 
-      {/* Add/Edit Modal */}
-      <Modal 
-        open={mod === 'add' || mod === 'edit'} 
-        onClose={() => {setMod(null); setEditItem(null); setNewTrans({title:'', amount:'', type:'expense', category:'', date:new Date().toISOString().split('T')[0], recurring:'none', notify:3});}}
-        title={mod === 'edit' ? '✏️ Modifica Movimento' : (newTrans.type === 'income' ? '💰 Nuova Entrata' : '💸 Nuova Uscita')}
-        footer={
-          <>
-            <button className="btn bg" onClick={() => {setMod(null); setEditItem(null);}}>Annulla</button>
-            <button className="btn bt" onClick={mod === 'edit' ? updateTrans : saveTrans}>
-              {mod === 'edit' ? 'Aggiorna' : 'Salva'}
-            </button>
-          </>
-        }
-      >
-        <div className="fl">
-          <label>Titolo</label>
-          <input 
-            className="field" 
-            placeholder="Es. Affitto, Stipendio..." 
-            value={mod === 'edit' ? (editItem?.title || '') : newTrans.title}
-            onChange={e => mod === 'edit' ? setEditItem(p => ({...p, title: e.target.value})) : setNewTrans(p => ({...p, title: e.target.value}))}
-          />
+      {showAdd&&<div className="card" style={{marginBottom:14,padding:'16px 18px',border:'1px solid '+(form.type==='income'?'rgba(6,214,160,.3)':'rgba(255,77,109,.3)')}}>
+        <div style={{fontWeight:700,fontSize:'.85rem',marginBottom:12}}>{editItem?'Modifica':'Nuova '+(form.type==='income'?'entrata':'uscita')}</div>
+        <input className="todo-add-input" placeholder="Titolo..." autoFocus value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} onKeyDown={e=>{if(e.key==='Enter')saveTrans();if(e.key==='Escape'){setShowAdd(false);setEditItem(null);}}}/>
+        <div style={{display:'flex',gap:8,marginTop:8}}>
+          <input className="todo-add-input" type="number" step="0.01" placeholder={'\u20AC'+' 0.00'} value={form.amount} onChange={e=>setForm(p=>({...p,amount:e.target.value}))} style={{flex:1}}/>
+          <input className="todo-add-input" type="date" value={form.date} onChange={e=>setForm(p=>({...p,date:e.target.value}))} style={{width:130,flex:'unset'}}/>
         </div>
-        <div className="fl">
-          <label>Importo (€)</label>
-          <input 
-            className="field" 
-            type="number" 
-            step="0.01"
-            placeholder="0.00"
-            value={mod === 'edit' ? (editItem ? Math.abs(editItem.amount) : '') : newTrans.amount}
-            onChange={e => mod === 'edit' ? setEditItem(p => ({...p, amount: (p.amount > 0 ? 1 : -1) * parseFloat(e.target.value || 0)})) : setNewTrans(p => ({...p, amount: e.target.value}))}
-          />
-        </div>
-        <div className="fl">
-          <label>Data</label>
-          <input 
-            className="field" 
-            type="date"
-            value={mod === 'edit' ? (editItem?.date || '') : newTrans.date}
-            onChange={e => mod === 'edit' ? setEditItem(p => ({...p, date: e.target.value})) : setNewTrans(p => ({...p, date: e.target.value}))}
-          />
-        </div>
-        <div className="fl">
-          <label>Categoria</label>
-          <select 
-            className="field"
-            value={mod === 'edit' ? (editItem?.category || '') : newTrans.category}
-            onChange={e => mod === 'edit' ? setEditItem(p => ({...p, category: e.target.value})) : setNewTrans(p => ({...p, category: e.target.value}))}
-          >
-            <option value="">Seleziona...</option>
-            {(mod === 'edit' ? (editItem?.amount > 0 ? categories.income : categories.expense) : (newTrans.type === 'income' ? categories.income : categories.expense)).map(c => (
-              <option key={c.key} value={c.key}>{c.icon} {c.name}</option>
-            ))}
+        <select className="todo-add-input" style={{marginTop:8}} value={form.category} onChange={e=>setForm(p=>({...p,category:e.target.value}))}>
+          <option value="">Categoria...</option>
+          {(form.type==='income'?CATS.income:CATS.expense).map(c=><option key={c.key} value={c.key}>{c.icon} {c.name}</option>)}
+        </select>
+        {form.type==='expense'&&<div style={{display:'flex',gap:8,marginTop:8,flexWrap:'wrap'}}>
+          <select className="todo-add-input" value={form.recurring} onChange={e=>setForm(p=>({...p,recurring:e.target.value}))} style={{flex:1,minWidth:100}}>
+            <option value="none">Una tantum</option><option value="weekly">Settimanale</option><option value="monthly">Mensile</option><option value="yearly">Annuale</option>
           </select>
-        </div>
-        {mod === 'add' && newTrans.type === 'expense' && (
-          <>
-            <div className="fl">
-              <label>Ricorrenza</label>
-              <select className="field" value={newTrans.recurring} onChange={e => setNewTrans(p => ({...p, recurring: e.target.value}))}>
-                <option value="none">Nessuna</option>
-                <option value="weekly">Settimanale</option>
-                <option value="monthly">Mensile</option>
-                <option value="yearly">Annuale</option>
-              </select>
-            </div>
-            <div className="fl">
-              <label>Avvisami prima (giorni)</label>
-              <select className="field" value={newTrans.notify} onChange={e => setNewTrans(p => ({...p, notify: parseInt(e.target.value)}))}>
-                <option value="0">No</option>
-                <option value="1">1 giorno prima</option>
-                <option value="3">3 giorni prima</option>
-                <option value="7">7 giorni prima</option>
-              </select>
-            </div>
-            <div className="fl" style={{flexDirection:'row', alignItems:'center', gap:8}}>
-              <input type="checkbox" id="addToCalendar" checked={newTrans.addToCalendar} 
-                onChange={e => setNewTrans(p => ({...p, addToCalendar: e.target.checked}))}
-                style={{width:18, height:18, accentColor:'#9146FF'}}/>
-              <label htmlFor="addToCalendar" style={{margin:0, cursor:'pointer', fontSize:'.85rem'}}>
-                📅 Aggiungi al calendario
-              </label>
-            </div>
-          </>
-        )}
-      </Modal>
-
-      {/* Subscription Modal */}
-      <Modal
-        open={subMod}
-        onClose={() => {setSubMod(false); setSubForm({name:'',cost:'',cycle:'monthly',renewalDate:'',category:'streaming',notify:true,active:true});}}
-        title="📱 Nuovo Abbonamento"
-        footer={<>
-          <button className="btn bg" onClick={() => {setSubMod(false); setSubForm({name:'',cost:'',cycle:'monthly',renewalDate:'',category:'streaming',notify:true,active:true});}}>Annulla</button>
-          <button className="btn bt" onClick={saveSubscription}>Salva</button>
-        </>}
-      >
-        <div className="fl">
-          <label>Nome</label>
-          <input className="field" placeholder="Es. Netflix, Spotify..." value={subForm.name} onChange={e => setSubForm(p => ({...p, name: e.target.value}))} />
-        </div>
-        <div className="fl">
-          <label>Costo (€)</label>
-          <input className="field" type="number" step="0.01" placeholder="0.00" value={subForm.cost} onChange={e => setSubForm(p => ({...p, cost: e.target.value}))} />
-        </div>
-        <div className="fl">
-          <label>Ciclo</label>
-          <select className="field" value={subForm.cycle} onChange={e => setSubForm(p => ({...p, cycle: e.target.value}))}>
-            <option value="weekly">Settimanale</option>
-            <option value="monthly">Mensile</option>
-            <option value="yearly">Annuale</option>
+          <select className="todo-add-input" value={form.notify} onChange={e=>setForm(p=>({...p,notify:parseInt(e.target.value)}))} style={{width:100,flex:'unset'}}>
+            <option value={0}>No avviso</option><option value={1}>1 giorno</option><option value={3}>3 giorni</option><option value={7}>7 giorni</option>
           </select>
+        </div>}
+        {form.type==='expense'&&<label style={{display:'flex',alignItems:'center',gap:6,fontSize:'.75rem',color:'var(--text2)',cursor:'pointer',marginTop:8,userSelect:'none'}}><input type="checkbox" checked={form.addToCalendar} onChange={e=>setForm(p=>({...p,addToCalendar:e.target.checked}))} style={{accentColor:'var(--blue)'}}/>Aggiungi al Calendario</label>}
+        <div style={{display:'flex',gap:6,marginTop:12}}>
+          <button className="btn bt bs" style={{flex:1}} onClick={saveTrans}>{editItem?'Aggiorna':'Aggiungi'}</button>
+          <button className="btn bg bs" onClick={()=>{setShowAdd(false);setEditItem(null);}}>Annulla</button>
         </div>
-        <div className="fl">
-          <label>Data rinnovo</label>
-          <input className="field" type="date" value={subForm.renewalDate} onChange={e => setSubForm(p => ({...p, renewalDate: e.target.value}))} />
-        </div>
-        <div className="fl">
-          <label>Categoria</label>
-          <select className="field" value={subForm.category} onChange={e => setSubForm(p => ({...p, category: e.target.value}))}>
-            {SUB_CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.icon} {c.name}</option>)}
-          </select>
-        </div>
-         <div className="fl" style={{flexDirection:'row', alignItems:'center', gap:8}}>
-           <input type="checkbox" id="subNotify" checked={subForm.notify} onChange={e => setSubForm(p => ({...p, notify: e.target.checked}))} style={{width:18, height:18, accentColor:'var(--yellow)'}}/>
-           <label htmlFor="subNotify" style={{margin:0, cursor:'pointer', fontSize:'.85rem'}}>🔔 Notifica prima del rinnovo</label>
-         </div>
-         <div className="fl" style={{flexDirection:'row', alignItems:'center', gap:8}}>
-           <input type="checkbox" id="subCal" checked={subForm.addToCalendar} 
-             onChange={e => setSubForm(p => ({...p, addToCalendar: e.target.checked}))} 
-             style={{width:18, height:18, accentColor:'var(--blue)'}}/>
-           <label htmlFor="subCal" style={{margin:0, cursor:'pointer', fontSize:'.85rem'}}>📅 Aggiungi al Calendario</label>
-         </div>
+      </div>}
 
+      <div className="card" style={{marginBottom:14,overflow:'hidden'}}>
+        <div onClick={()=>setExpSubs(!expSubs)} style={{display:'flex',alignItems:'center',gap:10,padding:'14px 18px',cursor:'pointer',userSelect:'none'}}>
+          <span style={{fontSize:'.75rem',transform:expSubs?'rotate(90deg)':'rotate(0)',transition:'transform .2s',display:'inline-block'}}>{'>'}</span>
+          <span style={{flex:1,fontWeight:600,fontSize:'.82rem'}}>Abbonamenti</span>
+          {activeSubs.length>0&&<span style={{fontSize:'.7rem',color:'var(--accent2)',background:'rgba(251,86,7,.1)',padding:'2px 8px',borderRadius:6}}>{'\u20AC'}{totalMonthlySubs.toFixed(2)}/mese</span>}
+        </div>
+        {expSubs&&<div style={{padding:'0 18px 14px',borderTop:'1px solid rgba(255,255,255,.04)'}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,paddingTop:10}}>
+            <div style={{fontSize:'.72rem',color:'var(--text2)'}}>{activeSubs.length} attivi \u00B7 {'\u20AC'}{totalYearlySubs.toFixed(2)}/anno</div>
+            <div className="ib" style={{width:28,height:28,fontSize:'.7rem'}} onClick={()=>setSubMod(true)}>{'+'}</div>
+          </div>
+          {subscriptions.length===0&&<div style={{fontSize:'.82rem',color:'var(--text2)',textAlign:'center',padding:'16px 0',opacity:.5}}>Nessun abbonamento</div>}
+          {subscriptions.map(s=>{const ci=SUBCATS.find(c=>c.key===s.category)||SUBCATS[SUBCATS.length-1];const rn=new Date(s.renewalDate);const dd=Math.ceil((rn-new Date())/(864e5));const urg=dd<=3&&dd>=0&&s.active;return(
+            <div key={s.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid rgba(255,255,255,.03)',opacity:s.active?1:.45}}>
+              <div style={{width:30,height:30,borderRadius:7,background:ci.color+'18',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.85rem',flexShrink:0}}>{ci.icon}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'.82rem',fontWeight:600}}>{s.name}</div>
+                <div style={{fontSize:'.65rem',color:urg?'var(--yellow)':'var(--text2)'}}>{s.cycle==='monthly'?'Mensile':s.cycle==='yearly'?'Annuale':'Settimanale'} \u00B7 {urg?(dd===0?'Oggi':'Tra '+dd+'g'):'Rinnovo '+rn.toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</div>
+              </div>
+              <div style={{fontSize:'.82rem',fontWeight:700,color:'var(--red)',flexShrink:0}}>{'\u20AC'}{s.cost.toFixed(2)}</div>
+              <div style={{display:'flex',gap:2,flexShrink:0}}>
+                <div className="ib" style={{width:24,height:24,fontSize:'.6rem'}} onClick={()=>toggleSubscription(s.id)}>{s.active?'\u23F8':'\u25B6'}</div>
+                <div className="ib" style={{width:24,height:24,fontSize:'.6rem',color:'var(--red)'}} onClick={()=>delSubscription(s.id)}>{'x'}</div>
+              </div>
+            </div>
+          );})}
+        </div>}
+      </div>
+
+      <div className="card" style={{marginBottom:14,overflow:'hidden'}}>
+        <div onClick={()=>setExpRecurring(!expRecurring)} style={{display:'flex',alignItems:'center',gap:10,padding:'14px 18px',cursor:'pointer',userSelect:'none'}}>
+          <span style={{fontSize:'.75rem',transform:expRecurring?'rotate(90deg)':'rotate(0)',transition:'transform .2s',display:'inline-block'}}>{'>'}</span>
+          <span style={{flex:1,fontWeight:600,fontSize:'.82rem'}}>Ricorrenti</span>
+          {activeRecurring.length>0&&<span style={{fontSize:'.7rem',color:'var(--text2)',background:'rgba(255,255,255,.05)',padding:'2px 8px',borderRadius:6}}>{activeRecurring.length}</span>}
+        </div>
+        {expRecurring&&<div style={{padding:'0 18px 14px',borderTop:'1px solid rgba(255,255,255,.04)'}}>
+          {activeRecurring.length===0&&<div style={{fontSize:'.82rem',color:'var(--text2)',textAlign:'center',padding:'16px 0',opacity:.5}}>Nessun pagamento ricorrente</div>}
+          {activeRecurring.map(r=>{const ci=getCatInfo(r.category,r.type);return(
+            <div key={r.id} style={{display:'flex',alignItems:'center',gap:10,padding:'8px 0',borderBottom:'1px solid rgba(255,255,255,.03)'}}>
+              <div style={{width:30,height:30,borderRadius:7,background:(r.amount>0?'rgba(6,214,160,.12)':'rgba(255,77,109,.12)'),display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.7rem',fontWeight:700,color:r.amount>0?'var(--green)':'var(--red)',textTransform:'uppercase',flexShrink:0}}>{r.recurring.slice(0,3)}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:'.82rem',fontWeight:600}}>{r.title}</div>
+                <div style={{fontSize:'.65rem',color:'var(--text2)'}}>Prossimo: {new Date(r.nextDate).toLocaleDateString('it-IT',{day:'numeric',month:'short'})}</div>
+              </div>
+              <div style={{fontSize:'.82rem',fontWeight:700,color:r.amount>0?'var(--green)':'var(--red)',flexShrink:0}}>{'\u20AC'}{Math.abs(r.amount).toFixed(2)}</div>
+              <div className="ib" style={{width:24,height:24,fontSize:'.6rem',color:'var(--red)'}} onClick={()=>{if(!window.confirm('Eliminare?'))return;const u=recurring.map(x=>x.id===r.id?{...x,active:false}:x);setRecurring(u);localStorage.setItem('lmv_recurring',JSON.stringify(u));toast('Eliminata','var(--yellow)');}}>{'x'}</div>
+            </div>
+          );})}
+        </div>}
+      </div>
+
+      <div className="card" style={{marginBottom:14,overflow:'hidden'}}>
+        <div onClick={()=>{setExpCalendar(!expCalendar);if(!expCalendar)setCalDays(14);}} style={{display:'flex',alignItems:'center',gap:10,padding:'14px 18px',cursor:'pointer',userSelect:'none'}}>
+          <span style={{fontSize:'.75rem',transform:expCalendar?'rotate(90deg)':'rotate(0)',transition:'transform .2s',display:'inline-block'}}>{'>'}</span>
+          <span style={{flex:1,fontWeight:600,fontSize:'.82rem'}}>Calendario pagamenti</span>
+        </div>
+        {expCalendar&&<div style={{padding:'0 18px 14px',borderTop:'1px solid rgba(255,255,255,.04)'}}>
+          {(()=>{const td=new Date();const days=[];for(let i=0;i<calDays;i++){const d=new Date(td);d.setDate(d.getDate()+i);const ds=d.toISOString().split('T')[0];days.push({date:d,ds,tx:transactions.filter(t=>t.date===ds),rc:recurring.filter(r=>r.nextDate===ds&&r.active)});}const todayStr=td.toDateString();return days.map((day,i)=>{const hasItems=day.tx.length>0||day.rc.length>0;const isToday=day.date.toDateString()===todayStr;return(
+            <div key={i} style={{padding:'8px 0',borderBottom:'1px solid rgba(255,255,255,.03)',background:isToday?'rgba(76,201,240,.06)':undefined,borderRadius:isToday?8:0}}>
+              <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:hasItems?4:0}}>
+                <span style={{fontSize:'.78rem',fontWeight:isToday?700:500,color:isToday?'var(--accent)':'var(--text)'}}>{day.date.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})}</span>
+                {isToday&&<span style={{fontSize:'.6rem',background:'var(--accent)',color:'#fff',padding:'1px 5px',borderRadius:4,fontWeight:600}}>OGGI</span>}
+              </div>
+              {day.tx.map(t=><div key={t.id} style={{display:'flex',justifyContent:'space-between',padding:'2px 0 2px 8px',fontSize:'.75rem'}}><span style={{color:'var(--text2)'}}>{t.title}</span><span style={{fontWeight:600,color:t.amount>0?'var(--green)':'var(--red)'}}>{t.amount>0?'+':''}{'\u20AC'}{Math.abs(t.amount).toFixed(2)}</span></div>)}
+              {day.rc.map(r=><div key={r.id} style={{display:'flex',justifyContent:'space-between',padding:'2px 0 2px 8px',fontSize:'.75rem'}}><span style={{color:'var(--yellow)'}}>Ric. {r.title}</span><span style={{fontWeight:600,color:r.amount>0?'var(--green)':'var(--red)'}}>{'\u20AC'}{Math.abs(r.amount).toFixed(2)}</span></div>)}
+              {!hasItems&&<div style={{fontSize:'.7rem',color:'var(--text2)',opacity:.35,paddingLeft:8}}>-</div>}
+            </div>
+          );});})()}
+          {calDays<60&&<div style={{textAlign:'center',padding:'8px 0'}}><div className="ib" style={{fontSize:'.7rem',padding:'6px 14px',width:'auto',borderRadius:8}} onClick={()=>setCalDays(d=>d+14)}>Mostra altri 14 giorni</div></div>}
+        </div>}
+      </div>
+
+      <Modal open={subMod} onClose={()=>setSubMod(false)} title="Nuovo Abbonamento" footer={<><button className="btn bg" onClick={()=>setSubMod(false)}>Annulla</button><button className="btn bt" onClick={saveSubscription}>Salva</button></>}>
+        <div className="fl"><label>Nome</label><input className="field" placeholder="Netflix, Spotify..." value={subForm.name} onChange={e=>setSubForm(p=>({...p,name:e.target.value}))}/></div>
+        <div className="fl"><label>Costo</label><input className="field" type="number" step="0.01" placeholder="0.00" value={subForm.cost} onChange={e=>setSubForm(p=>({...p,cost:e.target.value}))}/></div>
+        <div className="fl"><label>Ciclo</label><select className="field" value={subForm.cycle} onChange={e=>setSubForm(p=>({...p,cycle:e.target.value}))}><option value="weekly">Settimanale</option><option value="monthly">Mensile</option><option value="yearly">Annuale</option></select></div>
+        <div className="fl"><label>Data rinnovo</label><input className="field" type="date" value={subForm.renewalDate} onChange={e=>setSubForm(p=>({...p,renewalDate:e.target.value}))}/></div>
+        <div className="fl"><label>Categoria</label><select className="field" value={subForm.category} onChange={e=>setSubForm(p=>({...p,category:e.target.value}))}>{SUBCATS.map(c=><option key={c.key} value={c.key}>{c.icon} {c.name}</option>)}</select></div>
+        <div className="fl" style={{flexDirection:'row',alignItems:'center',gap:8}}><input type="checkbox" checked={subForm.notify} onChange={e=>setSubForm(p=>({...p,notify:e.target.checked}))} style={{accentColor:'var(--yellow)'}}/><label style={{margin:0,cursor:'pointer',fontSize:'.82rem'}}>Notifica rinnovo</label></div>
+        <div className="fl" style={{flexDirection:'row',alignItems:'center',gap:8}}><input type="checkbox" checked={subForm.addToCalendar} onChange={e=>setSubForm(p=>({...p,addToCalendar:e.target.checked}))} style={{accentColor:'var(--blue)'}}/><label style={{margin:0,cursor:'pointer',fontSize:'.82rem'}}>Aggiungi al Calendario</label></div>
       </Modal>
     </div>
   );
