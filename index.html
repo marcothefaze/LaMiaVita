@@ -29207,5 +29207,13 @@ html body #root .app .main .content > div {
 }
 }
 </style>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(r => r.unregister());
+    navigator.serviceWorker.register('/LaMiaVita/sw.js?v=2.5');
+  });
+}
+</script>
 </body>
 </html>
