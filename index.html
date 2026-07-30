@@ -18889,7 +18889,11 @@ function WeatherWidget({onClick}) {
           temp: cur.temp_C,
           desc: cur.weatherDesc[0].value,
           icon: getWeatherIcon(parseInt(cur.weatherCode)),
-          city: d.nearest_area?.[0]?.areaName?.[0]?.value||''
+          city: d.nearest_area?.[0]?.areaName?.[0]?.value||'',
+          humidity: cur.humidity,
+          windSpeed: cur.windspeedKmph,
+          windDir: cur.winddir16Point,
+          feelsLike: cur.FeelsLikeC
         };
         localStorage.setItem('weather_cache', JSON.stringify(data));
         localStorage.setItem('weather_time', String(Date.now()));
@@ -25403,6 +25407,10 @@ function DashboardHome({toast, setTab, setNotesOpen}) {
   const [ww,setWw]=useState(window.innerWidth);
   useEffect(()=>{const h=()=>setWw(window.innerWidth);window.addEventListener('resize',h);return ()=>window.removeEventListener('resize',h)},[]);
   const isTab=ww>=768;
+  const [wx,setWx]=useState(()=>{try{const c=localStorage.getItem('weather_cache');return c?JSON.parse(c):null}catch(e){return null}});
+  useEffect(()=>{if(!wx){(async()=>{try{const p=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej));const r=await fetch('https://wttr.in/'+p.coords.latitude+','+p.coords.longitude+'?format=j1');const d=await r.json();const c=d.current_condition[0];const data={temp:c.temp_C,desc:c.weatherDesc[0].value,icon:(()=>{const cd=parseInt(c.weatherCode);if(cd===113)return'☀️';if(cd<=116)return'⛅';if(cd<=122)return'☁️';if(cd<=143)return'🌫️';if(cd<=176)return'🌦️';if(cd<=200)return'⛈️';if(cd<=260)return'🌨️';if(cd<=296)return'🌧️';if(cd<=350)return'❄️';if(cd<=389)return'⛈️';return'🌡️'})(),city:d.nearest_area?.[0]?.areaName?.[0]?.value||'',humidity:c.humidity,windSpeed:c.windspeedKmph,windDir:c.winddir16Point,feelsLike:c.FeelsLikeC};localStorage.setItem('weather_cache',JSON.stringify(data));localStorage.setItem('weather_time',String(Date.now()));setWx(data)}catch(e){}})()}},[wx]);
+  
+
   const cw=isTab?Math.min(740,ww-96):Math.min(600,ww-32);
   const cp=isTab?22:18;
   const cb=isTab?22:20;
@@ -25445,6 +25453,27 @@ function DashboardHome({toast, setTab, setNotesOpen}) {
             ))}
           </div>
         </div>
+
+        {/* Weather */}
+        {wx && (
+          <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:cb,padding:cp,marginBottom:14}}>
+            <div style={{display:'flex',alignItems:'center',gap:12}}>
+              <div style={{fontSize:36}}>{wx.icon}</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:11,color:'rgba(255,255,255,.35)',fontWeight:600,textTransform:'uppercase',letterSpacing:1,marginBottom:2}}>{wx.city}</div>
+                <div style={{display:'flex',alignItems:'baseline',gap:6}}>
+                  <span style={{fontSize:30,fontWeight:800,color:'#fff',lineHeight:1}}>{wx.temp}°</span>
+                  <span style={{fontSize:13,color:'rgba(255,255,255,.45)'}}>{wx.desc}</span>
+                </div>
+                <div style={{display:'flex',gap:14,marginTop:6,fontSize:11,color:'rgba(255,255,255,.3)'}}>
+                  {wx.humidity && <span>💧 {wx.humidity}%</span>}
+                  {wx.windSpeed && <span>🌬️ {wx.windSpeed} km/h {wx.windDir||''}</span>}
+                  {wx.feelsLike && <span>🌡️ Percepiti {wx.feelsLike}°</span>}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:24}}>
@@ -28207,25 +28236,26 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
             );
           })()}
           
-          <div className="content">
-             {tab==='home'&&<DashboardHome toast={toast} setTab={setTab} setNotesOpen={setNotesOpen}/>}
-             {tab==='pw'&&<PwTab toast={toast} setNotesOpen={setNotesOpen}/>}
-             {tab==='cal'&&<CalTab toast={toast}/>}
-             {tab==='email'&&<EmailTab toast={toast} callAI={callAI}/>}
-             {tab==='ai'&&<AITab toast={toast} onTabSwitch={setTab} apiKeys={apiKeys} callAI={callAI} user={user} setProv={setProv} prov={prov}/>}
-             {tab==='music'&&<MusicTab toast={toast}/>}
-             {tab==='studio'&&<MusicStudioTab toast={toast}/>}
-             {tab==='video'&&<VideoEditorTab toast={toast}/>}
-             {tab==='youtube'&&<YouTubeTab toast={toast}/>}
-             {tab==='todo'&&<TodoTab toast={toast}/>}
-             {tab==='wallet'&&<WalletTab toast={toast}/>}
-             {tab==='reminders'&&<RemindersTab toast={toast}/>}
-             {tab==='extra'&&<ExtraTab toast={toast}/>}
-             {tab==='games'&&<GamesTab toast={toast}/>}
-             {tab==='stats'&&<StatsTab toast={toast}/>}
-             {tab==='settings'&&<SettingsTab toast={toast} user={user}/>}
-              {tab==='profile'&&<ProfileTab user={user} toast={toast}/>}
-              {notesOpen && mw >= 768 && <NotesPage onClose={()=>setNotesOpen(false)} toast={toast} fullScreen={false}/>}
+           <div className="content">
+            {notesOpen && mw >= 768
+              ? <NotesPage onClose={()=>setNotesOpen(false)} toast={toast} fullScreen={false}/>
+              : <>{tab==='home'&&<DashboardHome toast={toast} setTab={setTab} setNotesOpen={setNotesOpen}/>}
+              {tab==='pw'&&<PwTab toast={toast} setNotesOpen={setNotesOpen}/>}
+              {tab==='cal'&&<CalTab toast={toast}/>}
+              {tab==='email'&&<EmailTab toast={toast} callAI={callAI}/>}
+              {tab==='ai'&&<AITab toast={toast} onTabSwitch={setTab} apiKeys={apiKeys} callAI={callAI} user={user} setProv={setProv} prov={prov}/>}
+              {tab==='music'&&<MusicTab toast={toast}/>}
+              {tab==='studio'&&<MusicStudioTab toast={toast}/>}
+              {tab==='video'&&<VideoEditorTab toast={toast}/>}
+              {tab==='youtube'&&<YouTubeTab toast={toast}/>}
+              {tab==='todo'&&<TodoTab toast={toast}/>}
+              {tab==='wallet'&&<WalletTab toast={toast}/>}
+              {tab==='reminders'&&<RemindersTab toast={toast}/>}
+              {tab==='extra'&&<ExtraTab toast={toast}/>}
+              {tab==='games'&&<GamesTab toast={toast}/>}
+              {tab==='stats'&&<StatsTab toast={toast}/>}
+              {tab==='settings'&&<SettingsTab toast={toast} user={user}/>}
+              {tab==='profile'&&<ProfileTab user={user} toast={toast}/>}</>}
             </div>
          </div>
          {notesOpen && mw < 768 && <NotesPage onClose={()=>setNotesOpen(false)} toast={toast} fullScreen={true}/>}
