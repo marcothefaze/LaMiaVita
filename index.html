@@ -11054,9 +11054,9 @@ Formatta con emoji.`;
     setPendingAction(null);
   };
 
-  const evList = events.slice(-15).map(e=>e.id+':'+e.title+'('+e.date+')').join(' | ') || 'nessuno';
-  const pwList = passwords.slice(-5).map(p=>p.id+':'+p.svc).join(' | ') || 'nessuna';
-  const noteList = notes.slice(-5).map(n=>n.id+':'+n.title).join(' | ') || 'nessuna';
+  const evList = events.slice(-30).map(e=>e.id+':'+e.title+'('+e.date+(e.time?' '+e.time:'')+')').join(' | ') || 'nessuno';
+  const pwList = passwords.slice(-10).map(p=>p.id+':'+p.svc).join(' | ') || 'nessuna';
+  const noteList = notes.slice(-10).map(n=>n.id+':'+n.title).join(' | ') || 'nessuna';
   
   const personalityContext = {amichevole:'Parla in modo caloroso, con emoji, incoraggiante.',professionale:'Parla in modo formale ma chiaro. Risposte strutturate.',paziente:'Spiega con pazienza, come un tutor. Chiedi se vuoi approfondire.',conciso:'Risposte brevi e dirette. Vai al punto.'}[personality];
   
@@ -11551,7 +11551,7 @@ $$[formula in LaTeX]$$
     );
   }
   return (
-    <div className="fi2" style={{position:'relative'}}>
+            <div className="fi2" style={{position:'relative',display:'flex',flexDirection:'column',flex:1,minHeight:0}}>
       <div className="sh">
         <div style={{display:'flex',alignItems:'center',gap:8}}>
           <span className="sht">🤖 Super Marco IA {memory.length>0&&<span className="ai-memory-badge">🧠</span>}</span>
@@ -12168,7 +12168,7 @@ function makeCallAI(apiKeys, prov) {
       const needsSearch = 
         queryLower.includes('notizia') || queryLower.includes('news') ||
         queryLower.includes('oggi') || queryLower.includes('ieri') ||
-        queryLower.includes('2024') || queryLower.includes('2025') ||
+        queryLower.includes('2024') || queryLower.includes('2025') || queryLower.includes('2026') ||
         queryLower.includes('attuale') || queryLower.includes('recente') ||
         queryLower.includes('quando') || queryLower.includes('dove') ||
         queryLower.includes('chi è') || queryLower.includes('cosa è') ||
@@ -12321,42 +12321,30 @@ ${sys}
       enhancedMessages = [...messages.slice(0, -1), webContextMsg, messages[messages.length - 1]];
     }
 
-    if (currentProv === 'groq' || !currentProv) {
-      const key = localStorage.getItem('groq_key') || '';
-      console.log('🔑 Groq key length:', key.length, 'key starts with:', key.substring(0, 6));
-      if (!key) throw new Error('Groq: chiave API mancante. Vai su Impostazioni → Chiavi API AI e inserisci la tua chiave.');
-      const model = shouldSearchFirst ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant';
-      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: JSON.stringify({
-          model: model,
-          max_tokens: 1500,
-          temperature: shouldSearchFirst ? 0.3 : 0.7,
-          messages: [{ role: 'system', content: masterPrompt }, ...enhancedMessages]
-        })
-      });
-      const d = await r.json();
-      if (d.error) {
-        console.error('❌ Groq API error:', d.error);
-        throw new Error('Groq: ' + d.error.message);
+    const tryProvider = async (name) => {
+      if (name === 'groq') {
+        const key = localStorage.getItem('groq_key') || '';
+        if (!key) throw new Error('Groq: chiave API mancante');
+        const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+          body: JSON.stringify({
+            model: shouldSearchFirst ? 'llama-3.3-70b-versatile' : 'llama-3.1-8b-instant',
+            max_tokens: 1500,
+            temperature: shouldSearchFirst ? 0.3 : 0.7,
+            messages: [{ role: 'system', content: masterPrompt }, ...enhancedMessages]
+          })
+        });
+        const d = await r.json();
+        if (d.error) throw new Error('Groq: ' + d.error.message);
+        return d.choices[0].message.content
+          .replace(/^(Come modello di linguaggio|Basandomi|Grazie per)/gi, '')
+          .replace(/(Posso aiutarti|Posso fornirti|Ti posso|Posso)/gi, 'Ecco')
+          .trim();
       }
-      let response = d.choices[0].message.content;
-
-      // Post-process: remove common AI filler phrases
-      response = response
-        .replace(/^(Come modello di linguaggio|Basandomi|Grazie per)/gi, '')
-        .replace(/(Posso aiutarti|Posso fornirti|Ti posso|Posso)/gi, 'Ecco')
-        .trim();
-
-      return response;
-    }
-
-    if (currentProv === 'gemini') {
-      try {
+      if (name === 'gemini') {
         const geminiKey = localStorage.getItem('gemini_key');
-        console.log('🔑 Gemini key length:', geminiKey ? geminiKey.length : 0, 'key starts with:', geminiKey ? geminiKey.substring(0, 6) : 'NONE');
-        if (!geminiKey) throw new Error('Gemini: chiave API mancante. Vai su Impostazioni → Chiavi API AI e inserisci la tua chiave.');
+        if (!geminiKey) throw new Error('Gemini: chiave API mancante');
         const gm = enhancedMessages.map(m => ({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] }));
         const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + geminiKey, {
           method: 'POST',
@@ -12367,73 +12355,52 @@ ${sys}
             generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
           })
         });
-        console.log('📡 Gemini response status:', r.status);
         const d = await r.json();
-        if (d.error) {
-          console.error('❌ Gemini API error:', d.error);
-          if (d.error.message && d.error.message.includes('quota')) throw new Error('Gemini: Quota superata. Vai su aistudio.google.com per aumentare il limite o usa un\'altra chiave.');
-          throw new Error('Gemini: ' + JSON.stringify(d.error));
-        }
+        if (d.error) throw new Error('Gemini: ' + (d.error.message || JSON.stringify(d.error)));
         return d.candidates[0].content.parts[0].text;
-      } catch (e) { throw new Error('Gemini non disponibile: ' + e.message); }
-    }
-
-    if (currentProv === 'openrouter') {
-      const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + GROQ_KEY },
-        body: JSON.stringify({
-          model: 'meta-llama/llama-3.1-8b-instruct:free',
-          max_tokens: 1500,
-          messages: [{ role: 'system', content: masterPrompt }, ...enhancedMessages]
-        })
-      });
-      const d = await r.json();
-      if (d.error) throw new Error(typeof d.error === 'string' ? d.error : d.error.message);
-      return d.choices[0].message.content;
-    }
-
-    if (currentProv === 'deepseek') {
-      try {
+      }
+      if (name === 'deepseek') {
         const r = await proxyFetch('https://api.deepseek.com/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (localStorage.getItem('deepseek_key') || '') },
           body: JSON.stringify({
-            model: 'deepseek-chat',
-            max_tokens: 1500,
+            model: 'deepseek-chat', max_tokens: 1500,
             messages: [{ role: 'system', content: masterPrompt }, ...enhancedMessages]
           })
         });
         const d = await r.json();
-        if (d.error) throw new Error(d.error.message);
+        if (d.error) throw new Error('DeepSeek: ' + d.error.message);
         return d.choices[0].message.content;
-      } catch (e) {
-        throw new Error('DeepSeek errore: ' + e.message);
       }
-    }
-
-    if (currentProv === 'grok') {
-      try {
+      if (name === 'grok') {
         const grokKey = localStorage.getItem('grok_key');
-        if (!grokKey) throw new Error('Grok: chiave API mancante. Inseriscila nelle impostazioni.');
+        if (!grokKey) throw new Error('Grok: chiave API mancante');
         const r = await proxyFetch('https://api.x.ai/v1/chat/completions', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + grokKey },
           body: JSON.stringify({
-            model: 'grok-2-1212',
-            max_tokens: 1500,
+            model: 'grok-2-1212', max_tokens: 1500,
             messages: [{ role: 'system', content: masterPrompt }, ...enhancedMessages]
           })
         });
         const d = await r.json();
-        if (d.error) throw new Error(d.error.message);
+        if (d.error) throw new Error('Grok: ' + d.error.message);
         return d.choices[0].message.content;
+      }
+      throw new Error('Provider sconosciuto: ' + name);
+    };
+
+    const fallbackOrder = [...new Set([currentProv, 'groq', 'gemini', 'deepseek', 'grok'])];
+    let lastError;
+    for (const name of fallbackOrder) {
+      try {
+        return await tryProvider(name);
       } catch (e) {
-        throw new Error('Grok errore: ' + e.message);
+        console.warn('⚠️ ' + name + ' fallito:', e.message);
+        lastError = e;
       }
     }
-
-    throw new Error('Provider non valido');
+    throw lastError || new Error('Nessun provider AI disponibile');
   };
 }
 
