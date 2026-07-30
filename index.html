@@ -23799,7 +23799,7 @@ function StudySessionsModal({onClose, toast}) {
 
 
 // - NOTES PAGE -
-function NotesPage({onClose, toast}) {
+function NotesPage({onClose, toast, fullScreen}) {
   const {notes, addNote, updateNote, delNote} = useContext(DataCtx);
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState(null);
@@ -23809,7 +23809,7 @@ function NotesPage({onClose, toast}) {
   const [confirmDel, setConfirmDel] = useState(null);
   const [pinnedIds, setPinnedIds] = useState(()=>{try{return JSON.parse(localStorage.getItem('pinnedNotes')||'[]');}catch(e){return [];}});
   const [mobileView, setMobileView] = useState('list');
-  const [isMobile, setIsMobile] = useState(()=>window.innerWidth<=768);
+  const [isMobile, setIsMobile] = useState(()=>window.innerWidth<768);
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const titleRef = useRef(null);
@@ -23819,7 +23819,7 @@ function NotesPage({onClose, toast}) {
   const cameraInputRef = useRef(null);
 
   useEffect(()=>{
-    const check=()=>setIsMobile(window.innerWidth<=768);
+    const check=()=>setIsMobile(window.innerWidth<768);
     window.addEventListener('resize',check);
     return()=>window.removeEventListener('resize',check);
   },[]);
@@ -24010,7 +24010,7 @@ function NotesPage({onClose, toast}) {
   );
 
   return (
-    <div style={{position:'fixed',inset:0,zIndex:99999,background:'var(--bg)',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+    <div style={fullScreen?{position:'fixed',inset:0,zIndex:99999,background:'var(--bg)',display:'flex',flexDirection:'column',overflow:'hidden'}:{background:'var(--bg)',display:'flex',flexDirection:'column',overflow:'hidden',height:'100%',width:'100%'}}>
 
       {/* Header */}
       <div style={{padding:'12px 20px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',gap:12,flexShrink:0,background:'var(--surface)',zIndex:10}}>
@@ -26274,6 +26274,8 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
   const {notifList,notifOpen,setNotifOpen,unread,markAllRead,addNotif} = useNotifications(events,birthdays);
   const [syncPending, setSyncPending] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
+  const [mw,setMw]=useState(window.innerWidth);
+  useEffect(()=>{const h=()=>setMw(window.innerWidth);window.addEventListener('resize',h);return()=>window.removeEventListener('resize',h)},[]);
   
   // Listen for sync events
   useEffect(() => {
@@ -28012,7 +28014,7 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
                 <div className="noise-overlay"/>
         <div className="grid-overlay"/>
         <div className="section-bg" key={tab}>
-          <div className="orb-a" style={{width:480,height:480,background:bg.a,cssText:bg.ap,...Object.fromEntries(bg.ap.split(';').filter(Boolean).map(s=>[s.split(':')[0].trim(),s.split(':')[1].trim()]))}}/>
+          <div className="orb-a" style={{width:480,height:480,background:bg.a,...Object.fromEntries(bg.ap.split(';').filter(Boolean).map(s=>[s.split(':')[0].trim(),s.split(':')[1].trim()]))}}/>
           <div className="orb-b" style={{width:380,height:380,background:bg.b,...Object.fromEntries(bg.bp.split(';').filter(Boolean).map(s=>[s.split(':')[0].trim(),s.split(':')[1].trim()]))}}/>
           <div className="orb-c" style={{width:240,height:240,background:bg.c,...Object.fromEntries(bg.cp.split(';').filter(Boolean).map(s=>[s.split(':')[0].trim(),s.split(':')[1].trim()]))}}/>
         </div>
@@ -28226,10 +28228,11 @@ function AppInner({user,tab,setTab,toast,callAI,apiKeys,setApiKeys,prov,setProv,
              {tab==='games'&&<GamesTab toast={toast}/>}
              {tab==='stats'&&<StatsTab toast={toast}/>}
              {tab==='settings'&&<SettingsTab toast={toast} user={user}/>}
-             {tab==='profile'&&<ProfileTab user={user} toast={toast}/>}
-           </div>
-        </div>
-        {notesOpen && <NotesPage onClose={()=>setNotesOpen(false)} toast={toast}/>}
+              {tab==='profile'&&<ProfileTab user={user} toast={toast}/>}
+              {notesOpen && mw >= 768 && <NotesPage onClose={()=>setNotesOpen(false)} toast={toast} fullScreen={false}/>}
+            </div>
+         </div>
+         {notesOpen && mw < 768 && <NotesPage onClose={()=>setNotesOpen(false)} toast={toast} fullScreen={true}/>}
         <div className={`notif-drawer${notifOpen?' open':''}`}>
           <div className="notif-drawer-head">
             <span>Notifiche</span>
