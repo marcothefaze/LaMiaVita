@@ -1,7 +1,7 @@
 {
   "name": "LaMiaVita",
   "short_name": "LaMiaVita",
-  "start_url": "/LaMiaVita/",
+  "start_url": "/LaMiaVita/?src=app",
   "scope": "/LaMiaVita/",
   "id": "/LaMiaVita/",
   "display": "standalone",
