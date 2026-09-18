@@ -29307,12 +29307,33 @@ html body #root .app .main .content > div {
 }
 </style>
 <script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    regs.forEach(r => r.unregister());
-    navigator.serviceWorker.register('/LaMiaVita/sw.js?v=2.6').then(reg => reg.update());
+(function(){
+  var V='2.7';
+  function badge(){
+    try{
+      if(window.innerWidth>900) return;
+      if(document.getElementById('lmv-badge')) return;
+      var d=document.createElement('div');
+      d.id='lmv-badge';
+      d.textContent='build '+V;
+      d.setAttribute('title','LaMiaVita build '+V);
+      d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:2147483646;font:600 9px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:.3px;color:#fff;background:rgba(244,63,94,.9);padding:2px 7px;border-radius:8px;pointer-events:none;opacity:.9';
+      document.body.appendChild(d);
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',badge); else badge();
+  if(!('serviceWorker' in navigator)) return;
+  var hadController=!!navigator.serviceWorker.controller, reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(hadController && !reloaded){ reloaded=true; location.reload(); }
   });
-}
+  navigator.serviceWorker.register('/LaMiaVita/sw.js?v='+V,{updateViaCache:'none'})
+    .then(function(reg){ try{ reg.update(); }catch(e){} })
+    .catch(function(){});
+  if(window.caches && caches.keys){
+    caches.keys().then(function(ks){ ks.forEach(function(k){ if(k!=='lamyavita-v2.7') caches.delete(k); }); });
+  }
+})();
 </script>
 </body>
 </html>
