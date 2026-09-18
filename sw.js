@@ -1,10 +1,14 @@
-const CACHE_NAME = 'lamyavita-v2.7';
+const CACHE_NAME = 'lamyavita-v2.8';
 const urlsToCache = ['/LaMiaVita/', '/LaMiaVita/index.html'];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.all(urlsToCache.map(u =>
+        cache.add(u).catch(() => {})
+      ))
+    )
   );
 });
 
