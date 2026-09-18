@@ -1,0 +1,24 @@
+{
+  "name": "LaMiaVita",
+  "short_name": "LaMiaVita",
+  "start_url": "/LaMiaVita/",
+  "scope": "/LaMiaVita/",
+  "id": "/LaMiaVita/",
+  "display": "standalone",
+  "background_color": "#080B14",
+  "theme_color": "#FF4D6D",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/6JYFJ2hQ/un-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg",
+      "sizes": "512x512",
+      "type": "image/jpg",
+      "purpose": "any"
+    },
+    {
+      "src": "https://i.ibb.co/6JYFJ2hQ/un-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg",
+      "sizes": "192x192",
+      "type": "image/jpg",
+      "purpose": "any"
+    }
+  ]
+}

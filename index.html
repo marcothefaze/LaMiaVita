@@ -23,7 +23,7 @@
 <link rel="apple-touch-icon-precomposed" href="https://i.ibb.co/6JYFJ2hQ/un-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg">
 
 <!-- Web App Manifest -->
-<link rel="manifest" href="data:application/json,%7B%22name%22%3A%22LaMiaVita%22%2C%22short_name%22%3A%22LaMiaVita%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23080B14%22%2C%22theme_color%22%3A%22%23FF4D6D%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fi.ibb.co%2F6JYFJ2hQ%2Fun-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fjpg%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22https%3A%2F%2Fi.ibb.co%2F6JYFJ2hQ%2Fun-logo-per-un-app-di-utilita-e-gestione-chiamata-la-mia-vita-rappresentato-da-una-cangura-visibil.jpg%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fjpg%22%2C%22purpose%22%3A%22any%22%7D%5D%7D">
+<link rel="manifest" href="/LaMiaVita/manifest.json">
 
 <meta name="og:title" content="LaMiaVita">
 <meta name="og:description" content="La tua vita in un posto solo">
@@ -130,7 +130,7 @@ body[class*="bg-pattern-"] .orb-c{display:none}
 .ltab.active{background:var(--surface2);color:var(--text)}
 .lerr{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);border-radius:10px;padding:10px 14px;font-size:.82rem;color:var(--red);margin-bottom:12px}
 
-.app{display:flex;height:100vh;height:100dvh;width:100%;max-width:100%;position:relative;z-index:1;overflow:hidden;contain:layout style}
+.app{display:flex;position:fixed;top:0;left:0;right:0;bottom:0;height:auto;width:100%;max-width:100%;z-index:1;overflow:hidden;contain:layout style}
 .sb{width:72px;background:linear-gradient(180deg,#0E1220 0%,#0a0e1a 100%);border-right:1px solid rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:2px;flex-shrink:0;transition:width .3s cubic-bezier(.4,0,.2,1);overflow:hidden;position:relative;z-index:10;box-shadow:4px 0 20px rgba(0,0,0,.3);contain:layout style}
 .sb.exp{width:230px}
 .sb-top{display:flex;align-items:center;justify-content:center;width:100%;margin-bottom:16px;padding:0 14px;min-height:56px;gap:10px}
@@ -29290,10 +29290,10 @@ html body #root .app .main .content > div {
   }
 }
 
-/* Browser senza supporto 100dvh (iOS vecchio o Android): app = 100% della schermata visibile */
+/* Browser senza supporto 100dvh (iOS vecchio o Android): app ancorata a tutto lo schermo */
 @supports not (height: 100dvh) {
   html, body, #root { height: 100% !important; min-height: 0 !important; }
-  .app { height: 100% !important; min-height: 0 !important; }
+  .app { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; height: auto !important; }
 }
 </style>
 <script>
