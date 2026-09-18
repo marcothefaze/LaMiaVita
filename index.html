@@ -50,6 +50,10 @@ window.onSpotifyWebPlaybackSDKReady = function() {
   window._spotifySDKLoaded = true;
   if(window._spotifyInitCallback) window._spotifyInitCallback();
 };
+// Safari su iPhone non ha le Web API di notifica: shim per non bloccare le pagine
+if (typeof Notification === 'undefined') {
+  window.Notification = { permission: 'default', requestPermission: function(){ return Promise.resolve('default'); } };
+}
 </script>
 <script src="https://sdk.scdn.co/spotify-player.js" async onerror="window._spotifySDKErr=true"></script>
 <style>
