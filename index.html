@@ -29296,7 +29296,7 @@ html body #root .app .main .content > div {
 if('serviceWorker' in navigator){
   navigator.serviceWorker.getRegistrations().then(regs => {
     regs.forEach(r => r.unregister());
-    navigator.serviceWorker.register('/LaMiaVita/sw.js?v=2.6');
+    navigator.serviceWorker.register('/LaMiaVita/sw.js?v=2.6').then(reg => reg.update());
   });
 }
 </script>
