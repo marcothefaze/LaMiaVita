@@ -1,5 +1,5 @@
 const CACHE_NAME = 'lamyavita-v2.5';
-const urlsToCache = ['/LaMiaVita/'];
+const urlsToCache = ['/LaMiaVita/', '/LaMiaVita/index.html'];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -19,10 +19,24 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request).then(response => {
-      const clone = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-      return response;
-    }).catch(() => caches.match(event.request))
+    caches.match(event.request)
+      .then(cachedResponse => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(event.request)
+          .then(response => {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, responseToCache));
+            return response;
+          })
+      })
+      .catch(error => {
+        console.error('Fetching failed:', error);
+        return new Response('<h1>Offline</h1>', {
+          headers: { 'Content-Type': 'text/html' }
+        });
+      })
   );
 });
