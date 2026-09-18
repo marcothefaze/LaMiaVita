@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lamyavita-v2.5';
+const CACHE_NAME = 'lamyavita-v2.6';
 const urlsToCache = ['/LaMiaVita/', '/LaMiaVita/index.html'];
 
 self.addEventListener('install', event => {
@@ -18,25 +18,43 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  const { request } = event;
+  
+  // Per l'HTML/navigazioni usa NETWORK-FIRST:
+  // serve SEMPRE la versione fresca da GitHub (mai quella vecchia in cache),
+  // e ricade sulla cache solo se offline.
+  if (request.mode === 'navigate' ||
+      (request.method === 'GET' && request.headers.get('accept') && request.headers.get('accept').includes('text/html'))) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
+          return response;
+        })
+        .catch(() =>
+          caches.match(request).catch(() => caches.match('/LaMiaVita/'))
+        )
+    );
+    return;
+  }
+
+  // Per le altre risorse statiche usa CACHE-FIRST per la velocita',
+  // con aggiornamento in background.
   event.respondWith(
-    caches.match(event.request)
+    caches.match(request)
       .then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(event.request)
+        const fetchPromise = fetch(request)
           .then(response => {
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => cache.put(event.request, responseToCache));
+            if (response && response.ok && request.method === 'GET' &&
+                (response.type === 'basic' || response.type === 'cors')) {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME).then(cache => cache.put(request, responseToCache));
+            }
             return response;
           })
-      })
-      .catch(error => {
-        console.error('Fetching failed:', error);
-        return new Response('<h1>Offline</h1>', {
-          headers: { 'Content-Type': 'text/html' }
-        });
+          .catch(() => cachedResponse);
+        return cachedResponse || fetchPromise;
       })
   );
 });
