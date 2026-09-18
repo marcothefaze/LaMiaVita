@@ -58,7 +58,7 @@ window.onSpotifyWebPlaybackSDKReady = function() {
 img[src*="ibb.co"],img[src*="imgur.com"]{border:none;outline:none;background:transparent;image-rendering:-webkit-optimize-contrast}
 :root{--bg:#0A0E1A;--surface:#111827;--surface2:#1A2332;--surface3:#1F2937;--border:rgba(255,255,255,.08);--text:#F3F4F6;--text2:#B0B7C4;--text3:#6B7280;--red:#F43F5E;--yellow:#FBBF24;--green:#10B981;--blue:#06B6D4;--purple:#8B5CF6;--pink:#EC4899;--accent:#F43F5E;--accent2:#F97316;--g1:linear-gradient(135deg,var(--accent),var(--accent2));--g2:linear-gradient(135deg,#06B6D4,#10B981);--g3:linear-gradient(135deg,#8B5CF6,#06B6D4);--g4:linear-gradient(135deg,#FBBF24,#F97316);--g5:linear-gradient(135deg,#EC4899,#8B5CF6);--g6:linear-gradient(135deg,#8B5CF6,#EC4899);--r:12px;--r2:16px;--font-main:Inter,sans-serif;--radius:12px;--radius2:16px;--shadow:0 4px 24px rgba(0,0,0,.4);--shadow-lg:0 8px 48px rgba(0,0,0,.5);--shadow-glow:0 0 30px rgba(244,63,94,.15);--btn-radius:10px;--card-radius:16px;--card-radius-v2:24px;--shadow-card:0 8px 32px rgba(0,0,0,.4);--shadow-card-hover:0 12px 48px rgba(0,0,0,.5),0 0 30px rgba(139,92,246,.15);--orange:#F97316;--content-pad:20px}}
 :root.light{--bg:#F8FAFC;--surface:#FFFFFF;--surface2:#F1F5F9;--surface3:#E2E8F0;--border:rgba(0,0,0,.06);--text:#0F172A;--text2:#64748B;--text3:#94A3B8;--red:#E11D48;--yellow:#D97706;--green:#059669;--blue:#0891B2;--purple:#7C3AED;--pink:#DB2777;--accent:#E11D48;--accent2:#EA580C}
-html,body,#root{height:100%;overflow:hidden;min-height:100vh}
+html,body,#root{height:100%;overflow:hidden}
 body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 *{font-family:inherit}
 button,span,div,p{font-family:inherit}
@@ -29264,6 +29264,32 @@ html body #root .app .main .content > div {
   display: block !important;
   min-height: 0 !important;
 }
+}
+
+/* SAFE AREA fix (notch + home indicator): topbar/nav riempono la barra del telefono, niente strisce nere */
+@media (max-width: 768px) {
+  html, body, #root { background: var(--bg) !important; }
+  .app { background: var(--bg) !important; }
+  .topbar, body.lmv-v2 .topbar {
+    height: calc(52px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+  }
+  .bottom-nav, body.lmv-v2 .bottom-nav {
+    height: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+  }
+  .content, body.lmv-v2 .content {
+    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .quick-create-fab, body.lmv-v2 .quick-create-fab {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* Browser senza supporto 100dvh (iOS vecchio o Android): app = 100% della schermata visibile */
+@supports not (height: 100dvh) {
+  html, body, #root { height: 100% !important; min-height: 0 !important; }
+  .app { height: 100% !important; min-height: 0 !important; }
 }
 </style>
 <script>
