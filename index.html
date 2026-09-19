@@ -29288,7 +29288,14 @@ html body #root .app .main .content > div {
   }
   .bottom-nav, body.lmv-v2 .bottom-nav {
     height: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
-    padding-bottom: max(env(safe-area-inset-bottom, 0px) - 16px, 8px) !important;
+    padding-bottom: max(env(safe-area-inset-bottom, 0px) - 16px, 6px) !important;
+  }
+  .bottom-nav-item svg, .bottom-nav-item img {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  .bottom-nav-item span {
+    font-size: .74rem !important;
   }
   .mobile-menu, body.lmv-v2 .mobile-menu {
     padding-top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
@@ -29309,7 +29316,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='3.0';
+  var V='3.1';
   function badge(){
     try{
       if(window.innerWidth>900) return;
@@ -29339,8 +29346,11 @@ html body #root .app .main .content > div {
       var it=probe('t'), ib=probe('b');
       var sh=(window.screen&&window.screen.height)||0, ih=window.innerHeight||0;
       var gapB=(sh&&ih)?Math.max(0, sh-ih-(it>0?0:Math.max(it,47))):0;
+      if(ih>=800) gapB=Math.max(gapB,34);
       var padT=it>0?(it+10):10;
-      var padB=Math.max((ib||0)-16,8);
+      var padB=Math.max((ib||0)-16,6);
+      var a=document.querySelector('.app');
+      if(a&&gapB>0){ a.style.setProperty('bottom',(-gapB)+'px','important'); }
       var t=document.querySelector('.topbar');
       if(t){
         t.style.setProperty('height',(52+padT)+'px','important');
@@ -29362,7 +29372,7 @@ html body #root .app .main .content > div {
       if(mm){ mm.style.setProperty('padding-top',padT+'px','important'); }
     }catch(e){}
   }
-  var tries=0, iv=setInterval(function(){ enforce(); if(++tries>20) clearInterval(iv); },600);
+  setInterval(function(){ enforce(); },600);
   window.addEventListener('load',function(){ enforce(); });
 })();
 </script>
