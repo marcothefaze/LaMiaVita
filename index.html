@@ -29283,12 +29283,15 @@ html body #root .app .main .content > div {
     background: var(--bg) !important;
   }
   .topbar, body.lmv-v2 .topbar {
-    height: calc(52px + env(safe-area-inset-top, 0px)) !important;
-    padding-top: env(safe-area-inset-top, 0px) !important;
+    height: calc(52px + env(safe-area-inset-top, 0px) + 10px) !important;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
   }
   .bottom-nav, body.lmv-v2 .bottom-nav {
     height: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
-    padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    padding-bottom: max(env(safe-area-inset-bottom, 0px) - 16px, 8px) !important;
+  }
+  .mobile-menu, body.lmv-v2 .mobile-menu {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 10px) !important;
   }
   .content, body.lmv-v2 .content {
     padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
@@ -29306,7 +29309,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='2.9';
+  var V='3.0';
   function badge(){
     try{
       if(window.innerWidth>900) return;
@@ -29334,23 +29337,29 @@ html body #root .app .main .content > div {
     try{
       if(window.innerWidth>768) return;
       var it=probe('t'), ib=probe('b');
+      var sh=(window.screen&&window.screen.height)||0, ih=window.innerHeight||0;
+      var gapB=(sh&&ih)?Math.max(0, sh-ih-(it>0?0:Math.max(it,47))):0;
+      var padT=it>0?(it+10):10;
+      var padB=Math.max((ib||0)-16,8);
       var t=document.querySelector('.topbar');
       if(t){
-        t.style.setProperty('height',(52+it)+'px','important');
-        t.style.setProperty('padding-top',it+'px','important');
+        t.style.setProperty('height',(52+padT)+'px','important');
+        t.style.setProperty('padding-top',padT+'px','important');
         t.style.setProperty('box-sizing','border-box','important');
       }
       var n=document.querySelector('.bottom-nav');
       if(n){
         n.style.setProperty('position','fixed','important');
-        n.style.setProperty('bottom','0','important');
+        n.style.setProperty('bottom',(-gapB)+'px','important');
         n.style.setProperty('left','0','important');
         n.style.setProperty('right','0','important');
-        n.style.setProperty('height',(68+ib)+'px','important');
-        n.style.setProperty('padding-bottom',ib+'px','important');
+        n.style.setProperty('height',(68+padB+gapB)+'px','important');
+        n.style.setProperty('padding-bottom',padB+'px','important');
         n.style.setProperty('box-sizing','border-box','important');
         n.style.setProperty('z-index','9999','important');
       }
+      var mm=document.querySelector('.mobile-menu');
+      if(mm){ mm.style.setProperty('padding-top',padT+'px','important'); }
     }catch(e){}
   }
   var tries=0, iv=setInterval(function(){ enforce(); if(++tries>20) clearInterval(iv); },600);
