@@ -8425,9 +8425,7 @@ body.lmv-v2 .v2-logo {
   <style>@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)};@keyframes pulse{0%,100%{opacity:.8}50%{opacity:1}}</style>
 </div>
 <div id="root"></div>
-
-
-
+<script>
 // ========== OFFLINE MODE & PUSH NOTIFICATIONS ==========
 
 // Online/Offline detection
@@ -29308,7 +29306,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='2.8';
+  var V='2.9';
   function badge(){
     try{
       if(window.innerWidth>900) return;
@@ -29322,11 +29320,41 @@ html body #root .app .main .content > div {
     }catch(e){}
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',badge); else badge();
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.getRegistrations().then(function(regs){
-      regs.forEach(function(r){ try{ r.update(); }catch(e){} });
-    }).catch(function(){});
+  function probe(kind){
+    try{
+      var d=document.createElement('div');
+      d.style.cssText='position:fixed;left:-10px;width:1px;top:0;visibility:hidden;pointer-events:none;height:'+(kind==='t'?'env(safe-area-inset-top)':'env(safe-area-inset-bottom)')+';';
+      (document.body||document.documentElement).appendChild(d);
+      var v=d.getBoundingClientRect().height;
+      d.parentNode&&d.parentNode.removeChild(d);
+      return Math.max(0,Math.round(v));
+    }catch(e){return 0;}
   }
+  function enforce(){
+    try{
+      if(window.innerWidth>768) return;
+      var it=probe('t'), ib=probe('b');
+      var t=document.querySelector('.topbar');
+      if(t){
+        t.style.setProperty('height',(52+it)+'px','important');
+        t.style.setProperty('padding-top',it+'px','important');
+        t.style.setProperty('box-sizing','border-box','important');
+      }
+      var n=document.querySelector('.bottom-nav');
+      if(n){
+        n.style.setProperty('position','fixed','important');
+        n.style.setProperty('bottom','0','important');
+        n.style.setProperty('left','0','important');
+        n.style.setProperty('right','0','important');
+        n.style.setProperty('height',(68+ib)+'px','important');
+        n.style.setProperty('padding-bottom',ib+'px','important');
+        n.style.setProperty('box-sizing','border-box','important');
+        n.style.setProperty('z-index','9999','important');
+      }
+    }catch(e){}
+  }
+  var tries=0, iv=setInterval(function(){ enforce(); if(++tries>20) clearInterval(iv); },600);
+  window.addEventListener('load',function(){ enforce(); });
 })();
 </script>
 </body>
