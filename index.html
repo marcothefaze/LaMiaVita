@@ -9293,17 +9293,7 @@ function PwTab({toast, setNotesOpen}) {
           </div>
         ))}
       </>}
-      {sub==='notes'&&<div>
-        <div style={{textAlign:'center',padding:'60px 20px'}}>
-          <div style={{fontSize:'3rem',marginBottom:16,opacity:.4}}>📝</div>
-          <div style={{fontWeight:700,fontSize:'1.1rem',color:'var(--text2)',marginBottom:8}}>Le tue note</div>
-          <div style={{fontSize:'.85rem',color:'var(--text3)',marginBottom:24}}>Gestisci le tue note in vista completa</div>
-          <button onClick={()=>setNotesOpen(true)} style={{background:'var(--accent)',color:'#fff',border:'none',borderRadius:12,padding:'12px 28px',fontSize:'.9rem',fontWeight:700,cursor:'pointer',fontFamily:'inherit'}}>
-            📝 Apri Note
-          </button>
-          <div style={{marginTop:12,fontSize:'.75rem',color:'var(--text3)'}}>{notes.length} note salvate</div>
-        </div>
-      </div>}
+      {sub==='notes'&&<NotesPage onClose={()=>setNotesOpen(false)} toast={toast} fullScreen={false}/>}
       <Modal open={mod==='pw'} onClose={()=>setMod(null)} title="🔐 Nuova Password" footer={<><button className="btn bg" onClick={()=>setMod(null)}>Annulla</button><button className="btn br" onClick={savePw}>Salva</button></>}>
         <div className="fl"><label>Servizio</label><input className="field" placeholder="Gmail, Netflix..." value={pf.svc} onChange={e=>setPf(f=>({...f,svc:e.target.value}))}/></div>
         <div className="fl"><label>Utente / Email</label><input className="field" placeholder="mario@example.com" value={pf.usr} onChange={e=>setPf(f=>({...f,usr:e.target.value}))}/></div>
@@ -29265,6 +29255,9 @@ html body #root .app .main .content .fi2 > * {
 html body #root .app .main .content > div {
   display: block !important;
   min-height: 0 !important;
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 }
 
@@ -29316,7 +29309,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='3.2';
+  var V='3.3';
   function badge(){
     try{
       if(window.innerWidth>900) return;
@@ -29348,7 +29341,7 @@ html body #root .app .main .content > div {
       var gapB=(sh&&ih)?Math.max(0, sh-ih-(it>0?0:Math.max(it,47))):0;
       if(ih>=800) gapB=Math.max(gapB,34);
       var padT=it>0?(it+10):10;
-      var padB=Math.max((ib||0)-16,14);
+      var padB=gapB>0?34:Math.max((ib||0)-16,14);
       var a=document.querySelector('.app');
       if(a&&gapB>0){ a.style.setProperty('bottom',(-gapB)+'px','important'); }
       var t=document.querySelector('.topbar');
@@ -29360,10 +29353,10 @@ html body #root .app .main .content > div {
       var n=document.querySelector('.bottom-nav');
       if(n){
         n.style.setProperty('position','fixed','important');
-        n.style.setProperty('bottom','0','important');
+        n.style.setProperty('bottom',(-gapB)+'px','important');
         n.style.setProperty('left','0','important');
         n.style.setProperty('right','0','important');
-        n.style.setProperty('height',(68+padB)+'px','important');
+        n.style.setProperty('height',(68+padB+gapB)+'px','important');
         n.style.setProperty('padding-bottom',padB+'px','important');
         n.style.setProperty('box-sizing','border-box','important');
         n.style.setProperty('z-index','9999','important');
