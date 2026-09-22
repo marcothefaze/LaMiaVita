@@ -24154,6 +24154,8 @@ function StatsTab({toast}) {
   const todos = data?.todos || todoItems;
   const [docs, setDocs] = useState([]);
   const [sessionsOpen, setSessionsOpen] = useState(false);
+  const [advOpen, setAdvOpen] = useState(false);
+  const [advPage, setAdvPage] = useState(0);
   useEffect(()=>{window._idb.getAll('docs').then(d=>setDocs(d)).catch(()=>setDocs([]));},[]);
   
   // Study data from pom_log — live updated
@@ -24228,7 +24230,10 @@ function StatsTab({toast}) {
       <div className="card" style={{marginBottom:16,background:'linear-gradient(135deg,rgba(16,185,129,.08),rgba(6,214,160,.04))',border:'1px solid rgba(16,185,129,.15)',padding:'20px'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
           <div style={{fontWeight:700,fontSize:'1rem'}}>📚 Ore di studio</div>
-          <button className="btn bs" onClick={()=>setSessionsOpen(true)} style={{fontSize:'.7rem',padding:'3px 10px',background:'rgba(16,185,129,.15)',color:'var(--green)',border:'1px solid rgba(16,185,129,.25)'}}>➕ Aggiungi</button>
+          <div style={{display:'flex',gap:6}}>
+            <button className="btn bs" onClick={()=>setSessionsOpen(true)} style={{fontSize:'.7rem',padding:'3px 10px',background:'rgba(16,185,129,.15)',color:'var(--green)',border:'1px solid rgba(16,185,129,.25)'}}>➕ Aggiungi</button>
+            <button className="btn bs" onClick={()=>{setAdvPage(0);setAdvOpen(true);}} style={{fontSize:'.7rem',padding:'3px 10px',background:'rgba(139,92,246,.15)',color:'var(--purple)',border:'1px solid rgba(139,92,246,.25)'}}>📊 Avanzate</button>
+          </div>
         </div>
         <div style={{display:'flex',gap:24,marginTop:10}}>
           <div style={{display:'flex',alignItems:'baseline',gap:6}}>
@@ -24259,6 +24264,56 @@ function StatsTab({toast}) {
         ))}
       </div>
       {sessionsOpen && <StudySessionsModal onClose={() => setSessionsOpen(false)} toast={toast}/>}
+      {advOpen && (()=>{
+        const DAYS=14;
+        const now=new Date();
+        const days=[];
+        for(let i=advPage*DAYS;i<(advPage+1)*DAYS;i++){
+          const d=new Date(now); d.setDate(d.getDate()-i);
+          const ds=d.toISOString().split('T')[0];
+          const study=studyLog.filter(e=>e.date===ds&&e.type==='work').reduce((s,e)=>s+(e.duration||25),0);
+          const tasksC=(todos||[]).filter(t=>(t.createdAt||'').split('T')[0]===ds).length;
+          const tasksD=(todos||[]).filter(t=>t.done&&(t.createdAt||'').split('T')[0]===ds).length;
+          const notesC=(notes||[]).filter(n=>(n.createdAt||'').split('T')[0]===ds).length;
+          const evs=(events||[]).filter(e=>(e.date||'').split('T')[0]===ds).length;
+          const rems=((data&&data.reminders)||[]).filter(r=>(r.date||'')===ds).length;
+          days.push({ds,d,study,tasksC,tasksD,notesC,evs,rems});
+        }
+        return(
+        <div style={{position:'fixed',inset:0,zIndex:999998,background:'var(--bg)',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+          <div style={{padding:'14px 20px',borderBottom:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,gap:8}}>
+            <div style={{fontWeight:700,fontSize:'1.05rem',whiteSpace:'nowrap'}}>📊 Analisi Avanzate</div>
+            <div style={{display:'flex',gap:6,alignItems:'center',flexShrink:0}}>
+              <button className="btn bs" onClick={()=>setAdvPage(p=>Math.max(0,p-1))} disabled={advPage===0} style={{opacity:advPage===0?.4:1}}>‹</button>
+              <span style={{fontSize:'.72rem',color:'var(--text2)',whiteSpace:'nowrap'}}>{advPage===0?'Oggi':(-advPage*DAYS+1)+'-'+(-advPage*DAYS+DAYS)+' gg fa'}</span>
+              <button className="btn bs" onClick={()=>setAdvPage(p=>p+1)}>›</button>
+              <div className="ib" onClick={()=>setAdvOpen(false)}>✕</div>
+            </div>
+          </div>
+          <div style={{flex:1,overflowY:'auto',WebkitOverflowScrolling:'touch',padding:16,paddingBottom:'calc(40px + env(safe-area-inset-bottom,0px))'}}>
+            {days.map(x=>(
+              <div key={x.ds} style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:12,padding:'10px 14px',marginBottom:8,display:'flex',flexDirection:'column',gap:6}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                  <div style={{fontWeight:700,fontSize:'.9rem'}}>{x.d.toLocaleDateString('it-IT',{weekday:'short',day:'numeric',month:'short'})}{x.ds===todayStr?' · oggi':''}</div>
+                  {(x.study>0||x.tasksC>0||x.notesC>0||x.evs>0||x.rems>0)?<span style={{fontSize:'.65rem',padding:'2px 8px',borderRadius:8,background:'rgba(6,214,160,.12)',color:'var(--green)'}}>attivo</span>:<span style={{fontSize:'.65rem',padding:'2px 8px',borderRadius:8,background:'rgba(255,255,255,.05)',color:'var(--text2)'}}>—</span>}
+                </div>
+                <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+                  <span style={{fontSize:'.78rem',color:'var(--green)',fontWeight:600}}>📚 {Math.floor(x.study/60)}h {x.study%60}m</span>
+                  <span style={{fontSize:'.78rem',color:'var(--text2)'}}>✅ {x.tasksD}/{x.tasksC}</span>
+                  <span style={{fontSize:'.78rem',color:'var(--yellow)'}}>📝 {x.notesC}</span>
+                  <span style={{fontSize:'.78rem',color:'var(--blue)'}}>📅 {x.evs}</span>
+                  <span style={{fontSize:'.78rem',color:'var(--purple)'}}>🔔 {x.rems}</span>
+                </div>
+              </div>
+            ))}
+            <div style={{textAlign:'center',padding:'10px 0 4px',display:'flex',gap:10,justifyContent:'center',alignItems:'center'}}>
+              <button className="btn bs" onClick={()=>setAdvPage(p=>Math.max(0,p-1))} disabled={advPage===0} style={{opacity:advPage===0?.4:1}}>‹ Precedenti</button>
+              <button className="btn bs" onClick={()=>setAdvPage(p=>p+1)}>Successivi ›</button>
+            </div>
+          </div>
+        </div>
+        );
+      })()}
     </div>
   );
 }
@@ -29309,7 +29364,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='3.3';
+  var V='3.4';
   function badge(){
     try{
       if(window.innerWidth>900) return;
