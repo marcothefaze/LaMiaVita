@@ -29301,7 +29301,6 @@ window._fb = {
       var slot=document.createElement('div');
       slot.style.cssText='display:flex;justify-content:center;min-height:44px';
       box.appendChild(tt);box.appendChild(slot);
-      google.accounts.id.renderButton(slot,{theme:'outline',size:'large',width:280,text:'signin_with'});
       var x=document.createElement('div');
       x.style.cssText='margin-top:16px;color:#5f6368;font:500 14px system-ui;cursor:pointer';
       x.textContent='Annulla';
@@ -29309,6 +29308,7 @@ window._fb = {
       box.appendChild(x);
       ov.onclick=function(e){ if(e.target===ov){ ov.remove(); reject(new Error('annullato')); } };
       document.body.appendChild(ov);
+      google.accounts.id.renderButton(slot,{theme:'outline',size:'large',width:280,text:'signin_with'});
     }catch(e){ reject(e); }
   }),
   signInEmail: (e,p) => auth ? auth.signInWithEmailAndPassword(e,p) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
@@ -29475,7 +29475,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='4.0';
+  var V='4.1';
   function badge(){
     try{
       if(window.innerWidth>900) return;
