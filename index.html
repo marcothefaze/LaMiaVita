@@ -9199,7 +9199,7 @@ function Login({onUser}) {
   const [pwd,setPwd]=useState('');
   const [err,setErr]=useState('');
   const [busy,setBusy]=useState(false);
-  const ERRS={'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata','auth/email-already-in-use':'Email già registrata','auth/weak-password':'Password troppo corta (min 6 caratteri)','auth/invalid-email':'Email non valida','auth/invalid-credential':'Email o password errata'};
+  const ERRS={'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata','auth/email-already-in-use':'Email già registrata','auth/weak-password':'Password troppo corta (min 6 caratteri)','auth/invalid-email':'Email non valida','auth/invalid-credential':'Email o password errata','auth/network-request-failed':'Errore di rete: controlla la connessione e riprova','auth/too-many-requests':'Troppi tentativi: riprova tra qualche minuto','auth/operation-not-allowed':'Accesso con email non abilitato'};
 
   const google=async()=>{setBusy(true);setErr('');try{const r=await window._fb.signInGoogle();onUser(r.user);}catch(e){setErr(e.message);}setBusy(false);};
   const submit=async()=>{
@@ -29364,7 +29364,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='3.4';
+  var V='3.5';
   function badge(){
     try{
       if(window.innerWidth>900) return;

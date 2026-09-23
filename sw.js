@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lamyavita-v2.8';
+const CACHE_NAME = 'lamyavita-v3.5';
 const urlsToCache = ['/LaMiaVita/', '/LaMiaVita/index.html'];
 
 self.addEventListener('install', event => {
@@ -23,6 +23,15 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const { request } = event;
+
+  // BYPASS TOTALE: non intercettare mai Firebase/Google (auth, API, SDK).
+  // La richiesta va alla rete senza respondWith: nessuna interferenza col login.
+  const u = request.url || '';
+  if (u.indexOf('googleapis.com') !== -1 || u.indexOf('gstatic.com') !== -1 ||
+      u.indexOf('firebaseio.com') !== -1 || u.indexOf('firebaseapp.com') !== -1 ||
+      u.indexOf('firebaseinstallations') !== -1 || u.indexOf('accounts.google.com') !== -1) {
+    return;
+  }
   
   // Per l'HTML/navigazioni usa NETWORK-FIRST:
   // serve SEMPRE la versione fresca da GitHub (mai quella vecchia in cache),
