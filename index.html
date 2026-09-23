@@ -9228,7 +9228,27 @@ function Login({onUser}) {
   const [busy,setBusy]=useState(false);
   const ERRS={'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata','auth/email-already-in-use':'Email già registrata','auth/weak-password':'Password troppo corta (min 6 caratteri)','auth/invalid-email':'Email non valida','auth/invalid-credential':'Email o password errata','auth/network-request-failed':'Errore di rete: controlla la connessione e riprova','auth/too-many-requests':'Troppi tentativi: riprova tra qualche minuto','auth/operation-not-allowed':'Accesso con email non abilitato'};
 
-  const google=async()=>{setBusy(true);setErr('');window._ggDbg='click:invio...';try{const r=await window._fb.signInGoogle();window._ggDbg='risultato: user '+(r&&r.user?'SI':'NO');onUser(r&&r.user);}catch(e){window._ggDbg='errore: '+(e&&e.code); setErr(e.message);}setBusy(false);};
+  const google=async()=>{
+    setBusy(true);setErr('');
+    window._ggDbg='click: invio...';
+    try{
+      var standalone=false;
+      try{ standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator&&window.navigator.standalone===true; }catch(e){}
+      var r;
+      if(standalone && window.google && window.google.accounts && window.google.accounts.id){
+        window._ggDbg='mode: bottone integrato';
+        r=await window._fb.ggGIS();
+      } else {
+        r=await window._fb.signInGoogle();
+      }
+      window._ggDbg='risultato: user '+(r&&r.user?'SI':'NO');
+      onUser(r&&r.user);
+    }catch(e){
+      window._ggDbg='errore: '+(e&&e.code||e&&e.message);
+      if(e&&e.message!=='annullato') setErr(e.message);
+    }
+    setBusy(false);
+  };
   const submit=async()=>{
     if(!email||!pwd){setErr('Inserisci email e password');return;}
     setBusy(true);setErr('');
@@ -29255,6 +29275,42 @@ window._fb = {
       return auth.signInWithPopup(gp);
     }catch(e){ return Promise.reject(e); }
   },
+  ggGIS: () => new Promise(function(resolve,reject){
+    try{
+      if(!(window.google&&window.google.accounts&&window.google.accounts.id)) return reject(new Error('Servizi Google non disponibili'));
+      var cid=localStorage.getItem('lmv_gg_client_id')||'14910139571-1qti69l5k1sd08hlf4onu155jl6r4h8g.apps.googleusercontent.com';
+      google.accounts.id.initialize({
+        client_id: cid,
+        callback: function(resp){
+          try{
+            if(!resp||!resp.credential){ window._ggDbg='gis: nessun credential'; return reject(new Error('Nessuna credenziale ricevuta')); }
+            window._ggDbg='gis: credential ok, accesso...';
+            var cred=firebase.auth.GoogleAuthProvider.credential(resp.credential);
+            auth.signInWithCredential(cred).then(function(r){ window._ggDbg='gis: user SI'; resolve(r); })
+              .catch(function(e){ window._ggDbg='gis: ERRORE '+(e&&e.code); reject(e); });
+          }catch(e){ window._ggDbg='gis: ERRORE '+e.message; reject(e); }
+        }
+      });
+      var ov=document.createElement('div');
+      ov.style.cssText='position:fixed;inset:0;z-index:2147483640;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center';
+      var box=document.createElement('div');
+      box.style.cssText='background:#fff;border-radius:16px;padding:28px 30px;max-width:92vw;text-align:center';
+      var tt=document.createElement('div');
+      tt.style.cssText='color:#202124;font:700 16px system-ui;margin-bottom:18px';
+      tt.textContent='Accedi con Google';
+      var slot=document.createElement('div');
+      slot.style.cssText='display:flex;justify-content:center;min-height:44px';
+      box.appendChild(tt);box.appendChild(slot);
+      google.accounts.id.renderButton(slot,{theme:'outline',size:'large',width:280,text:'signin_with'});
+      var x=document.createElement('div');
+      x.style.cssText='margin-top:16px;color:#5f6368;font:500 14px system-ui;cursor:pointer';
+      x.textContent='Annulla';
+      x.onclick=function(){ ov.remove(); reject(new Error('annullato')); };
+      box.appendChild(x);
+      ov.onclick=function(e){ if(e.target===ov){ ov.remove(); reject(new Error('annullato')); } };
+      document.body.appendChild(ov);
+    }catch(e){ reject(e); }
+  }),
   signInEmail: (e,p) => auth ? auth.signInWithEmailAndPassword(e,p) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
   registerEmail: (e,p) => auth ? auth.createUserWithEmailAndPassword(e,p) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
   signOut: () => auth ? auth.signOut() : Promise.resolve(),
@@ -29419,7 +29475,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='3.9';
+  var V='4.0';
   function badge(){
     try{
       if(window.innerWidth>900) return;
