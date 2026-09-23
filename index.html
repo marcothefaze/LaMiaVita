@@ -2166,6 +2166,15 @@ html {
   .card { transform: none !important; contain: layout style; }
 }
 
+/* Performance: speed up on iPad (app installata) */
+@media (min-width: 769px) and (max-width: 1366px) {
+  * { animation-duration: 0.25s !important; transition-duration: 0.15s !important; }
+  .noise-overlay, .grid-overlay { display: none !important; }
+  .orb-a, .orb-b, .orb-c { filter: blur(55px) !important; }
+  .topbar { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .card { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+}
+
 /* Performance: reduce motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -29199,7 +29208,17 @@ const decryptData = async (encrypted, uid) => {
 };
 
 window._fb = {
-  signInGoogle: () => auth ? auth.signInWithPopup(gp) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
+  signInGoogle: () => {
+    if(!auth) return Promise.reject(new Error('Firebase non disponibile, verifica connessione'));
+    try{
+      var standalone=false;
+      try{ standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator&&window.navigator.standalone===true; }catch(e){}
+      if(standalone){
+        return auth.signInWithRedirect(gp).then(function(){return {user:null};});
+      }
+      return auth.signInWithPopup(gp);
+    }catch(e){ return Promise.reject(e); }
+  },
   signInEmail: (e,p) => auth ? auth.signInWithEmailAndPassword(e,p) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
   registerEmail: (e,p) => auth ? auth.createUserWithEmailAndPassword(e,p) : Promise.reject(new Error('Firebase non disponibile, verifica connessione')),
   signOut: () => auth ? auth.signOut() : Promise.resolve(),
@@ -29364,7 +29383,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='3.5';
+  var V='3.6';
   function badge(){
     try{
       if(window.innerWidth>900) return;
@@ -29390,7 +29409,7 @@ html body #root .app .main .content > div {
   }
   function enforce(){
     try{
-      if(window.innerWidth>768) return;
+      if(window.innerWidth>1366) return;
       var it=probe('t'), ib=probe('b');
       var sh=(window.screen&&window.screen.height)||0, ih=window.innerHeight||0;
       var gapB=(sh&&ih)?Math.max(0, sh-ih-(it>0?0:Math.max(it,47))):0;
