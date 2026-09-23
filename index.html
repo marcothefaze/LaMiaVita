@@ -9210,7 +9210,7 @@ function Login({onUser}) {
   const [busy,setBusy]=useState(false);
   const ERRS={'auth/user-not-found':'Account non trovato','auth/wrong-password':'Password errata','auth/email-already-in-use':'Email già registrata','auth/weak-password':'Password troppo corta (min 6 caratteri)','auth/invalid-email':'Email non valida','auth/invalid-credential':'Email o password errata','auth/network-request-failed':'Errore di rete: controlla la connessione e riprova','auth/too-many-requests':'Troppi tentativi: riprova tra qualche minuto','auth/operation-not-allowed':'Accesso con email non abilitato'};
 
-  const google=async()=>{setBusy(true);setErr('');try{const r=await window._fb.signInGoogle();onUser(r.user);}catch(e){setErr(e.message);}setBusy(false);};
+  const google=async()=>{setBusy(true);setErr('');window._ggDbg='click:invio...';try{const r=await window._fb.signInGoogle();window._ggDbg='risultato: user '+(r&&r.user?'SI':'NO');onUser(r&&r.user);}catch(e){window._ggDbg='errore: '+(e&&e.code); setErr(e.message);}setBusy(false);};
   const submit=async()=>{
     if(!email||!pwd){setErr('Inserisci email e password');return;}
     setBusy(true);setErr('');
@@ -25806,6 +25806,7 @@ function App(){
     if(window._fb) {
       const unsub = window._fb.onAuth(u=>{
         clearTimeout(timeout);
+        window._ggDbg='auth: '+(u?'user SI':'null');
         setUser(u);
         setChecked(true);
         if(u){
@@ -28551,7 +28552,10 @@ try {
   gp = new firebase.auth.GoogleAuthProvider();
   // Completa il flusso di redirect Google (app installata): senza questa
   // chiamata il ritorno da Google non completa il login.
-  try { auth.getRedirectResult().catch(function(){}); } catch(e) {}
+  try {
+    auth.getRedirectResult().then(function(r){ window._ggDbg='redirect: ok, user '+(r&&r.user?'SI':'NO'); })
+      .catch(function(e){ window._ggDbg='redirect: ERRORE '+(e&&e.code); });
+  } catch(e) {}
 } catch(e) {
   console.warn('Firebase init failed:', e);
 }
@@ -29217,8 +29221,10 @@ window._fb = {
       var standalone=false;
       try{ standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator&&window.navigator.standalone===true; }catch(e){}
       if(standalone){
+        window._ggDbg='mode:redirect';
         return auth.signInWithRedirect(gp).then(function(){return {user:null};});
       }
+      window._ggDbg='mode:popup';
       return auth.signInWithPopup(gp);
     }catch(e){ return Promise.reject(e); }
   },
@@ -29386,7 +29392,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='3.7';
+  var V='3.8';
   function badge(){
     try{
       if(window.innerWidth>900) return;
@@ -29444,6 +29450,19 @@ html body #root .app .main .content > div {
   }
   setInterval(function(){ enforce(); },600);
   window.addEventListener('load',function(){ enforce(); });
+  setInterval(function(){
+    try{
+      var t=window._ggDbg; if(!t) return;
+      var b=document.getElementById('lmv-ggdbg');
+      if(!b){
+        b=document.createElement('div');
+        b.id='lmv-ggdbg';
+        b.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 2px);left:4px;z-index:2147483647;font:600 10px/1.3 monospace;color:#0f0;background:rgba(0,0,0,.85);padding:3px 8px;border-radius:6px;pointer-events:none;max-width:92vw;word-break:break-all';
+        document.body.appendChild(b);
+      }
+      if(b.textContent!==t) b.textContent=t;
+    }catch(e){}
+  },400);
 })();
 </script>
 </body>
