@@ -28549,6 +28549,9 @@ try {
   db = firebase.firestore();
   storage = firebase.storage();
   gp = new firebase.auth.GoogleAuthProvider();
+  // Completa il flusso di redirect Google (app installata): senza questa
+  // chiamata il ritorno da Google non completa il login.
+  try { auth.getRedirectResult().catch(function(){}); } catch(e) {}
 } catch(e) {
   console.warn('Firebase init failed:', e);
 }
@@ -29383,7 +29386,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='3.6';
+  var V='3.7';
   function badge(){
     try{
       if(window.innerWidth>900) return;
