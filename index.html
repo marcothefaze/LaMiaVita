@@ -29475,7 +29475,7 @@ html body #root .app .main .content > div {
 </style>
 <script>
 (function(){
-  var V='4.1';
+  var V='4.2';
   function badge(){
     try{
       if(window.innerWidth>900) return;
@@ -29535,7 +29535,8 @@ html body #root .app .main .content > div {
   window.addEventListener('load',function(){ enforce(); });
   setInterval(function(){
     try{
-      var t=window._ggDbg; if(!t) return;
+      var t=window._ggDbg;
+      if(!t){ try{ t='gis script: '+(window.google&&window.google.accounts&&window.google.accounts.id?'caricato':'NON caricato'); }catch(e){ t='gis script: ?'; } }
       window._ggHist=window._ggHist||[];
       if(window._ggHist[window._ggHist.length-1]!==t){ window._ggHist.push(t); if(window._ggHist.length>3) window._ggHist.shift(); }
       var txt=window._ggHist.join(' | ');
