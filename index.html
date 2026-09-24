@@ -9232,15 +9232,7 @@ function Login({onUser}) {
     setBusy(true);setErr('');
     window._ggDbg='click: invio...';
     try{
-      var standalone=false;
-      try{ standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator&&window.navigator.standalone===true; }catch(e){}
-      var r;
-      if(standalone && window.google && window.google.accounts && window.google.accounts.id){
-        window._ggDbg='mode: bottone integrato';
-        r=await window._fb.ggGIS();
-      } else {
-        r=await window._fb.signInGoogle();
-      }
+      var r=await window._fb.signInGoogle();
       window._ggDbg='risultato: user '+(r&&r.user?'SI':'NO');
       onUser(r&&r.user);
     }catch(e){
@@ -28596,6 +28588,31 @@ try {
       window._ggDbg='redirect: ok, user '+(r&&r.user?'SI':'NO');
     }).catch(function(e){ window._ggDbg='redirect: ERRORE '+(e&&e.code); });
   } catch(e) {}
+  // Ritorno dal flusso OAuth diretto (app installata): Google restituisce
+  // l'access token nel fragment dell'URL. Con quello entriamo in Firebase.
+  // Nessun iframe/popup: funziona in standalone dove i cookie di terze parti
+  // sono bloccati da iOS.
+  try {
+    var h = location.hash || '';
+    if (h.indexOf('access_token=') !== -1) {
+      window._ggDbg = 'token: ricevuto, accesso...';
+      var pp = new URLSearchParams(h.substring(1));
+      var at = pp.get('access_token');
+      try{ sessionStorage.removeItem('lmv_gg_tok'); }catch(e){}
+      history.replaceState(null, '', location.origin + location.pathname + location.search);
+      if (at) {
+        var credT = firebase.auth.GoogleAuthProvider.credential(null, at);
+        auth.signInWithCredential(credT).then(function(){
+          window._ggDbg = 'token: user SI';
+        }).catch(function(e){
+          window._ggDbg = 'token: ERRORE ' + (e && e.code);
+        });
+      }
+    } else if (h.indexOf('error=') !== -1) {
+      window._ggDbg = 'token: annullato/errore Google';
+      history.replaceState(null, '', location.origin + location.pathname + location.search);
+    }
+  } catch(e) {}
 } catch(e) {
   console.warn('Firebase init failed:', e);
 }
@@ -29261,15 +29278,13 @@ window._fb = {
       var standalone=false;
       try{ standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator&&window.navigator.standalone===true; }catch(e){}
       if(standalone){
-        window._ggDbg='mode:redirect';
-        var already=false;
-        try{ already=sessionStorage.getItem('lmv_gg_red')==='1'; }catch(e){}
-        if(already){
-          window._ggDbg='redirect: gia tentato questa sessione';
-          return Promise.reject(new Error('Accesso Google non riuscito: usa email oppure chiudi e riapri l\'app e riprova'));
-        }
-        try{ sessionStorage.setItem('lmv_gg_red','1'); }catch(e){}
-        return auth.signInWithRedirect(gp).then(function(){return {user:null};});
+        window._ggDbg='mode:redirect token';
+        var cid=localStorage.getItem('lmv_gg_client_id')||'14910139571-1qti69l5k1sd08hlf4onu155jl6r4h8g.apps.googleusercontent.com';
+        var redir=location.origin+location.pathname;
+        var url='https://accounts.google.com/o/oauth2/v2/auth?client_id='+encodeURIComponent(cid)+'&redirect_uri='+encodeURIComponent(redir)+'&response_type=token&scope='+encodeURIComponent('openid email profile')+'&prompt=select_account';
+        try{ sessionStorage.setItem('lmv_gg_tok','1'); }catch(e){}
+        window.location.assign(url);
+        return new Promise(function(){});
       }
       window._ggDbg='mode:popup';
       return auth.signInWithPopup(gp);
