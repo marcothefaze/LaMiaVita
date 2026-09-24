@@ -29548,23 +29548,6 @@ html body #root .app .main .content > div {
   }
   setInterval(function(){ enforce(); },600);
   window.addEventListener('load',function(){ enforce(); });
-  setInterval(function(){
-    try{
-      var t=window._ggDbg;
-      if(!t){ try{ t='gis script: '+(window.google&&window.google.accounts&&window.google.accounts.id?'caricato':'NON caricato'); }catch(e){ t='gis script: ?'; } }
-      window._ggHist=window._ggHist||[];
-      if(window._ggHist[window._ggHist.length-1]!==t){ window._ggHist.push(t); if(window._ggHist.length>3) window._ggHist.shift(); }
-      var txt=window._ggHist.join(' | ');
-      var b=document.getElementById('lmv-ggdbg');
-      if(!b){
-        b=document.createElement('div');
-        b.id='lmv-ggdbg';
-        b.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 2px);left:4px;z-index:2147483647;font:600 10px/1.3 monospace;color:#0f0;background:rgba(0,0,0,.85);padding:3px 8px;border-radius:6px;pointer-events:none;max-width:92vw;word-break:break-all';
-        document.body.appendChild(b);
-      }
-      if(b.textContent!==txt) b.textContent=txt;
-    }catch(e){}
-  },400);
 })();
 </script>
 </body>
