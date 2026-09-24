@@ -15396,12 +15396,30 @@ function GlobalYouTubeMini({currentTab, setTab}) {
   const [dragPos, setDragPos] = useState({x: window.innerWidth - 380, y: window.innerHeight - 140});
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({x:0, y:0});
+  const ytRootRef = useRef(null);
   
   useEffect(() => {
     const iv = setInterval(() => {
       if (window._ytState) setYtState({...window._ytState});
     }, 1000);
     return () => clearInterval(iv);
+  }, []);
+  
+  // Mai fuori schermo: riclampa la posizione su resize/rotazione
+  useEffect(() => {
+    const fix = () => {
+      setDragPos(p => {
+        const el = ytRootRef.current;
+        if(!el) return p;
+        const w = el.offsetWidth || 360, h = el.offsetHeight || 60;
+        const maxX = Math.max(0, window.innerWidth - w), maxY = Math.max(0, window.innerHeight - h);
+        const nx = Math.min(Math.max(0,p.x),maxX), ny = Math.min(Math.max(0,p.y),maxY);
+        return (nx!==p.x||ny!==p.y)?{x:nx,y:ny}:p;
+      });
+    };
+    window.addEventListener('resize', fix);
+    window.addEventListener('orientationchange', fix);
+    return () => { window.removeEventListener('resize', fix); window.removeEventListener('orientationchange', fix); };
   }, []);
   
   useEffect(() => {
@@ -15474,11 +15492,11 @@ function GlobalYouTubeMini({currentTab, setTab}) {
   }
   
   return (
-    <div style={{
+    <div ref={ytRootRef} style={{
       position:'fixed',
       left: dragPos.x,
       top: dragPos.y,
-      zIndex:540,
+      zIndex:isDragging?9998:540,
       background:'rgba(20,20,20,.98)',
       borderRadius: isExpanded ? 16 : 14,
       boxShadow:'0 8px 32px rgba(0,0,0,.6)',
@@ -15535,12 +15553,30 @@ function GlobalTwitchMini({currentTab, setTab}) {
   const [dragPos, setDragPos] = useState({x: window.innerWidth - 380, y: window.innerHeight - 140});
   const [isDragging, setIsDragging] = useState(false);
   const dragOffset = useRef({x:0, y:0});
+  const twRootRef = useRef(null);
   
   useEffect(() => {
     const iv = setInterval(() => {
       if (window._twitchState) setTwitchState({...window._twitchState});
     }, 1000);
     return () => clearInterval(iv);
+  }, []);
+  
+  // Mai fuori schermo: riclampa la posizione su resize/rotazione
+  useEffect(() => {
+    const fix = () => {
+      setDragPos(p => {
+        const el = twRootRef.current;
+        if(!el) return p;
+        const w = el.offsetWidth || 360, h = el.offsetHeight || 60;
+        const maxX = Math.max(0, window.innerWidth - w), maxY = Math.max(0, window.innerHeight - h);
+        const nx = Math.min(Math.max(0,p.x),maxX), ny = Math.min(Math.max(0,p.y),maxY);
+        return (nx!==p.x||ny!==p.y)?{x:nx,y:ny}:p;
+      });
+    };
+    window.addEventListener('resize', fix);
+    window.addEventListener('orientationchange', fix);
+    return () => { window.removeEventListener('resize', fix); window.removeEventListener('orientationchange', fix); };
   }, []);
   
   useEffect(() => {
@@ -15608,11 +15644,11 @@ function GlobalTwitchMini({currentTab, setTab}) {
   }
   
   return (
-    <div style={{
+    <div ref={twRootRef} style={{
       position:'fixed',
       left: dragPos.x,
       top: dragPos.y,
-      zIndex:540,
+      zIndex:isDragging?9998:540,
       background:'rgba(20,20,20,.98)',
       borderRadius: isExpanded ? 16 : 14,
       boxShadow:'0 8px 32px rgba(0,0,0,.6)',
@@ -15669,6 +15705,7 @@ function GlobalRadioMini({currentTab, setTab}) {
   const [isPlaying, setIsPlaying] = useState(()=> window._radioPlaying || false);
   const [error, setError] = useState(null);
   const dragOffset = useRef({x:0, y:0});
+  const rdRootRef = useRef(null);
   const audioRef = useRef(null);
   
   useEffect(() => {
@@ -15692,6 +15729,29 @@ function GlobalRadioMini({currentTab, setTab}) {
       document.addEventListener('touchmove', handleMove, {passive: false});
       document.addEventListener('touchend', handleUp);
     }
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleUp);
+    };
+  }, [isDragging]);
+  
+  // Mai fuori schermo: riclampa la posizione su resize/rotazione
+  useEffect(() => {
+    const fix = () => {
+      setDragPos(p => {
+        const el = rdRootRef.current;
+        if(!el) return p;
+        const w = el.offsetWidth || 360, h = el.offsetHeight || 80;
+        const maxX = Math.max(0, window.innerWidth - w), maxY = Math.max(0, window.innerHeight - h);
+        const nx = Math.min(Math.max(0,p.x),maxX), ny = Math.min(Math.max(0,p.y),maxY);
+        return (nx!==p.x||ny!==p.y)?{x:nx,y:ny}:p;
+      });
+    };
+    window.addEventListener('resize', fix);
+    window.addEventListener('orientationchange', fix);
+    return () => { window.removeEventListener('resize', fix); window.removeEventListener('orientationchange', fix); };
   }, []);
   
   useEffect(() => {
@@ -15742,11 +15802,11 @@ function GlobalRadioMini({currentTab, setTab}) {
   };
   
   return (
-    <div style={{
+    <div ref={rdRootRef} style={{
       position:'fixed',
       left: dragPos.x,
       top: dragPos.y,
-      zIndex:540,
+      zIndex:isDragging?9998:540,
       background:'rgba(20,20,20,.98)',
       borderRadius: isExpanded ? 16 : 14,
       boxShadow:'0 8px 32px rgba(0,0,0,.6)',
@@ -26266,6 +26326,10 @@ function GlobalMiniPlayer({currentTab, setTab}) {
   const [spState, setSpState] = useState(null);
   const [hidden, setHidden] = useState(false);
   const prevTrackId = useRef(null);
+  const playerRef = useRef(null);
+  const [dragPos, setDragPos] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragOffset = useRef({x:0, y:0});
 
   useEffect(()=>{
     const iv = setInterval(()=>{
@@ -26273,6 +26337,58 @@ function GlobalMiniPlayer({currentTab, setTab}) {
     }, 1500);
     return ()=>clearInterval(iv);
   },[]);
+
+  // Posizionamento trascinabile: quando trascinato usa left/top fissi (batte anche i CSS !important)
+  useEffect(()=>{
+    if(dragPos && playerRef.current){
+      const el = playerRef.current;
+      el.style.setProperty('position','fixed','important');
+      el.style.setProperty('left',dragPos.x+'px','important');
+      el.style.setProperty('top',dragPos.y+'px','important');
+      el.style.setProperty('bottom','auto','important');
+      el.style.setProperty('transform','none','important');
+      el.style.setProperty('z-index',isDragging?'9998':'400','important');
+    }
+  },[dragPos, isDragging]);
+
+  // Mai fuori schermo: riclampa la posizione su resize/rotazione
+  useEffect(()=>{
+    const fix = () => {
+      setDragPos(p => {
+        if(!p || !playerRef.current) return p;
+        const el = playerRef.current;
+        const w = el.offsetWidth || 360, h = el.offsetHeight || 68;
+        const maxX = Math.max(0, window.innerWidth - w), maxY = Math.max(0, window.innerHeight - h);
+        const nx = Math.min(Math.max(0,p.x),maxX), ny = Math.min(Math.max(0,p.y),maxY);
+        return (nx!==p.x||ny!==p.y)?{x:nx,y:ny}:p;
+      });
+    };
+    window.addEventListener('resize', fix);
+    window.addEventListener('orientationchange', fix);
+    return ()=>{ window.removeEventListener('resize', fix); window.removeEventListener('orientationchange', fix); };
+  },[]);
+
+  // Trascinamento mouse + touch
+  useEffect(()=>{
+    if(!isDragging) return;
+    const handleMove = (e) => {
+      e.preventDefault();
+      const cx = e.touches ? e.touches[0].clientX : e.clientX;
+      const cy = e.touches ? e.touches[0].clientY : e.clientY;
+      setDragPos({x: cx - dragOffset.current.x, y: cy - dragOffset.current.y});
+    };
+    const handleUp = () => setIsDragging(false);
+    document.addEventListener('mousemove', handleMove);
+    document.addEventListener('mouseup', handleUp);
+    document.addEventListener('touchmove', handleMove, {passive:false});
+    document.addEventListener('touchend', handleUp);
+    return () => {
+      document.removeEventListener('mousemove', handleMove);
+      document.removeEventListener('mouseup', handleUp);
+      document.removeEventListener('touchmove', handleMove);
+      document.removeEventListener('touchend', handleUp);
+    };
+  },[isDragging]);
 
   const track = spState?.track_window?.current_track;
   const paused = spState?.paused ?? true;
@@ -26287,13 +26403,27 @@ function GlobalMiniPlayer({currentTab, setTab}) {
 
   if(!track || currentTab==='music' || hidden) return null;
 
+  const handleDragStart = (e) => {
+    if(e.target.closest && (e.target.closest('button') || e.target.closest('a') || e.target.closest('.sp-vol-track'))) return;
+    e.preventDefault();
+    const el = playerRef.current;
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    if(el){
+      const r = el.getBoundingClientRect();
+      if(!dragPos) setDragPos({x:r.left, y:r.top});
+      dragOffset.current = {x: cx - r.left, y: cy - r.top};
+    }
+    setIsDragging(true);
+  };
+
   const prev = () => { navigator.vibrate(10); if(window._spPlayer) window._spPlayer.previousTrack(); };
   const next = () => { navigator.vibrate(10); if(window._spPlayer) window._spPlayer.nextTrack(); };
   const toggle = () => { navigator.vibrate(10); if(window._spPlayer){ paused ? window._spPlayer.resume() : window._spPlayer.pause(); }};
   const setVolume = (v) => { setVol(v); if(window._spPlayer) window._spPlayer.setVolume(v/100); };
 
   return (
-    <div className="sp-global-player" style={{background:track?'linear-gradient(90deg,rgba(30,215,96,.12),rgba(8,11,20,.97) 40%,rgba(8,11,20,.97))':'rgba(8,11,20,.97)'}}>
+    <div className="sp-global-player" ref={playerRef} onMouseDown={handleDragStart} onTouchStart={handleDragStart} style={{background:track?'linear-gradient(90deg,rgba(30,215,96,.12),rgba(8,11,20,.97) 40%,rgba(8,11,20,.97))':'rgba(8,11,20,.97)',touchAction:'none',cursor:isDragging?'grabbing':'grab',userSelect:'none'}}>
       <img src={track.album?.images?.[2]?.url||track.album?.images?.[0]?.url||''} alt=""
         style={{width:52,height:52,borderRadius:10,objectFit:'cover',flexShrink:0,background:'rgba(255,255,255,.08)',cursor:'pointer',boxShadow:paused?'none':'0 0 16px rgba(30,215,96,.3)',transition:'box-shadow .5s'}}
         onClick={()=>setTab('music')}/>
@@ -26322,9 +26452,9 @@ function GlobalMiniPlayer({currentTab, setTab}) {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         </div>
       </div>
-      <div style={{width:90,display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
+        <div style={{width:90,display:'flex',alignItems:'center',gap:6,flexShrink:0}}>
         <span style={{fontSize:'.7rem',color:'rgba(255,255,255,.4)',width:14,textAlign:'center'}}>🔈</span>
-        <div style={{flex:1,height:8,background:'rgba(255,255,255,.15)',borderRadius:4,cursor:'pointer',position:'relative',overflow:'visible'}}
+        <div className="sp-vol-track" style={{flex:1,height:8,background:'rgba(255,255,255,.15)',borderRadius:4,cursor:'pointer',position:'relative',overflow:'visible'}}
           onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setVolume(Math.round((e.clientX-r.left)/r.width*100));}}>
           <div style={{height:'100%',width:vol+'%',background:'linear-gradient(90deg,#1ED760,#169c46)',borderRadius:4,transition:'width .1s',boxShadow:vol>0?'0 0 10px rgba(30,215,96,.45)':'none'}}/>
           {vol>0&&<div style={{position:'absolute',left:vol+'%',top:'50%',width:14,height:14,borderRadius:'50%',background:'#1ED760',border:'2px solid #fff',transform:'translate(-50%,-50%)',boxShadow:'0 0 8px rgba(30,215,96,.6)',pointerEvents:'none',transition:'left .1s'}}/>}
@@ -29487,23 +29617,25 @@ html body #root .app .main .content > div {
   html, body, #root { height: 100% !important; min-height: 0 !important; }
   .app { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; height: auto !important; }
 }
+
+/* SIDEBAR sempre a tutta altezza: il menu laterale arriva al fondo e il Profilo resta visibile */
+.sb, body.lmv-v2 .sb { height: 100% !important; }
+.sidebar-nav-scroll, body.lmv-v2 .sidebar-nav-scroll { max-height: none !important; }
+.sb-foot, body.lmv-v2 .sb-foot { flex-shrink: 0; padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)); }
+
+/* iPad/tablet: l'app riempie sempre lo schermo, nessun gap artificiale, adattamento a rotazione */
+@media (min-width: 768px) {
+  .app, body.lmv-v2 .app { bottom: 0 !important; height: 100dvh !important; max-height: none !important; }
+  .topbar, body.lmv-v2 .topbar {
+    height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    box-sizing: border-box !important;
+  }
+  .content, body.lmv-v2 .content { padding-bottom: 24px !important; }
+}
 </style>
 <script>
 (function(){
-  var V='4.2';
-  function badge(){
-    try{
-      if(window.innerWidth>900) return;
-      if(document.getElementById('lmv-badge')) return;
-      var d=document.createElement('div');
-      d.id='lmv-badge';
-      d.textContent='build '+V;
-      d.setAttribute('title','LaMiaVita build '+V);
-      d.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:2147483646;font:600 9px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:.3px;color:#fff;background:rgba(244,63,94,.9);padding:2px 7px;border-radius:8px;pointer-events:none;opacity:.9';
-      document.body.appendChild(d);
-    }catch(e){}
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',badge); else badge();
   function probe(kind){
     try{
       var d=document.createElement('div');
@@ -29514,9 +29646,11 @@ html body #root .app .main .content > div {
       return Math.max(0,Math.round(v));
     }catch(e){return 0;}
   }
+  /* Fix safe-area SOLO per telefoni (<=767px): su tablet/iPad il layout CSS
+     gestisce tutto da solo, senza gap artificiali in basso. */
   function enforce(){
     try{
-      if(window.innerWidth>1366) return;
+      if(window.innerWidth>767) return;
       var it=probe('t'), ib=probe('b');
       var sh=(window.screen&&window.screen.height)||0, ih=window.innerHeight||0;
       var gapB=(sh&&ih)?Math.max(0, sh-ih-(it>0?0:Math.max(it,47))):0;
@@ -29542,12 +29676,11 @@ html body #root .app .main .content > div {
         n.style.setProperty('box-sizing','border-box','important');
         n.style.setProperty('z-index','9999','important');
       }
-      var mm=document.querySelector('.mobile-menu');
-      if(mm){ mm.style.setProperty('padding-top',(padT+24)+'px','important'); }
     }catch(e){}
   }
   setInterval(function(){ enforce(); },600);
   window.addEventListener('load',function(){ enforce(); });
+  window.addEventListener('orientationchange',function(){ setTimeout(enforce,350); });
 })();
 </script>
 </body>
